@@ -102,35 +102,49 @@ private struct UsageBar: View {
     }
 }
 
-/// One row in "Other plans". Tapping forwards to `selectPlan(id:)`.
+/// One row in "Other plans". Tapping forwards to `selectPlan(id:)`. A row for the current plan
+/// is informational: no button, no chevron, no press effect.
 struct PlanRow: View {
     let plan: PlanOption
     let onSelect: @MainActor () -> Void
 
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 16) {
-                PlanIcon(systemImage: plan.systemImage, size: 60)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(plan.name)
-                        .font(.title3.weight(.semibold))
-                    Text(plan.tagline)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 8)
-                Text(plan.priceText)
-                    .font(.body.weight(.medium))
+        if plan.isCurrent {
+            rowContent(showsChevron: false)
+                .cardSurface()
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("plan.\(plan.id)")
+        } else {
+            Button(action: onSelect) {
+                rowContent(showsChevron: true)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .cardSurface()
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("plan.\(plan.id)")
+        }
+    }
+
+    private func rowContent(showsChevron: Bool) -> some View {
+        HStack(spacing: 16) {
+            PlanIcon(systemImage: plan.systemImage, size: 60)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(plan.name)
+                    .font(.title3.weight(.semibold))
+                Text(plan.tagline)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Text(plan.priceText)
+                .font(.body.weight(.medium))
+            if showsChevron {
                 RowChevron()
             }
-            .foregroundStyle(.primary)
-            .padding(16)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .cardSurface()
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("plan.\(plan.id)")
+        .foregroundStyle(.primary)
+        .padding(16)
     }
 }
 

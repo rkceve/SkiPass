@@ -92,6 +92,12 @@ final class AppModel: SkiPassUIActions {
         else {
             throw SkiPassUIError.needsServerSettings
         }
+        // Without a real client ID the provider only shows "Error 401: invalid_client / Access
+        // blocked"; do not open its page, report it in the sheet instead.
+        guard services.accounts.isSignInConfigured(kind: kind) else {
+            logger.error("Sign-in not configured for \(kind.rawValue, privacy: .public): client ID missing in this build")
+            throw AppModelError.signInNotConfigured(kind)
+        }
 
         let result = try await services.accounts.signIn(kind: kind, loginHint: address)
         // The account that signed in is the one whose mailbox is read (XOAUTH2 user = this address).
@@ -164,6 +170,23 @@ final class AppModel: SkiPassUIActions {
     private func existingMailboxID(address: String) -> UUID? {
         let mailboxes = (try? services.accounts.loadMailboxes()) ?? []
         return mailboxes.first { $0.address.caseInsensitiveCompare(address) == .orderedSame }?.id
+    }
+}
+
+/// Errors AppModel reports to the UI; the add-account sheet shows `localizedDescription`.
+enum AppModelError: LocalizedError, Equatable {
+    /// The build has no (real) OAuth client ID for this provider.
+    case signInNotConfigured(ProviderKind)
+
+    var errorDescription: String? {
+        switch self {
+        case .signInNotConfigured(.google):
+            "Google sign-in is not configured in this build."
+        case .signInNotConfigured(.microsoft):
+            "Microsoft sign-in is not configured in this build."
+        case .signInNotConfigured(.imap):
+            "Sign-in is not configured in this build."
+        }
     }
 }
 

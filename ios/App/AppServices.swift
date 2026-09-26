@@ -18,6 +18,8 @@ protocol AccountServices: AnyObject {
     /// Removes every secret stored for the mailbox (password and OAuth state).
     func deleteCredentials(mailboxID: UUID) throws
 
+    /// True when this build has a usable OAuth client ID for `kind` (checked before `signIn`).
+    func isSignInConfigured(kind: ProviderKind) -> Bool
     /// Opens the provider's official sign-in page with `loginHint` prefilled.
     func signIn(kind: ProviderKind, loginHint: String) async throws -> OAuthSignInResult
     /// Stores archived OAuth state under `oauth.<mailboxID>`.

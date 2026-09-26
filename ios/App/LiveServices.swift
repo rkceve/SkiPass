@@ -105,6 +105,10 @@ final class LiveAccountServices: AccountServices {
         try credentialStore.removeAll(for: mailboxID)
     }
 
+    func isSignInConfigured(kind: ProviderKind) -> Bool {
+        oauthService.clients.isConfigured(kind)
+    }
+
     func signIn(kind: ProviderKind, loginHint: String) async throws -> OAuthSignInResult {
         guard let presenter = Self.topViewController() else {
             throw LiveServicesError.noPresentingViewController

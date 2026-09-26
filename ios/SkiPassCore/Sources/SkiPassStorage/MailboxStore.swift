@@ -12,12 +12,11 @@ public final class MailboxStore: @unchecked Sendable {
         self.defaults = defaults
     }
 
-    /// Store backed by the shared App Group defaults.
+    /// Store backed by the runtime-resolved App Group defaults, or `UserDefaults.standard` (logged by
+    /// `SharedStorageEnvironment`) when no App Group is available, so the app keeps working alone.
+    /// Still `throws` for source compatibility; it no longer throws.
     public convenience init() throws {
-        guard let defaults = StorageConstants.sharedDefaults() else {
-            throw StorageError.appGroupUnavailable
-        }
-        self.init(defaults: defaults)
+        self.init(defaults: SharedStorageEnvironment.current.defaults)
     }
 
     public func list() throws -> [MailboxConfig] {

@@ -50,6 +50,9 @@ enum Copy {
     static let editAccountTitle = "Edit Account"
     static let emailAddress = "Email address"
     static let emailPlaceholder = "name@example.com"
+    static let emailHelper = "Gmail and Outlook open their official sign-in. Other providers ask for server settings."
+    static let emailInvalid = "Enter a valid email address, like name@example.com."
+    static let clearEmail = "Clear email address"  // accessibility only
     static let continueAction = "Continue"
     static let save = "Save"
     static let serverSettingsSection = "Server settings"
@@ -63,6 +66,7 @@ enum Copy {
     static let remainingSends = "Remaining sends"  // [Open] one count = one code fill
     static let otherPlansTitle = "Other plans"
     static let changePlan = "Change Plan"
+    static let plansUnavailable = "Plans are unavailable in this build."  // not in mockups
 
     static func remainingOfLimit(_ remaining: String, _ limit: String) -> String {
         "\(remaining) of \(limit) left"
