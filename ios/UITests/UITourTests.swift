@@ -91,14 +91,14 @@ final class UITourTests: XCTestCase {
 
         // Expand it.
         scrollToHittable(newExpand, in: app, direction: .up)
-        newExpand.tap()
+        tapOnScreen(newExpand, in: app)
         let delete = app.buttons["account.\(newAddress).delete"]
         XCTAssertTrue(delete.waitForExistence(timeout: 10))
         scrollToHittable(delete, in: app, direction: .up)
         pause("new-card-expanded")
 
         // Delete and confirm.
-        delete.tap()
+        tapOnScreen(delete, in: app)
         let confirm = confirmDeleteButton(in: app, excluding: "account.\(newAddress).delete")
         pause("delete-confirm")
         confirm.tap()
@@ -109,7 +109,7 @@ final class UITourTests: XCTestCase {
         let settings = app.buttons["header.settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 10))
         scrollToHittable(settings, in: app, direction: .down)
-        settings.tap()
+        tapOnScreen(settings, in: app)
         pause("settings-tapped")
 
         // Plan tab.
@@ -119,7 +119,7 @@ final class UITourTests: XCTestCase {
         scrollToHittable(pro, in: app, direction: .up)
         pause("plan")
 
-        pro.tap()
+        tapOnScreen(pro, in: app)
         pause("pro-tapped")
 
         // Back to Home.
@@ -176,7 +176,27 @@ final class UITourTests: XCTestCase {
             }
             Thread.sleep(forTimeInterval: 0.6)  // let deceleration finish before rechecking
         }
-        XCTAssertTrue(element.isHittable, "\(element.identifier) not hittable after \(attempts) swipes; frame \(element.frame)")
+        // After the IMAP sheet closes, iOS 26.2 sometimes keeps reporting an element that is
+        // fully on screen as not hittable (seen on main 0a104dd and wip/i11 cf31d30: the new card
+        // at y 476 pt, visible in the screenshot). Accept a fully visible frame; `tapOnScreen`
+        // then taps its center by coordinate.
+        if element.isHittable || isFullyOnScreen(element, in: app) { return }
+        XCTFail("\(element.identifier) not hittable after \(attempts) swipes; frame \(element.frame)")
+    }
+
+    private func isFullyOnScreen(_ element: XCUIElement, in app: XCUIApplication) -> Bool {
+        let frame = element.frame
+        return element.exists && !frame.isEmpty && app.windows.firstMatch.frame.contains(frame)
+    }
+
+    /// Taps the element, by coordinate when XCUITest reports it not hittable although it is visible.
+    private func tapOnScreen(_ element: XCUIElement, in app: XCUIApplication) {
+        if element.isHittable {
+            element.tap()
+        } else {
+            XCTAssertTrue(isFullyOnScreen(element, in: app), "\(element.identifier) is off screen; frame \(element.frame)")
+            element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
     }
 
     /// The dialog's destructive "Delete" action. iOS 26 renders it as a button nested in a
