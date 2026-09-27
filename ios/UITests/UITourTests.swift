@@ -195,6 +195,9 @@ final class UITourTests: XCTestCase {
             element.tap()
         } else {
             XCTAssertTrue(isFullyOnScreen(element, in: app), "\(element.identifier) is off screen; frame \(element.frame)")
+            // Diagnostics: what covers the element (app hierarchy and SpringBoard overlays).
+            print("TOUR-DIAG not hittable: \(element.identifier)\n\(app.debugDescription)")
+            print("TOUR-DIAG springboard:\n\(XCUIApplication(bundleIdentifier: "com.apple.springboard").debugDescription)")
             element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         }
     }
