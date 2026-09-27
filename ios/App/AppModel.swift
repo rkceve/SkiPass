@@ -16,6 +16,8 @@ final class AppModel: SkiPassUIActions {
     @ObservationIgnored private var appUserID: String?
     @ObservationIgnored private var didStart = false
     @ObservationIgnored private var isRefreshingUsage = false
+    /// A plan change (purchase sheet / subscription management) is in progress; further taps are ignored.
+    @ObservationIgnored private var isChangingPlan = false
     @ObservationIgnored private let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "AppModel")
 
     init(services: AppServicesBundle) {
@@ -42,12 +44,16 @@ final class AppModel: SkiPassUIActions {
 
         await refreshPlans()
         await refreshUsage()
+        await syncIdentities()
     }
 
-    /// Called when the app returns to the foreground.
+    /// Called when the app returns to the foreground (e.g. from subscription management or from
+    /// Settings after enabling AutoFill, which is when the identity store becomes writable).
     func didBecomeActive() async {
         guard didStart else { return }
+        await refreshPlans()
         await refreshUsage()
+        await syncIdentities()
     }
 
     func refreshUsage() async {
@@ -73,6 +79,12 @@ final class AppModel: SkiPassUIActions {
         } catch {
             logger.error("Plan refresh failed: \(String(describing: error), privacy: .public)")
         }
+    }
+
+    /// Registers the one-time-code identities for the current mailboxes (first one labels them).
+    private func syncIdentities() async {
+        let addresses = ((try? services.accounts.loadMailboxes()) ?? []).map(\.address)
+        await services.identities.syncIdentities(mailboxAddresses: addresses)
     }
 
     private func reloadAccounts() {
@@ -115,6 +127,7 @@ final class AppModel: SkiPassUIActions {
         )
         try services.accounts.saveMailbox(config)
         reloadAccounts()
+        await syncIdentities()
         return Self.mailAccount(from: config)
     }
 
@@ -131,6 +144,7 @@ final class AppModel: SkiPassUIActions {
         try services.accounts.savePassword(password, mailboxID: id)
         try services.accounts.saveMailbox(config)
         reloadAccounts()
+        await syncIdentities()
         return Self.mailAccount(from: config)
     }
 
@@ -138,22 +152,45 @@ final class AppModel: SkiPassUIActions {
         try services.accounts.deleteCredentials(mailboxID: id)
         try services.accounts.deleteMailbox(id: id)
         reloadAccounts()
+        await syncIdentities()
     }
 
     func revealPassword(id: UUID) async -> String? {
         services.accounts.password(mailboxID: id)
     }
 
+    /// Plan rows under "Other plans":
+    /// - a paid plan purchases its package. Upgrades take effect at once. A lower tier does not
+    ///   replace a higher active one: the highest active tier stays current (the server's rule,
+    ///   server/src/plans.ts) until the higher subscription ends.
+    /// - Free opens RevenueCat's cancellation path (`showManageSubscriptions`); the plan returns to
+    ///   Free when the subscription ends, which the next foreground refresh picks up.
     func selectPlan(id: String) async {
-        guard appUserID != nil else { return }
-        // OPEN(plans): moving back to Free (cancelling a subscription) is not specified; tapping Free does nothing.
-        guard id != Self.freePlanID else { return }
+        guard appUserID != nil, !isChangingPlan else { return }
+        isChangingPlan = true
+        defer { isChangingPlan = false }
+
+        if id == Self.freePlanID {
+            guard plans.contains(where: { $0.isCurrent && $0.id != Self.freePlanID }) else { return }
+            do {
+                // OPEN(plans): with the RevenueCat Test Store there is no in-app cancellation (see
+                // LiveBillingServices.showManageSubscriptions); test subscriptions end by themselves.
+                try await services.billing.showManageSubscriptions()
+            } catch {
+                logger.error("Manage subscriptions failed: \(String(describing: error), privacy: .public)")
+            }
+            await refreshPlans()
+            return
+        }
+
         do {
             // Test Store presents its own purchase modal here; nothing else is shown by the app.
             let completed = try await services.billing.purchase(packageID: id)
             guard completed else { return }
         } catch {
             logger.error("Purchase failed: \(String(describing: error), privacy: .public)")
+            // Show what the store now holds (e.g. a purchase that completed before a later error).
+            await refreshPlans()
             return
         }
         await refreshPlans()
@@ -235,17 +272,23 @@ extension AppModel {
         UsageInfo(used: snapshot.used, limit: snapshot.limit, resetsAt: snapshot.resetsAt)
     }
 
-    /// Free plus the current offering's packages (cheapest first). A package is current when one
-    /// of the customer's active entitlements was granted by its product; Free is current otherwise.
+    /// Free plus the current offering's packages (cheapest first). Exactly one option is current:
+    /// the highest-priced package whose product grants an active entitlement, or Free when none does.
+    ///
+    /// Several packages can be active at once: the RevenueCat Test Store has no product change, so
+    /// buying Pro while Standard is active adds a second subscription (and on the App Store a
+    /// downgrade stays pending until renewal). The highest tier wins, as on the server
+    /// (server/src/plans.ts PAID_PLANS order); price is the app's proxy for tier.
     static func planOptions(packages: [StorePackageInfo], activeProductIDs: Set<String>) -> [PlanOption] {
         let sorted = packages.sorted { $0.price < $1.price }
+        let currentID = sorted.last { activeProductIDs.contains($0.productID) }?.id
         let paid = sorted.enumerated().map { index, package in
             PlanOption(
                 id: package.id,
                 name: package.title,
                 tagline: package.description,
                 priceText: package.priceString,
-                isCurrent: activeProductIDs.contains(package.productID),
+                isCurrent: package.id == currentID,
                 // OPEN(plans): plan set is not decided; icons follow the mockup order
                 // (lowest paid tier = stack, higher tiers = crown).
                 systemImage: index == 0 ? "square.stack.3d.up.fill" : "crown.fill"

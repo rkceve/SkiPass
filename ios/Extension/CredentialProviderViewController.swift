@@ -7,12 +7,25 @@ import Foundation
 /// cancelled without showing anything (decided: no UI on quota exhaustion / no match / errors).
 final class CredentialProviderViewController: ASCredentialProviderViewController {
 
-    /// nil when the build lacks the server configuration; every request then cancels.
+    /// nil when the mailbox store is unavailable; every request then cancels. Without a server
+    /// configuration the resolver still works with the local fallback rule.
     private lazy var resolver: OneTimeCodeResolver? = LiveDependencies.makeResolver()
+
+    /// Keeps the one-time-code identities current whenever the extension runs, once per process, in
+    /// the background (the app also registers them on launch and after a mailbox is added or removed).
+    /// Every entry point below touches it; the no-UI path does not necessarily load the view.
+    private static let identitySync: Task<Void, Never> = Task.detached {
+        _ = await LiveDependencies.syncIdentities()
+    }
+
+    private func startIdentitySync() {
+        _ = Self.identitySync
+    }
 
     // MARK: - No-UI path (QuickType suggestion tapped)
 
     override func provideCredentialWithoutUserInteraction(for credentialRequest: any ASCredentialRequest) {
+        startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
             extensionContext.cancelRequest(withError: ASExtensionError(.credentialIdentityNotFound))
             return
@@ -27,11 +40,13 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     // resolver and complete immediately, or cancel with .userCanceled, adding no views of their own.
 
     override func prepareOneTimeCodeCredentialList(for serviceIdentifiers: [ASCredentialServiceIdentifier]) {
+        startIdentitySync()
         // Lower indices are the more specific identifiers (docs/facts/F1 §1).
         resolveAndCompleteOneTimeCode(service: serviceIdentifiers.first?.identifier, failure: .userCanceled)
     }
 
     override func prepareInterfaceToProvideCredential(for credentialRequest: any ASCredentialRequest) {
+        startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
             extensionContext.cancelRequest(withError: ASExtensionError(.credentialIdentityNotFound))
             return
@@ -44,6 +59,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     /// fields in some cases, and iOS 18 requires it to avoid "AutoFill Unavailable" (docs/facts/F1 §2).
     /// No service identifier is available here, so the newest code email is used (spec §5.6).
     override func prepareInterfaceForUserChoosingTextToInsert() {
+        startIdentitySync()
         guard let resolver else {
             extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
             return

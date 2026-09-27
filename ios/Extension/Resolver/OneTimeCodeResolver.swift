@@ -31,14 +31,18 @@ public struct OneTimeCodeResolver: Sendable {
     private let usage: any UsageReporting
     private let perMailboxBudget: Duration
     private let now: @Sendable () -> Date
+    private let candidateObserver: (@Sendable ([FetchedMessage]) -> Void)?
 
+    /// `candidateObserver` receives the messages in which a code was found (before judging);
+    /// the extension records the domains they mention for identity registration.
     public init(mailboxes: @escaping MailboxSource,
                 fetcher: any MailFetching,
                 extractor: any CodeExtracting,
                 judge: any CandidateJudging,
                 usage: any UsageReporting,
                 perMailboxBudget: Duration = OneTimeCodeResolver.defaultPerMailboxBudget,
-                now: @escaping @Sendable () -> Date = { Date() }) {
+                now: @escaping @Sendable () -> Date = { Date() },
+                candidateObserver: (@Sendable ([FetchedMessage]) -> Void)? = nil) {
         self.mailboxes = mailboxes
         self.fetcher = fetcher
         self.extractor = extractor
@@ -46,6 +50,7 @@ public struct OneTimeCodeResolver: Sendable {
         self.usage = usage
         self.perMailboxBudget = perMailboxBudget
         self.now = now
+        self.candidateObserver = candidateObserver
     }
 
     /// Finds the code for `service` (nil = no service identifier available).
@@ -60,6 +65,7 @@ public struct OneTimeCodeResolver: Sendable {
             .compactMap { message in extractor.extractCode(from: message).map { CodeCandidate(message: message, code: $0) } }
             .sorted { $0.message.date > $1.message.date }
         guard !candidates.isEmpty else { return nil }
+        candidateObserver?(candidates.map(\.message))
 
         let outcome: JudgeOutcome
         do {

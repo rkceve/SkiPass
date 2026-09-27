@@ -28,7 +28,8 @@ enum LiveServices {
             accounts: LiveAccountServices(),
             billing: LiveBillingServices(apiKey: config.revenueCatAPIKey),
             usage: LiveUsageServices(configuration: config),
-            sharedState: LiveSharedStateServices()
+            sharedState: LiveSharedStateServices(),
+            identities: LiveIdentityServices(bundle: bundle)
         )
     }
 }
@@ -182,6 +183,20 @@ final class LiveBillingServices: BillingServices {
         let result = try await Purchases.shared.purchase(package: package)
         return !result.userCancelled
     }
+
+    /// purchases-ios 5.91.0 `Purchases.showManageSubscriptions()` (Purchases.swift:1652) ->
+    /// `ManageSubscriptionsHelper.showManageSubscriptions` (Support/ManageSubscriptionsHelper.swift:34-65):
+    /// opens `CustomerInfo.managementURL`, or Apple's subscription sheet
+    /// (`AppStore.showManageSubscriptions(in:)`) when that URL is nil or an Apple URL.
+    ///
+    /// Test Store limitation: the SDK has no Test Store cancellation. Customer Center offers
+    /// "cancel" for a non-App-Store purchase only when it has a `managementURL`
+    /// (RevenueCatUI/CustomerCenter/Actions/CustomerCenterConfigData.HelpPath+PurchaseInformation.swift:50-53),
+    /// and Apple's sheet lists App Store subscriptions only. Test Store subscriptions renew at most
+    /// five times and then end with their entitlements (RevenueCat docs, "RevenueCat Test Store").
+    func showManageSubscriptions() async throws {
+        try await Purchases.shared.showManageSubscriptions()
+    }
 }
 
 // MARK: - Usage (SkiPassServerClient)
@@ -204,6 +219,25 @@ final class LiveUsageServices: UsageServices {
             appUserID: { appUserID }
         ))
         return try await client.currentUsage()
+    }
+}
+
+// MARK: - One-time-code identities (ios/Extension/Identity, compiled into the app too)
+
+@MainActor
+final class LiveIdentityServices: IdentityServices {
+    private let bundle: Bundle
+    private let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "Identities")
+
+    init(bundle: Bundle) {
+        self.bundle = bundle
+    }
+
+    func syncIdentities(mailboxAddresses: [String]) async {
+        let seen = SeenDomainStore(defaults: SharedStorageEnvironment.current.defaults)
+        let registrar = IdentityRegistrar(domainSource: CompositeDomainSource.standard(bundle: bundle, seen: seen))
+        let result = await registrar.register(mailboxAddresses: mailboxAddresses)
+        logger.notice("Identity sync: \(String(describing: result), privacy: .public)")
     }
 }
 
