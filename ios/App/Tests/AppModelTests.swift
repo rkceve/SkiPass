@@ -115,10 +115,25 @@ private final class FakeUsage: UsageServices {
     var calls: [String] = []
     var error: Error?
 
+    /// When true, calls wait until `release()` (a slow request in flight).
+    var hold = false
+    private var held: [CheckedContinuation<Void, Never>] = []
+    var heldCount: Int { held.count }
+
     func currentUsage(appUserID: String) async throws -> UsageSnapshot {
         calls.append(appUserID)
+        let answer = snapshot
+        if hold {
+            await withCheckedContinuation { held.append($0) }
+        }
         if let error { throw error }
-        return snapshot
+        return answer
+    }
+
+    func release() {
+        let waiting = held
+        held = []
+        waiting.forEach { $0.resume() }
     }
 }
 
@@ -167,6 +182,13 @@ struct ProviderDetectionTests {
         #expect(AppModel.oauthProvider(forEmail: email) == .microsoft)
     }
 
+    /// A1-05 / D9: Microsoft consumer domains under other TLDs.
+    @Test(arguments: ["a@outlook.jp", "a@outlook.com.au", "a@hotmail.co.jp", "a@hotmail.co.uk", "a@hotmail.fr",
+                      "a@live.jp", "a@live.co.uk", "a@msn.co.jp", "a@outlook.de"])
+    func microsoftRegionalDomains(_ email: String) {
+        #expect(AppModel.oauthProvider(forEmail: email) == .microsoft)
+    }
+
     @Test(arguments: ["a@icloud.com", "a@yahoo.com", "a@myshop.jp", "a@mail.gmail.com", "no-at-sign"])
     func otherDomainsNeedIMAP(_ email: String) {
         #expect(AppModel.oauthProvider(forEmail: email) == nil)
@@ -199,6 +221,16 @@ struct MappingTests {
         #expect(plans[1].name == "Standard")
         #expect(plans[1].tagline == "More fills")
         #expect(plans[1].priceText == "$2.99")
+    }
+
+    /// A1-03: tier comes from the entitlement, not the price (annual Standard costs more than monthly Pro).
+    @Test func tierIsNotInferredFromPrice() {
+        let standardAnnual = StorePackageInfo(
+            id: "$rc_annual", productID: "skipass_standard_annual", title: "Standard",
+            description: "More fills", priceString: "$99.99", price: 99.99)
+        let plans = AppModel.planOptions(packages: [standardAnnual, pro],
+                                         activeProductIDs: ["skipass_standard_annual", "skipass_pro_monthly"])
+        #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
     }
 
     @Test func activeEntitlementMarksItsPackageCurrent() {
@@ -552,6 +584,30 @@ struct AppModelTests {
         try await model.deleteAccount(id: account.id)
         #expect(h.identities.syncs.last == [])
         #expect(h.identities.syncs.count == 3)
+    }
+
+    /// A1-07: a refresh requested while another is in flight is re-run afterwards, not dropped,
+    /// so the post-purchase limit is shown.
+    @Test func usageRefreshDuringAnInFlightOneIsNotDropped() async {
+        let h = Harness()
+        let model = h.makeModel()
+        await model.start()
+        h.usage.hold = true
+        let before = h.usage.calls.count
+
+        let foreground = Task { await model.refreshUsage() }
+        while h.usage.heldCount == 0 { await Task.yield() }
+        // The purchase completes: the server now reports the Pro limit.
+        h.usage.snapshot = UsageSnapshot(plan: "pro", used: 3, limit: 1000, resetsAt: h.usage.snapshot.resetsAt)
+        let afterPurchase = Task { await model.refreshUsage() }
+        for _ in 0..<50 { await Task.yield() }
+        h.usage.hold = false
+        h.usage.release()
+        await foreground.value
+        await afterPurchase.value
+
+        #expect(h.usage.calls.count == before + 2)
+        #expect(model.usage?.limit == 1000)
     }
 
     @Test func foregroundRefreshesUsageAfterStart() async {
