@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// App icon tile, title, subtitle and the glass gear button (shared by both tabs).
+/// App icon tile, title and subtitle (shared by both tabs).
 struct HeaderView: View {
-    let onSettings: @MainActor () -> Void
-
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
             AppIconTile()
@@ -21,43 +19,6 @@ struct HeaderView: View {
             .accessibilityAddTraits(.isHeader)
 
             Spacer(minLength: 8)
-
-            // OPEN(ui): settings screen contents are [Open] (SPEC_v2 §11.1); the
-            // button only forwards to the host app.
-            SettingsButton(onSettings: onSettings)
-                .accessibilityLabel(Copy.settingsLabel)
-                .accessibilityIdentifier("header.settings")
-        }
-    }
-}
-
-/// Circular gear button: system `.glass` button style on iOS 26+, material circle before.
-private struct SettingsButton: View {
-    let onSettings: @MainActor () -> Void
-
-    var body: some View {
-        if #available(iOS 26, *) {
-            Button(action: onSettings) {
-                Image(systemName: "gearshape")
-                    .font(.title2.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .frame(width: 38, height: 38)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            .controlSize(.large)
-            // The glass style colors the glyph with the tint (the app accent); the mockup gear is dark.
-            .tint(.primary)
-        } else {
-            Button(action: onSettings) {
-                Image(systemName: "gearshape")
-                    .font(.title2.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .frame(width: 52, height: 52)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .background(.ultraThinMaterial, in: Circle())
         }
     }
 }
@@ -82,7 +43,7 @@ private struct AppIconTile: View {
 }
 
 #Preview("Header", traits: .sizeThatFitsLayout) {
-    HeaderView(onSettings: {})
+    HeaderView()
         .padding()
         .background(PastelBackground())
 }

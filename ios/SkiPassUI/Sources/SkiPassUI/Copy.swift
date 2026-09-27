@@ -8,7 +8,6 @@ enum Copy {
     // MARK: Header (mockup)
     static let appName = "SkiPass"
     static let appSubtitle = "Manage email accounts across domains."
-    static let settingsLabel = "Settings"  // accessibility only
 
     // MARK: Tabs (mockup)
     static let tabHome = "Home"

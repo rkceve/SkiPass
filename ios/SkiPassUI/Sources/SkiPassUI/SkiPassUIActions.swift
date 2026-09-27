@@ -11,5 +11,4 @@ public protocol SkiPassUIActions: AnyObject {
     func deleteAccount(id: UUID) async throws
     func revealPassword(id: UUID) async -> String?
     func selectPlan(id: String) async
-    func openSettings()
 }

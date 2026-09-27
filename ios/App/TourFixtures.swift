@@ -127,8 +127,6 @@ final class TourFixtureModel: SkiPassUIActions {
 
     func selectPlan(id: String) async {}
 
-    func openSettings() {}
-
     private func insert(_ account: MailAccount) -> MailAccount {
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
             accounts[index] = account

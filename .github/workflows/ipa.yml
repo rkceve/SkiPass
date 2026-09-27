@@ -66,7 +66,7 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/dd" \
             -skipMacroValidation -skipPackagePluginValidation \
             CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            DEVELOPMENT_TEAM= | tail -30
+            DEVELOPMENT_TEAM= CURRENT_PROJECT_VERSION=${{ github.run_number }} | tail -30
       - name: Package IPA
         env:
           CONFIG: ${{ inputs.configuration || 'Release' }}
@@ -89,9 +89,15 @@ jobs:
           echo "Embedded entitlements (extension):"; codesign -d --entitlements - "$app/PlugIns/"*.appex 2>/dev/null || true
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
           cp -R "$app" "$RUNNER_TEMP/ipa/Payload/"
-          (cd "$RUNNER_TEMP/ipa" && zip -qry SkiPass.ipa Payload)
-          ls -la "$RUNNER_TEMP/ipa/SkiPass.ipa"
+          # Resource bundles must not carry their own _CodeSignature (Sideloadly rejects/struggles otherwise).
+          find "$RUNNER_TEMP/ipa/Payload" -path "*.bundle/_CodeSignature" -type d -prune -exec rm -rf {} +
+          version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$app/Info.plist")
+          build=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$app/Info.plist")
+          name="SkiPass-v${version}-b${build}.ipa"
+          (cd "$RUNNER_TEMP/ipa" && zip -qry "$name" Payload)
+          echo "IPA_NAME=$name" >> "$GITHUB_ENV"
+          ls -la "$RUNNER_TEMP/ipa/$name"
       - uses: actions/upload-artifact@v7
         with:
-          name: SkiPass-ipa
-          path: ${{ runner.temp }}/ipa/SkiPass.ipa
+          name: ${{ env.IPA_NAME }}
+          path: ${{ runner.temp }}/ipa/${{ env.IPA_NAME }}

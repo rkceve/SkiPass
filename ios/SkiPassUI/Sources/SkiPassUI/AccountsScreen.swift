@@ -13,7 +13,7 @@ struct AccountsScreen: View {
                 // Gear and Add are the screen's glass controls; one container lets them
                 // share a sampling region (glass cannot sample other glass).
                 VStack(alignment: .leading, spacing: 24) {
-                    HeaderView(onSettings: { store.openSettings() })
+                    HeaderView()
 
                     AccountsSectionHeader(sheetNamespace: sheetNamespace) {
                         store.accountSheet = .add

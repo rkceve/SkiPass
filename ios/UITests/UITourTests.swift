@@ -105,13 +105,6 @@ final class UITourTests: XCTestCase {
         XCTAssertTrue(newExpand.waitForNonExistence(timeout: 10), "card was not deleted")
         pause("deleted")
 
-        // Gear (no-op).
-        let settings = app.buttons["header.settings"]
-        XCTAssertTrue(settings.waitForExistence(timeout: 10))
-        scrollToHittable(settings, in: app, direction: .down)
-        tapOnScreen(settings, in: app)
-        pause("settings-tapped")
-
         // Plan tab.
         tabButton(in: app, label: "Plan").tap()
         let pro = app.buttons["plan.pro"]

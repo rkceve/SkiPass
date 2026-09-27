@@ -160,10 +160,6 @@ final class AppModel: SkiPassUIActions {
         await refreshUsage()
     }
 
-    func openSettings() {
-        // OPEN(settings): settings screen contents are not decided (SPEC_v2 §11.1); intentionally a no-op.
-    }
-
     // OPEN(enable-autofill): how the user is guided to turn on the AutoFill extension is not decided;
     // nothing is presented for it here.
 

@@ -154,6 +154,4 @@ final class PreviewActions: SkiPassUIActions {
     func revealPassword(id: UUID) async -> String? { "preview-password" }
 
     func selectPlan(id: String) async {}
-
-    func openSettings() {}
 }

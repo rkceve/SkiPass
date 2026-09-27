@@ -84,10 +84,4 @@ final class SkiPassUIStore {
     func selectPlan(id: String) async {
         await actions.selectPlan(id: id)
     }
-
-    // MARK: Settings
-
-    func openSettings() {
-        actions.openSettings()
-    }
 }
