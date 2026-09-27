@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Writes ios/Config/Secrets.xcconfig from CI secrets (docs/CONTRACTS.md §2).
+# Writes ios/Config/Secrets.xcconfig from CI secrets (docs/ARCHITECTURE.md §1, Build-time configuration).
 # Values that are unset keep the defaults from Secrets.example.xcconfig. Never prints values.
 set -euo pipefail
 

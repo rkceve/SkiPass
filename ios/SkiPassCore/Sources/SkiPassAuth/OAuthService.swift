@@ -37,7 +37,7 @@ public struct OAuthService: Sendable {
         }
     }
 
-    /// `NSKeyedArchiver` data of `OIDAuthState` (CONTRACTS §4; `OIDAuthState` is NSSecureCoding,
+    /// `NSKeyedArchiver` data of `OIDAuthState` (docs/ARCHITECTURE.md §5; `OIDAuthState` is NSSecureCoding,
     /// OIDAuthState.h L60). Same calls as AppAuth's SPM example (AuthManager.swift L394, L410).
     package static func archive(_ state: OIDAuthState) throws -> Data {
         try NSKeyedArchiver.archivedData(withRootObject: state, requiringSecureCoding: true)

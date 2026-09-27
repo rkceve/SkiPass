@@ -1,8 +1,8 @@
 # SkiPass server (Hono — Vercel and Cloudflare Workers)
 
-Implements `docs/CONTRACTS.md` §5: `POST /v1/judge`, `POST /v1/fills`, `GET /v1/usage`.
+Implements `docs/API.md`: `POST /v1/judge`, `POST /v1/fills`, `GET /v1/usage`.
 
-Abuse and outage rules (docs/SYSTEM.md):
+Abuse and outage rules (docs/ARCHITECTURE.md §4):
 
 - The app token is public (it ships in every IPA). Every `/v1/*` request therefore also needs an
   `X-SkiPass-User` that RevenueCat knows: a 404 from `active_entitlements` (while the project's

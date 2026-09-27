@@ -1,6 +1,6 @@
 import Foundation
 
-/// Every user-visible string of the app (SYSTEM.md §2). Strings marked "mockup" are copied
+/// Every user-visible string of the app (docs/ARCHITECTURE.md §2). Strings marked "mockup" are copied
 /// verbatim from the original screen designs (Home and Plan). The host app reaches
 /// the few it needs through public API (`PlanOption.free`, `PlanOption.paidPlanName`,
 /// `SkiPassUIError`), so all copy stays in this one file.

@@ -1,5 +1,5 @@
-// The single table of plan id -> RevenueCat entitlement id -> monthly fill limit (docs/CONTRACTS.md §5).
-// Note: the limits (free 10 / standard 100 / pro 1000 fills per month) are provisional values;
+// The single table of plan id -> RevenueCat entitlement id -> monthly fill limit (docs/API.md).
+// Note: the limits (free 10 / standard 100 / pro 1000 fills per month) are provisional product values;
 // changing them here changes both enforcement and `GET /v1/usage`.
 
 export type PlanId = 'free' | 'standard' | 'pro'

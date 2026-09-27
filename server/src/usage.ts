@@ -1,5 +1,5 @@
 // Server state: the monthly fill counter (key `usage:<appUserID>:<YYYY-MM>`, UTC, per
-// docs/CONTRACTS.md §5), the judge rate-limit windows (`rl:judge:…`) and the last known plan per
+// docs/API.md), the judge rate-limit windows (`rl:judge:…`) and the last known plan per
 // user (`plan:<appUserID>`). One interface, three stores:
 //   - KvUsageCounter    — Cloudflare Workers KV (the Worker target).
 //     KV API: get(key) / put(key, value, {expirationTtl}) —

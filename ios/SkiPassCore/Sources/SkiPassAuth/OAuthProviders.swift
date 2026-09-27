@@ -20,7 +20,7 @@ public enum OAuthError: Error, Equatable, Sendable {
     case missingStoredSecret(mailboxID: UUID)
 }
 
-/// Client IDs read from Info.plist keys `GoogleClientID` / `MicrosoftClientID` (CONTRACTS §2).
+/// Client IDs read from Info.plist keys `GoogleClientID` / `MicrosoftClientID` (docs/ARCHITECTURE.md §1).
 public struct OAuthClientConfiguration: Sendable, Equatable {
     public var googleClientID: String?
     public var microsoftClientID: String?
@@ -77,7 +77,7 @@ package struct OAuthProviderSettings: Sendable, Equatable {
     /// (OIDAuthorizationService.m L596-L605).
     package let omitIssuer: Bool
 
-    /// Fixed (CONTRACTS §2), deliberately not built from the runtime bundle ID: a sideloaded build's
+    /// Fixed (docs/ARCHITECTURE.md §1), deliberately not built from the runtime bundle ID: a sideloaded build's
     /// ID carries a team suffix, and Entra only string-matches the redirect against the app
     /// registration ("AADSTS50011: The reply URL specified in the request does not match";
     /// https://learn.microsoft.com/en-us/entra/identity-platform/reply-url). Bundle-ID checks exist
@@ -114,7 +114,7 @@ package struct OAuthProviderSettings: Sendable, Equatable {
         }
     }
 
-    /// `com.googleusercontent.apps.<GOOGLE_CLIENT_ID_PREFIX>:/oauth2redirect` (CONTRACTS §2): the
+    /// `com.googleusercontent.apps.<GOOGLE_CLIENT_ID_PREFIX>:/oauth2redirect` (docs/ARCHITECTURE.md §1): the
     /// client ID with its dot-separated fields reversed, used as a custom scheme.
     package static func googleRedirectURL(clientID: String) throws -> URL {
         let suffix = ".apps.googleusercontent.com"

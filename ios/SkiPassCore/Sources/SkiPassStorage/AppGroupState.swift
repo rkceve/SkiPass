@@ -1,7 +1,7 @@
 import Foundation
 import SkiPassModels
 
-/// Small shared values in the App Group defaults (CONTRACTS §4):
+/// Small shared values in the App Group defaults (docs/ARCHITECTURE.md §5):
 /// `rc.appUserID` (written by the app, read by the extension) and `usage.snapshot.v1`.
 public final class AppGroupState: @unchecked Sendable {
     private let defaults: UserDefaults

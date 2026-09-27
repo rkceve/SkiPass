@@ -15,7 +15,7 @@ import os
 //                   CredentialStore() setIMAPPassword / imapPassword / setOAuthStateData / removeAll(for:)
 //                   AppGroupState(defaults:) revenueCatAppUserID / usageSnapshot() / setUsageSnapshot(_:) throws
 //   SkiPassAuth:    OAuthService() (client IDs from Info.plist)
-//   SkiPassAuthUI:  OAuthService.signIn (app-only split, CONTRACTS §8 2026-09-24)
+//   SkiPassAuthUI:  OAuthService.signIn (app-only split)
 //                   .signIn(kind:presenting:loginHint:) async throws -> (address: String, authStateData: Data)
 //   SkiPassServerClient: ServerClient(configuration: ServerClientConfiguration(baseURL:appToken:appUserID:))
 //                   currentUsage() async throws -> UsageSnapshot
@@ -34,7 +34,7 @@ enum LiveServices {
     }
 }
 
-/// Build-time values from Info.plist (CONTRACTS §2).
+/// Build-time values from Info.plist (docs/ARCHITECTURE.md §1).
 struct AppConfiguration: Sendable {
     var serverURL: URL?
     var appToken: String?

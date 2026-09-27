@@ -27,7 +27,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
         }
     }
 
-    // Called instead of the OTP path on iOS 18.4+ in some cases (docs/facts/F1 §2).
+    // Called instead of the OTP path on iOS 18.4+ in some cases.
     override func prepareInterfaceForUserChoosingTextToInsert() {
         showChoice(title: "Probe text") { [weak self] in
             self?.extensionContext.completeRequest(withTextToInsert: ProbeIdentity.code)

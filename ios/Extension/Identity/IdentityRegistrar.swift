@@ -1,7 +1,7 @@
 import AuthenticationServices
 import Foundation
 
-/// Supplies the site domains for which one-time-code identities are registered (CONTRACTS §6 step 5).
+/// Supplies the site domains for which one-time-code identities are registered (docs/ARCHITECTURE.md §3 step 6).
 /// Concrete sources: `DomainSources.swift` (bundled popular domains, demo site, domains seen in
 /// verification emails).
 protocol IdentityDomainSource: Sendable {
@@ -9,7 +9,7 @@ protocol IdentityDomainSource: Sendable {
 }
 
 /// Registers `ASOneTimeCodeCredentialIdentity` entries so that iOS offers SkiPass in
-/// one-time-code fields of matching sites (SYSTEM §3.6: background, no UI).
+/// one-time-code fields of matching sites (docs/ARCHITECTURE.md §3 step 6: background, no UI).
 /// Compiled into both the app (launch, mailbox added/removed) and the extension (each run).
 struct IdentityRegistrar: Sendable {
     let domainSource: any IdentityDomainSource
@@ -53,7 +53,7 @@ struct IdentityRegistrar: Sendable {
         return await Self.replace(all) ? .registered(count: all.count) : .failed
     }
 
-    /// The QuickType label for an identity (CONTRACTS §6: `From <mailbox address>`).
+    /// The QuickType label for an identity (docs/ARCHITECTURE.md §3: `From <mailbox address>`).
     // Note: with several registered mailboxes the label names the first address only (one
     // identity per domain); a suggestion per mailbox would need one identity per domain and mailbox.
     static func label(mailboxAddresses: [String]) -> String? {
@@ -71,7 +71,7 @@ struct IdentityRegistrar: Sendable {
         return Array(Set(hosts)).sorted()
     }
 
-    // MARK: - ASCredentialIdentityStore (docs/facts/F1 §1)
+    // MARK: - ASCredentialIdentityStore
 
     private static func storeIsEnabled() async -> Bool {
         await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in

@@ -23,7 +23,7 @@ final class AppModel: SkiPassUIActions {
     /// A plan change (purchase sheet / subscription management) is in progress; further taps are ignored.
     @ObservationIgnored private var isChangingPlan = false
 
-    // Last known plan inputs. Failed refreshes keep them (SYSTEM.md §2).
+    // Last known plan inputs. Failed refreshes keep them (docs/ARCHITECTURE.md §2).
     @ObservationIgnored private var packages: [StorePackageInfo] = []
     @ObservationIgnored private var entitlements: EntitlementSnapshot?
     /// The server's `/v1/usage.plan` (source of truth for the current plan); nil when unknown.
@@ -291,7 +291,7 @@ final class AppModel: SkiPassUIActions {
         if id == Self.freePlanID {
             guard currentTier != .free else { return }
             do {
-                // SYSTEM.md §2: a Test Store subscription cannot be cancelled here; it expires by
+                // docs/ARCHITECTURE.md §2: a Test Store subscription cannot be cancelled here; it expires by
                 // itself (see LiveBillingServices.showManageSubscriptions).
                 try await services.billing.showManageSubscriptions()
             } catch {

@@ -1,4 +1,4 @@
-// SkiPass server HTTP API — docs/CONTRACTS.md §5 is the binding contract for paths, headers,
+// SkiPass server HTTP API — docs/API.md is the binding contract for paths, headers,
 // bodies and status codes. Bindings are read from `c.env` as in
 // https://hono.dev/docs/getting-started/cloudflare-workers ("Bindings"). The same app runs on
 // Vercel (src/vercel.ts), which passes its environment variables in as the bindings.
@@ -17,7 +17,7 @@ import { type PlanCacheEntry, formatInstant, resetsAt } from './usage.js'
 export const APP_TOKEN_HEADER = 'X-SkiPass-App-Token'
 export const USER_HEADER = 'X-SkiPass-User'
 
-/** Request limits (not in CONTRACTS; defensive bounds). */
+/** Request limits (not part of the API contract; defensive bounds). */
 export const MAX_MESSAGES = 50
 export const MAX_TEXT_LENGTH = 200_000
 export const MAX_ID_LENGTH = 512
@@ -47,7 +47,7 @@ type Env = {
 type Ctx = Context<Env>
 
 const unauthorized = (c: Ctx) => c.json({ error: 'unauthorized' }, 401)
-// Malformed requests: CONTRACTS §5 defines no body, so this one mirrors the other error replies.
+// Malformed header or body -> 400 (docs/API.md, "Errors on every route").
 const invalidRequest = (c: Ctx) => c.json({ error: 'invalid_request' }, 400)
 const quotaExhausted = (c: Ctx) => c.json({ error: 'quota_exhausted', remaining: 0 }, 402)
 const unknownUser = (c: Ctx) => c.json({ error: 'unknown_user' }, 401)
@@ -129,7 +129,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
   const app = new Hono<Env>()
   let configChecked = false
 
-  // Auth: CONTRACTS §5 — missing/invalid app token -> 401 {"error":"unauthorized"}.
+  // Auth: docs/API.md — missing/invalid app token -> 401 {"error":"unauthorized"}.
   app.use('/v1/*', async (c, next) => {
     if (!configChecked) {
       // Once per instance: a missing live credential is a config error in the logs.

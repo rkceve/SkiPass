@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Why: a re-signed build (e.g. sideloaded with a free Apple ID) gets a different bundle ID
 /// (`io.github.rkceve.skipass.<suffix>`) and therefore different App Group / keychain-group
-/// identifiers than the ones fixed in CONTRACTS §2. Hard-coded identifiers then fail silently
+/// identifiers than the ones fixed in docs/ARCHITECTURE.md §1. Hard-coded identifiers then fail silently
 /// (`UserDefaults(suiteName:)` still returns a process-local store) or with
 /// `errSecMissingEntitlement`. The live side (`SharedStorageEnvironment`) feeds this type the
 /// runtime facts and availability checks; everything here is deterministic and unit-tested.
@@ -43,7 +43,7 @@ public enum SharedStorageResolver {
     /// 1. `group.<runtime app bundle ID>` (the group a re-signing tool derives from the new bundle ID),
     /// 2. groups declared by the installed provisioning profile / Info.plist that belong to this
     ///    app (they contain the canonical or the runtime app bundle ID),
-    /// 3. the canonical `group.io.github.rkceve.skipass` (CONTRACTS §2).
+    /// 3. the canonical `group.io.github.rkceve.skipass` (docs/ARCHITECTURE.md §1).
     /// Duplicates are removed, first occurrence wins.
     public static func appGroupCandidates(
         runtimeBundleIdentifier: String?,
@@ -86,7 +86,7 @@ public enum SharedStorageResolver {
     /// 1. the resolved App Group (App Groups double as keychain access groups on iOS),
     /// 2. `<team prefix>.<runtime app bundle ID>` (the app's own default group; usable by the
     ///    extension when its keychain-access-groups entitlement covers it, e.g. `<team>.*`),
-    /// 3. the canonical keychain group from CONTRACTS §2.
+    /// 3. the canonical keychain group from docs/ARCHITECTURE.md §1.
     public static func keychainGroupCandidates(
         appGroup: String?,
         defaultAccessGroup: String?,

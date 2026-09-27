@@ -116,7 +116,7 @@ final class AppGroupStateTests: XCTestCase {
     func testUsageSnapshotRoundTrip() throws {
         let state = AppGroupState(defaults: defaults)
         XCTAssertNil(state.usageSnapshot())
-        // Shape of CONTRACTS §5 `GET /v1/usage` example.
+        // Shape of docs/API.md `GET /v1/usage` example.
         let resetsAt = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-10-01T00:00:00Z"))
         let snapshot = UsageSnapshot(plan: "free", used: 3, limit: 10, resetsAt: resetsAt)
         try state.setUsageSnapshot(snapshot)
@@ -176,7 +176,7 @@ final class CredentialStoreTests: XCTestCase {
 
     func testKeychainStoreDefaultsMatchContract() {
         // The access group is resolved at runtime (SharedStorageResolverTests); the canonical
-        // names stay those of CONTRACTS §2 / §4.
+        // names stay those of docs/ARCHITECTURE.md §1 / §5.
         let keychain = KeychainStore(accessGroup: StorageConstants.keychainAccessGroup)
         XCTAssertEqual(keychain.service, "io.github.rkceve.skipass")
         XCTAssertEqual(keychain.accessGroup, "group.io.github.rkceve.skipass")

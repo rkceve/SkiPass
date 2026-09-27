@@ -51,7 +51,7 @@ struct AccountCard: View {
                             revealPassword: revealPassword
                         )
                     }
-                    // SYSTEM.md §2: Google / Microsoft cards show no server rows, Delete only.
+                    // docs/ARCHITECTURE.md §2: Google / Microsoft cards show no server rows, Delete only.
                     AccountActionRow(
                         address: account.address,
                         showsEdit: account.kind == .imap,

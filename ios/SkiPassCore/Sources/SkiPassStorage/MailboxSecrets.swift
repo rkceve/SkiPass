@@ -1,6 +1,6 @@
 import Foundation
 
-/// Per-mailbox secrets (CONTRACTS §4):
+/// Per-mailbox secrets (docs/ARCHITECTURE.md §5):
 /// - `password.<mailboxID>` → UTF-8 IMAP password
 /// - `oauth.<mailboxID>` → NSKeyedArchiver data of AppAuth `OIDAuthState` (opaque here;
 ///   SkiPassStorage does not import AppAuth).

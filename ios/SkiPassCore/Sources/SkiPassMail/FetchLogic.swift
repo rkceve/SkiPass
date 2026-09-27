@@ -26,7 +26,7 @@ enum FetchLogic {
         return received >= since
     }
 
-    /// `"<mailboxID>:<uid>"` (CONTRACTS §3).
+    /// `"<mailboxID>:<uid>"` (docs/ARCHITECTURE.md §1).
     static func messageID(mailboxID: UUID, uid: UID) -> String {
         "\(mailboxID.uuidString):\(uid.value)"
     }

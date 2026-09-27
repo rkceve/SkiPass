@@ -78,11 +78,28 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :CFBundleIcons" "$app/Info.plist"
           ls -la "$app" | grep -E "AppIcon|Assets.car"
 
+      # The test writes <name>.ready into SHOT_DIR at each screen; this loop answers with a
+      # native-resolution `simctl io screenshot` and <name>.done.
       - name: Take screenshots
         run: |
-          mkdir -p out
+          mkdir -p out screenshots
+          SHOT_DIR="$RUNNER_TEMP/shots"
+          mkdir -p "$SHOT_DIR"
+          (
+            while true; do
+              for f in "$SHOT_DIR"/*.ready; do
+                [ -e "$f" ] || continue
+                n=$(basename "$f" .ready)
+                xcrun simctl io "$SIM_UDID" screenshot --type=png "screenshots/$n.png" >/dev/null 2>&1
+                rm -f "$f"
+                touch "$SHOT_DIR/$n.done"
+              done
+              sleep 0.2
+            done
+          ) &
+          watcher=$!
           set +e
-          TEST_RUNNER_SKIPASS_SCREENSHOTS=1 xcodebuild test-without-building \
+          TEST_RUNNER_SKIPASS_SCREENSHOTS=1 TEST_RUNNER_SKIPASS_SHOT_DIR="$SHOT_DIR" xcodebuild test-without-building \
             -project SkiPass.xcodeproj -scheme SkiPassTour \
             -destination "platform=iOS Simulator,id=$SIM_UDID" \
             -derivedDataPath build/dd \
@@ -91,44 +108,23 @@ jobs:
             > out/test.log 2>&1
           status=$?
           set -e
+          kill "$watcher" 2>/dev/null || true
           grep -E "error:|Test Case|passed|failed|skipped" out/test.log | head -50 || true
           if grep -q "Test skipped" out/test.log; then echo "screenshot test was skipped"; exit 1; fi
           exit $status
 
-      - name: Export and check screenshots
+      - name: Check screenshots
         run: |
-          mkdir -p out/attachments screenshots
-          xcrun xcresulttool export attachments --path out/screenshots.xcresult --output-path out/attachments
-          python3 - <<'EOF'
-          import json, shutil, subprocess, sys
-          names = ["01-home", "02-imap-expanded", "03-plan"]
-          manifest = json.load(open("out/attachments/manifest.json"))
-          found = {}
-          for test in manifest:
-              for a in test.get("attachments", []):
-                  human = a.get("suggestedHumanReadableName", "")
-                  for n in names:
-                      if human.startswith(n):
-                          found[n] = a["exportedFileName"]
-          missing = [n for n in names if n not in found]
-          if missing:
-              sys.exit(f"missing screenshots: {missing}; manifest: {manifest}")
-          bad = False
-          for n in names:
-              src = f"out/attachments/{found[n]}"
-              dst = f"screenshots/{n}.png"
-              # Normalise to PNG whatever the attachment encoding was.
-              subprocess.run(["sips", "-s", "format", "png", src, "--out", dst], check=True, capture_output=True)
-              info = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", dst],
-                                    check=True, capture_output=True, text=True).stdout
-              w = int(info.split("pixelWidth:")[1].split()[0])
-              h = int(info.split("pixelHeight:")[1].split()[0])
-              print(f"{dst}: {w}x{h}")
-              if (w, h) != (1179, 2556):
-                  print(f"::error::{dst} is {w}x{h}, expected 1179x2556")
-                  bad = True
-          sys.exit(1 if bad else 0)
-          EOF
+          fail=0
+          for n in 01-home 02-imap-expanded 03-plan; do
+            f="screenshots/$n.png"
+            if [ ! -s "$f" ]; then echo "::error::$f missing"; fail=1; continue; fi
+            w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+            h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/ {print $2}')
+            echo "$f: ${w}x${h}"
+            [ "$w" = 1179 ] && [ "$h" = 2556 ] || { echo "::error::$f is ${w}x${h}, expected 1179x2556"; fail=1; }
+          done
+          exit $fail
 
       - name: Upload screenshots
         if: always()

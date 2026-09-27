@@ -1,6 +1,6 @@
 import Foundation
 
-/// Server settings baked into a build's Info.plist (CONTRACTS §2: `SkiPassServerURL`,
+/// Server settings baked into a build's Info.plist (docs/ARCHITECTURE.md §1: `SkiPassServerURL`,
 /// `SkiPassAppToken`), with unset values and the placeholders of `ios/Config/Secrets.example.xcconfig`
 /// meaning "not configured" (same rule as the app's `AppConfiguration`).
 public struct ServerBuildConfiguration: Sendable, Equatable {

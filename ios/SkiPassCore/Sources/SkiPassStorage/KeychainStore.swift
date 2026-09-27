@@ -9,7 +9,7 @@ public protocol SecretStoring: Sendable {
     func delete(account: String) throws
 }
 
-/// Keychain generic passwords per CONTRACTS §4: service `io.github.rkceve.skipass`,
+/// Keychain generic passwords per docs/ARCHITECTURE.md §5: service `io.github.rkceve.skipass`,
 /// `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not synchronizable. The access group defaults
 /// to the one resolved and verified at runtime (`SharedStorageEnvironment.current`); nil omits
 /// `kSecAttrAccessGroup`, so the process's default group is used (app-only fallback).

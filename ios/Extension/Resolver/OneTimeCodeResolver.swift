@@ -30,16 +30,16 @@ public struct FillReportRetry: Sendable {
     }
 }
 
-/// UI-free orchestration of the extension flow (CONTRACTS §6, steps 2–4).
+/// UI-free orchestration of the extension flow (docs/ARCHITECTURE.md §3, steps 2–4).
 ///
 /// Depends only on the `SkiPassModels` protocols so it can be unit-tested with fakes.
 /// Every failure resolves to `nil`; the caller cancels silently (decided: no UI).
 public struct OneTimeCodeResolver: Sendable {
     public typealias MailboxSource = @Sendable () async throws -> [MailboxConfig]
 
-    /// Messages older than this are ignored (CONTRACTS §6: last 10 minutes).
+    /// Messages older than this are ignored (docs/ARCHITECTURE.md §3: last 10 minutes).
     public static let lookback: TimeInterval = 10 * 60
-    /// Per-mailbox fetch budget (CONTRACTS §6: 4 s).
+    /// Per-mailbox fetch budget (docs/ARCHITECTURE.md §3: 4 s).
     public static let defaultPerMailboxBudget: Duration = .seconds(4)
 
     private let mailboxes: MailboxSource

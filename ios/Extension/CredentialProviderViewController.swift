@@ -1,7 +1,7 @@
 import AuthenticationServices
 import Foundation
 
-/// SkiPass AutoFill credential provider (CONTRACTS §6).
+/// SkiPass AutoFill credential provider (docs/ARCHITECTURE.md §3).
 ///
 /// All paths are silent: a code is supplied when one is found, otherwise the request is
 /// cancelled without showing anything (no UI on quota exhaustion / no match / errors).
@@ -40,12 +40,12 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
 
     // MARK: - Paths where the system presents the view controller
 
-    // The extension has no UI of its own (SYSTEM §3.5). The three methods below run the same
+    // The extension has no UI of its own (docs/ARCHITECTURE.md §3 step 5). The three methods below run the same
     // resolver and complete immediately, or cancel with .userCanceled, adding no views.
 
     override func prepareOneTimeCodeCredentialList(for serviceIdentifiers: [ASCredentialServiceIdentifier]) {
         startIdentitySync()
-        // Lower indices are the more specific identifiers (docs/facts/F1 §1).
+        // Lower indices are the more specific identifiers (ASCredentialProviderViewController documentation).
         resolveAndCompleteOneTimeCode(service: serviceIdentifiers.first?.identifier, failure: .userCanceled)
     }
 
@@ -60,8 +60,8 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     }
 
     /// iOS 18.4+ calls this instead of `prepareInterfaceToProvideCredential` for one-time-code
-    /// fields in some cases, and iOS 18 requires it to avoid "AutoFill Unavailable" (docs/facts/F1 §2).
-    /// No service identifier is available here, so the newest code email is used (SYSTEM §3.5).
+    /// fields in some cases, and iOS 18 requires it to avoid "AutoFill Unavailable" (seen in the feasibility probe, tools/probe/).
+    /// No service identifier is available here, so the newest code email is used (docs/ARCHITECTURE.md §3 step 5).
     override func prepareInterfaceForUserChoosingTextToInsert() {
         startIdentitySync()
         guard let resolver else {
@@ -103,10 +103,10 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
         )
     }
 
-    /// Completion handler that counts the fill (CONTRACTS §6: fire-and-forget after completion).
+    /// Completion handler that counts the fill (docs/ARCHITECTURE.md §3: fire-and-forget after completion).
     ///
     /// The system runs this handler after the request completes and passes `expired == true`
-    /// when it ends that time early (docs/facts/F1 §1). The handler itself never blocks: on the
+    /// when it ends that time early. The handler itself never blocks: on the
     /// first non-expired invocation it starts the fill report and returns at once.
     ///
     /// To keep the process from being suspended before the report is sent, the wait happens in a

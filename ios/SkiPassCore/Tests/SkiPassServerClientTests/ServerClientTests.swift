@@ -180,7 +180,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertTrue(ServerClientError.httpStatus(503).isTransient)
     }
 
-    /// CONTRACTS §5 (2026-09-27): a user RevenueCat does not know gets 401 unknown_user on every route.
+    /// docs/API.md: a user RevenueCat does not know gets 401 unknown_user on every route.
     /// It is not retried; the extension treats it like an unavailable server (local fallback).
     func testUnknownUserIsDistinctAndNotTransient() async throws {
         StubURLProtocol.respond(status: 401, json: #"{"error":"unknown_user"}"#)
@@ -193,7 +193,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertFalse(ServerClientError.unknownUser.isTransient)
     }
 
-    /// CONTRACTS §5 (2026-09-27): `remaining: 0` in a 200 means "not known" while RevenueCat is down,
+    /// docs/API.md: `remaining: 0` in a 200 means "not known" while RevenueCat is down,
     /// not "exhausted"; only 402 is quota exhaustion.
     func testRemainingZeroInA200IsNotQuotaExhaustion() async throws {
         StubURLProtocol.respond(status: 200, json: """

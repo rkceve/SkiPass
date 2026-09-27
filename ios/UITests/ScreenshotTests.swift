@@ -3,8 +3,10 @@
 // `.example` addresses, no accounts, keychain or network.
 //
 // Runs only when the test runner has SKIPASS_SCREENSHOTS=1 (the workflow sets
-// TEST_RUNNER_SKIPASS_SCREENSHOTS=1). Each screenshot is a full-resolution attachment named
-// `01-home`, `02-imap-expanded`, `03-plan`.
+// TEST_RUNNER_SKIPASS_SCREENSHOTS=1). At each screen (`01-home`, `02-imap-expanded`, `03-plan`)
+// the test writes `<name>.ready` into SKIPASS_SHOT_DIR and waits for `<name>.done`: the workflow
+// takes the image with `simctl io screenshot`, which keeps the native 1179x2556 pixels
+// (XCUIScreen rounds the 393 pt width to 1178 px). An XCUIScreen attachment is kept for diagnosis.
 import XCTest
 
 @MainActor
@@ -47,9 +49,26 @@ final class ScreenshotTests: XCTestCase {
 
     private func capture(_ name: String) {
         Thread.sleep(forTimeInterval: settle)
+        if let dir = ProcessInfo.processInfo.environment["SKIPASS_SHOT_DIR"], !dir.isEmpty {
+            requestHostScreenshot(name, in: URL(fileURLWithPath: dir))
+        }
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    /// Signals the workflow to take a simulator screenshot and waits until it is done.
+    private func requestHostScreenshot(_ name: String, in dir: URL) {
+        let ready = dir.appendingPathComponent("\(name).ready")
+        let done = dir.appendingPathComponent("\(name).done")
+        XCTAssertTrue(FileManager.default.createFile(atPath: ready.path, contents: Data()),
+                      "cannot write \(ready.path)")
+        let deadline = Date().addingTimeInterval(30)
+        while Date() < deadline {
+            if FileManager.default.fileExists(atPath: done.path) { return }
+            Thread.sleep(forTimeInterval: 0.2)
+        }
+        XCTFail("host screenshot \(name) was not taken within 30 s")
     }
 }

@@ -1,7 +1,7 @@
 import Foundation
 import SkiPassModels
 
-/// Persists `[MailboxConfig]` as JSON under `mailboxes.v1` in the App Group defaults (CONTRACTS §4).
+/// Persists `[MailboxConfig]` as JSON under `mailboxes.v1` in the App Group defaults (docs/ARCHITECTURE.md §5).
 /// Holds no secrets; credentials live in `CredentialStore`.
 public final class MailboxStore: @unchecked Sendable {
     // UserDefaults is thread-safe; the lock only serializes read-modify-write sequences.

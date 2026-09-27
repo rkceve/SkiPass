@@ -3,7 +3,7 @@ import SkiPassModels
 import os
 
 /// Configuration for `ServerClient` (values come from Info.plist keys `SkiPassServerURL` /
-/// `SkiPassAppToken` and the App Group key `rc.appUserID`, CONTRACTS §2 and §4).
+/// `SkiPassAppToken` and the App Group key `rc.appUserID`, docs/ARCHITECTURE.md §1 and §5).
 public struct ServerClientConfiguration: Sendable {
     /// Worker base URL, e.g. `https://skipass-server.example.workers.dev`.
     public var baseURL: URL
@@ -46,7 +46,7 @@ public enum ServerClientError: Error, Equatable, Sendable {
     case timedOut
     /// Any other non-success status.
     case httpStatus(Int)
-    /// The response was not HTTP or its body did not match CONTRACTS §5.
+    /// The response was not HTTP or its body did not match docs/API.md.
     case invalidResponse
 
     /// Worth retrying later (network trouble, timeouts, rate limiting, server errors). Answers that
@@ -60,12 +60,12 @@ public enum ServerClientError: Error, Equatable, Sendable {
     }
 }
 
-/// Client for the SkiPass server HTTP API (CONTRACTS §5).
+/// Client for the SkiPass server HTTP API (docs/API.md).
 public struct ServerClient: CandidateJudging, UsageReporting {
     public let configuration: ServerClientConfiguration
     private let session: URLSession
 
-    /// `source` values the server may report (CONTRACTS §5; `mock` when the server runs with JEV_MODE=mock).
+    /// `source` values the server may report (docs/API.md; `mock` when the server runs with JEV_MODE=mock).
     static let knownSources: Set<String> = ["jev", "fallback", "mock"]
 
     private static let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "ServerClient")
@@ -81,7 +81,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
     ///
     /// A 200 reply is accepted only when it names one of the messages sent (or none), reports a known
     /// `source`, and a non-negative `remaining`; anything else throws `.invalidResponse`, so the caller's
-    /// local fallback runs (SYSTEM §3.4 "bad reply").
+    /// local fallback runs (docs/ARCHITECTURE.md §3 step 4).
     public func judge(service: String?, messages: [FetchedMessage]) async throws -> JudgeOutcome {
         // The server rejects an empty list; with nothing to judge there is no match.
         guard !messages.isEmpty else { return .noMatch(scores: [:]) }
@@ -221,7 +221,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
     }
 }
 
-// MARK: Wire types (CONTRACTS §5)
+// MARK: Wire types (docs/API.md)
 
 struct JudgeRequest: Encodable, Sendable {
     struct Message: Encodable, Sendable {

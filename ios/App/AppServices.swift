@@ -5,7 +5,7 @@ import SkiPassModels
 // `LiveServices.swift` (SkiPassStorage / SkiPassAuth / SkiPassServerClient / RevenueCat).
 // `AppModel` depends only on these protocols so it can be unit-tested with fakes.
 
-/// Mailboxes and their secrets (CONTRACTS §4).
+/// Mailboxes and their secrets (docs/ARCHITECTURE.md §5).
 @MainActor
 protocol AccountServices: AnyObject {
     func loadMailboxes() throws -> [MailboxConfig]
@@ -85,13 +85,13 @@ protocol IdentityServices: AnyObject {
     func syncIdentities(mailboxAddresses: [String]) async
 }
 
-/// SkiPass server usage endpoint (CONTRACTS §5 `GET /v1/usage`).
+/// SkiPass server usage endpoint (docs/API.md `GET /v1/usage`).
 @MainActor
 protocol UsageServices: AnyObject {
     func currentUsage(appUserID: String) async throws -> UsageSnapshot
 }
 
-/// App Group values shared with the extension (CONTRACTS §4).
+/// App Group values shared with the extension (docs/ARCHITECTURE.md §5).
 @MainActor
 protocol SharedStateServices: AnyObject {
     /// `rc.appUserID`: the ID the extension sends to the server.

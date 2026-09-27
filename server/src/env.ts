@@ -25,7 +25,7 @@ export interface Bindings {
 export interface Deps {
   fetch: typeof fetch
   now: () => Date
-  /** Per-call timeout for upstream APIs (Jev: 2 s per docs/CONTRACTS.md §5). */
+  /** Per-call timeout for upstream APIs (Jev: 3 s, docs/API.md). */
   upstreamTimeoutMs: number
   /** Server state store (fill counter, rate limits, plan cache) for a request's bindings. */
   usageCounter: (env: Bindings) => UsageCounter

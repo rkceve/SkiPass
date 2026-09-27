@@ -1,7 +1,7 @@
 import Foundation
 import SkiPassModels
 
-/// On-device copy of the server's fallback rule (CONTRACTS §5; server/src/jev.ts `fallbackSelect`):
+/// On-device copy of the server's fallback rule (docs/API.md; server/src/jev.ts `fallbackSelect`):
 /// the newest message whose text contains the service's registrable domain, else the newest message.
 /// Used when the server cannot be reached, so a code is still filled (e.g. the demo with the server down).
 struct LocalFallbackJudge: CandidateJudging {
