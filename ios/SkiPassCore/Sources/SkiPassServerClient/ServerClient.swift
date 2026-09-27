@@ -33,8 +33,11 @@ public struct ServerClientConfiguration: Sendable {
 public enum ServerClientError: Error, Equatable, Sendable {
     /// 402 `{"error":"quota_exhausted","remaining":0}` from `POST /v1/fills`.
     case quotaExhausted
-    /// 401 `{"error":"unauthorized"}` (or `{"error":"unknown_user"}`, TRIAGE D1).
+    /// 401 `{"error":"unauthorized"}`.
     case unauthorized
+    /// 401 `{"error":"unknown_user"}`: RevenueCat does not know `X-SkiPass-User` (TRIAGE D1; e.g. a
+    /// `local:<uuid>` ID from a build without RevenueCat, D10). Treated like an unavailable server.
+    case unknownUser
     /// 429 `{"error":"rate_limited"}` (TRIAGE D1).
     case rateLimited
     /// No RevenueCat app user ID available to send.
@@ -52,7 +55,7 @@ public enum ServerClientError: Error, Equatable, Sendable {
         switch self {
         case .rateLimited, .timedOut: return true
         case .httpStatus(let status): return status >= 500 || status == 408
-        case .quotaExhausted, .unauthorized, .missingAppUserID, .invalidResponse: return false
+        case .quotaExhausted, .unauthorized, .unknownUser, .missingAppUserID, .invalidResponse: return false
         }
     }
 }
@@ -106,7 +109,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
             try requireQuotaBody(data, path: "v1/judge")
             return .quotaExhausted
         default:
-            throw failure(status: status, path: "v1/judge")
+            throw failure(status: status, body: data, path: "v1/judge")
         }
     }
 
@@ -122,7 +125,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
         case 402:
             try requireQuotaBody(data, path: "v1/fills")
             throw ServerClientError.quotaExhausted
-        default: throw failure(status: status, path: "v1/fills")
+        default: throw failure(status: status, body: data, path: "v1/fills")
         }
     }
 
@@ -130,7 +133,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
     public func currentUsage() async throws -> UsageSnapshot {
         let (data, status) = try await send(path: "v1/usage", method: "GET", body: Optional<FillRequest>.none,
                                             anonymousUser: nil)
-        guard status == 200 else { throw failure(status: status, path: "v1/usage") }
+        guard status == 200 else { throw failure(status: status, body: data, path: "v1/usage") }
         let u = try decode(UsageResponse.self, from: data)
         return UsageSnapshot(plan: u.plan, used: u.used, limit: u.limit, resetsAt: u.resetsAt)
     }
@@ -202,15 +205,16 @@ public struct ServerClient: CandidateJudging, UsageReporting {
 
     /// Maps a non-success status and logs it (A2-07: a wrong server URL or rejected header is otherwise
     /// invisible, because the extension silently falls back to the local rule).
-    private func failure(status: Int, path: String) -> ServerClientError {
+    private func failure(status: Int, body: Data, path: String) -> ServerClientError {
+        let errorCode = (try? JSONDecoder().decode(ErrorBody.self, from: body))?.error ?? "-"
         switch status {
         case 400, 404, 405, 413:
-            Self.logger.error("\(path, privacy: .public): HTTP \(status, privacy: .public) (configuration error? check SkiPassServerURL and the request headers)")
+            Self.logger.error("\(path, privacy: .public): HTTP \(status, privacy: .public) \(errorCode, privacy: .public) (configuration error? check SkiPassServerURL and the request headers)")
         default:
-            Self.logger.error("\(path, privacy: .public): HTTP \(status, privacy: .public)")
+            Self.logger.error("\(path, privacy: .public): HTTP \(status, privacy: .public) \(errorCode, privacy: .public)")
         }
         switch status {
-        case 401: return .unauthorized
+        case 401: return errorCode == "unknown_user" ? .unknownUser : .unauthorized
         case 429: return .rateLimited
         default: return .httpStatus(status)
         }

@@ -180,6 +180,38 @@ final class ServerClientTests: XCTestCase {
         XCTAssertTrue(ServerClientError.httpStatus(503).isTransient)
     }
 
+    /// CONTRACTS §5 (2026-09-27): a user RevenueCat does not know gets 401 unknown_user on every route.
+    /// It is not retried; the extension treats it like an unavailable server (local fallback).
+    func testUnknownUserIsDistinctAndNotTransient() async throws {
+        StubURLProtocol.respond(status: 401, json: #"{"error":"unknown_user"}"#)
+        await assertThrows(ServerClientError.unknownUser) {
+            _ = try await self.makeClient(user: "local:0F2E").judge(service: nil, messages: [self.acme])
+        }
+        await assertThrows(ServerClientError.unknownUser) {
+            _ = try await self.makeClient(user: "local:0F2E").reportFill(messageID: self.acme.id)
+        }
+        XCTAssertFalse(ServerClientError.unknownUser.isTransient)
+    }
+
+    /// CONTRACTS §5 (2026-09-27): `remaining: 0` in a 200 means "not known" while RevenueCat is down,
+    /// not "exhausted"; only 402 is quota exhaustion.
+    func testRemainingZeroInA200IsNotQuotaExhaustion() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{},"remaining":0,"source":"jev"}
+        """)
+        let outcome = try await makeClient().judge(service: nil, messages: [acme])
+        XCTAssertEqual(outcome, .chosen(messageID: acme.id, scores: [:]))
+
+        StubURLProtocol.respond(status: 200, json: #"{"remaining":0}"#)
+        let remaining = try await makeClient().reportFill(messageID: acme.id)
+        XCTAssertEqual(remaining, 0)
+
+        StubURLProtocol.respond(status: 200, json: #"{"plan":"unknown","used":3,"limit":0,"resetsAt":"2026-10-01T00:00:00Z"}"#)
+        let usage = try await makeClient().currentUsage()
+        XCTAssertEqual(usage.plan, "unknown")
+        XCTAssertEqual(usage.limit, 0)
+    }
+
     /// TRIAGE D10: without an app user ID the extension still asks the server to judge.
     func testJudgeWithoutAppUserIDUsesTheAnonymousJudgeUser() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":10,"source":"jev"}"#)
