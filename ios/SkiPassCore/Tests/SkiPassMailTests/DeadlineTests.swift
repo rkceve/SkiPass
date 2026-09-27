@@ -77,6 +77,27 @@ final class DeadlineTests: XCTestCase {
         XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
         XCTAssertThrowsError(try result.get()) { XCTAssertTrue($0 is CancellationError) }
     }
+
+    /// A2-05: when the caller gives up first (the resolver's own budget), the IMAP connection must
+    /// still be dropped, so the cleanup that runs on timeout also runs on cancellation.
+    func testOuterCancellationAlsoRunsCleanup() async {
+        let cleaned = CallFlag()
+        let task = Task {
+            try await Deadline.run(
+                seconds: 5,
+                operation: { () async throws -> Int in
+                    await uncancellableSleep(3)
+                    return 1
+                },
+                onTimeout: { cleaned.set() }
+            )
+        }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        task.cancel()
+        _ = await task.result
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertTrue(cleaned.isSet)
+    }
 }
 
 final class IMAPMailFetcherTimeoutTests: XCTestCase {

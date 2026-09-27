@@ -133,6 +133,68 @@ final class ServerClientTests: XCTestCase {
         }
     }
 
+    // MARK: judge reply validation (A2-06, TRIAGE D1/D3)
+
+    func testJudgeAcceptsMockSource() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127":0.9},"remaining":10,"source":"mock"}
+        """)
+        let outcome = try await makeClient().judge(service: "login.acme.co.uk", messages: [acme, globex])
+        XCTAssertEqual(outcome, .chosen(messageID: acme.id, scores: [acme.id: 0.9]))
+    }
+
+    func testJudgeRejectsUnknownSource() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{},"remaining":10,"source":"cache"}
+        """)
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
+        }
+    }
+
+    func testJudgeRejectsChosenIDThatWasNotSent() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:9999","scores":{},"remaining":10,"source":"jev"}
+        """)
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme, self.globex])
+        }
+    }
+
+    func testJudgeRejects402WithoutQuotaBody() async throws {
+        StubURLProtocol.respond(status: 402, json: "<html>Payment Required</html>")
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
+        }
+    }
+
+    func testJudgeRateLimitedThrowsSoTheCallerFallsBack() async throws {
+        StubURLProtocol.respond(status: 429, json: #"{"error":"rate_limited"}"#)
+        do {
+            _ = try await makeClient().judge(service: "login.acme.co.uk", messages: [acme])
+            XCTFail("expected an error")
+        } catch {
+            // Any thrown error makes FallbackJudge use the local rule.
+        }
+    }
+
+    /// A2-08: the configured timeout bounds the whole request, not only idle time.
+    func testJudgeTimeoutBoundsTheWholeRequest() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":1,"source":"jev"}"#,
+                                delay: 3)
+        let id = user
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { id }, timeout: 0.3),
+            session: StubURLProtocol.session()
+        )
+        let start = Date()
+        do {
+            _ = try await client.judge(service: nil, messages: [acme])
+            XCTFail("expected a timeout")
+        } catch {}
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
+    }
+
     func testMissingAppUserIDMakesNoRequest() async throws {
         StubURLProtocol.respond(status: 200, json: "{}")
         await assertThrows(ServerClientError.missingAppUserID) {

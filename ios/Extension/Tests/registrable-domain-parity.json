@@ -1,0 +1,989 @@
+{
+ "_comment": "Generated from tldts 7.4.15 with the server rule (server/src/jev.ts registrableDomain, allowPrivateDomains: true). Swift EmailDomains.registrableDomain must agree on every case.",
+ "cases": [
+  {
+   "input": "google.com",
+   "expected": "google.com"
+  },
+  {
+   "input": "login.google.com",
+   "expected": "google.com"
+  },
+  {
+   "input": "youtube.com",
+   "expected": "youtube.com"
+  },
+  {
+   "input": "login.youtube.com",
+   "expected": "youtube.com"
+  },
+  {
+   "input": "apple.com",
+   "expected": "apple.com"
+  },
+  {
+   "input": "login.apple.com",
+   "expected": "apple.com"
+  },
+  {
+   "input": "icloud.com",
+   "expected": "icloud.com"
+  },
+  {
+   "input": "login.icloud.com",
+   "expected": "icloud.com"
+  },
+  {
+   "input": "microsoft.com",
+   "expected": "microsoft.com"
+  },
+  {
+   "input": "login.microsoft.com",
+   "expected": "microsoft.com"
+  },
+  {
+   "input": "live.com",
+   "expected": "live.com"
+  },
+  {
+   "input": "login.live.com",
+   "expected": "live.com"
+  },
+  {
+   "input": "outlook.com",
+   "expected": "outlook.com"
+  },
+  {
+   "input": "login.outlook.com",
+   "expected": "outlook.com"
+  },
+  {
+   "input": "office.com",
+   "expected": "office.com"
+  },
+  {
+   "input": "login.office.com",
+   "expected": "office.com"
+  },
+  {
+   "input": "amazon.com",
+   "expected": "amazon.com"
+  },
+  {
+   "input": "login.amazon.com",
+   "expected": "amazon.com"
+  },
+  {
+   "input": "amazon.co.jp",
+   "expected": "amazon.co.jp"
+  },
+  {
+   "input": "login.amazon.co.jp",
+   "expected": "amazon.co.jp"
+  },
+  {
+   "input": "facebook.com",
+   "expected": "facebook.com"
+  },
+  {
+   "input": "login.facebook.com",
+   "expected": "facebook.com"
+  },
+  {
+   "input": "instagram.com",
+   "expected": "instagram.com"
+  },
+  {
+   "input": "login.instagram.com",
+   "expected": "instagram.com"
+  },
+  {
+   "input": "threads.net",
+   "expected": "threads.net"
+  },
+  {
+   "input": "login.threads.net",
+   "expected": "threads.net"
+  },
+  {
+   "input": "whatsapp.com",
+   "expected": "whatsapp.com"
+  },
+  {
+   "input": "login.whatsapp.com",
+   "expected": "whatsapp.com"
+  },
+  {
+   "input": "x.com",
+   "expected": "x.com"
+  },
+  {
+   "input": "login.x.com",
+   "expected": "x.com"
+  },
+  {
+   "input": "twitter.com",
+   "expected": "twitter.com"
+  },
+  {
+   "input": "login.twitter.com",
+   "expected": "twitter.com"
+  },
+  {
+   "input": "linkedin.com",
+   "expected": "linkedin.com"
+  },
+  {
+   "input": "login.linkedin.com",
+   "expected": "linkedin.com"
+  },
+  {
+   "input": "tiktok.com",
+   "expected": "tiktok.com"
+  },
+  {
+   "input": "login.tiktok.com",
+   "expected": "tiktok.com"
+  },
+  {
+   "input": "snapchat.com",
+   "expected": "snapchat.com"
+  },
+  {
+   "input": "login.snapchat.com",
+   "expected": "snapchat.com"
+  },
+  {
+   "input": "pinterest.com",
+   "expected": "pinterest.com"
+  },
+  {
+   "input": "login.pinterest.com",
+   "expected": "pinterest.com"
+  },
+  {
+   "input": "reddit.com",
+   "expected": "reddit.com"
+  },
+  {
+   "input": "login.reddit.com",
+   "expected": "reddit.com"
+  },
+  {
+   "input": "discord.com",
+   "expected": "discord.com"
+  },
+  {
+   "input": "login.discord.com",
+   "expected": "discord.com"
+  },
+  {
+   "input": "twitch.tv",
+   "expected": "twitch.tv"
+  },
+  {
+   "input": "login.twitch.tv",
+   "expected": "twitch.tv"
+  },
+  {
+   "input": "telegram.org",
+   "expected": "telegram.org"
+  },
+  {
+   "input": "login.telegram.org",
+   "expected": "telegram.org"
+  },
+  {
+   "input": "netflix.com",
+   "expected": "netflix.com"
+  },
+  {
+   "input": "login.netflix.com",
+   "expected": "netflix.com"
+  },
+  {
+   "input": "spotify.com",
+   "expected": "spotify.com"
+  },
+  {
+   "input": "login.spotify.com",
+   "expected": "spotify.com"
+  },
+  {
+   "input": "hulu.com",
+   "expected": "hulu.com"
+  },
+  {
+   "input": "login.hulu.com",
+   "expected": "hulu.com"
+  },
+  {
+   "input": "disneyplus.com",
+   "expected": "disneyplus.com"
+  },
+  {
+   "input": "login.disneyplus.com",
+   "expected": "disneyplus.com"
+  },
+  {
+   "input": "max.com",
+   "expected": "max.com"
+  },
+  {
+   "input": "login.max.com",
+   "expected": "max.com"
+  },
+  {
+   "input": "primevideo.com",
+   "expected": "primevideo.com"
+  },
+  {
+   "input": "login.primevideo.com",
+   "expected": "primevideo.com"
+  },
+  {
+   "input": "paypal.com",
+   "expected": "paypal.com"
+  },
+  {
+   "input": "login.paypal.com",
+   "expected": "paypal.com"
+  },
+  {
+   "input": "stripe.com",
+   "expected": "stripe.com"
+  },
+  {
+   "input": "login.stripe.com",
+   "expected": "stripe.com"
+  },
+  {
+   "input": "venmo.com",
+   "expected": "venmo.com"
+  },
+  {
+   "input": "login.venmo.com",
+   "expected": "venmo.com"
+  },
+  {
+   "input": "wise.com",
+   "expected": "wise.com"
+  },
+  {
+   "input": "login.wise.com",
+   "expected": "wise.com"
+  },
+  {
+   "input": "revolut.com",
+   "expected": "revolut.com"
+  },
+  {
+   "input": "login.revolut.com",
+   "expected": "revolut.com"
+  },
+  {
+   "input": "coinbase.com",
+   "expected": "coinbase.com"
+  },
+  {
+   "input": "login.coinbase.com",
+   "expected": "coinbase.com"
+  },
+  {
+   "input": "binance.com",
+   "expected": "binance.com"
+  },
+  {
+   "input": "login.binance.com",
+   "expected": "binance.com"
+  },
+  {
+   "input": "kraken.com",
+   "expected": "kraken.com"
+  },
+  {
+   "input": "login.kraken.com",
+   "expected": "kraken.com"
+  },
+  {
+   "input": "robinhood.com",
+   "expected": "robinhood.com"
+  },
+  {
+   "input": "login.robinhood.com",
+   "expected": "robinhood.com"
+  },
+  {
+   "input": "chase.com",
+   "expected": "chase.com"
+  },
+  {
+   "input": "login.chase.com",
+   "expected": "chase.com"
+  },
+  {
+   "input": "bankofamerica.com",
+   "expected": "bankofamerica.com"
+  },
+  {
+   "input": "login.bankofamerica.com",
+   "expected": "bankofamerica.com"
+  },
+  {
+   "input": "wellsfargo.com",
+   "expected": "wellsfargo.com"
+  },
+  {
+   "input": "login.wellsfargo.com",
+   "expected": "wellsfargo.com"
+  },
+  {
+   "input": "capitalone.com",
+   "expected": "capitalone.com"
+  },
+  {
+   "input": "login.capitalone.com",
+   "expected": "capitalone.com"
+  },
+  {
+   "input": "americanexpress.com",
+   "expected": "americanexpress.com"
+  },
+  {
+   "input": "login.americanexpress.com",
+   "expected": "americanexpress.com"
+  },
+  {
+   "input": "ebay.com",
+   "expected": "ebay.com"
+  },
+  {
+   "input": "login.ebay.com",
+   "expected": "ebay.com"
+  },
+  {
+   "input": "etsy.com",
+   "expected": "etsy.com"
+  },
+  {
+   "input": "login.etsy.com",
+   "expected": "etsy.com"
+  },
+  {
+   "input": "shopify.com",
+   "expected": "shopify.com"
+  },
+  {
+   "input": "login.shopify.com",
+   "expected": "shopify.com"
+  },
+  {
+   "input": "walmart.com",
+   "expected": "walmart.com"
+  },
+  {
+   "input": "login.walmart.com",
+   "expected": "walmart.com"
+  },
+  {
+   "input": "target.com",
+   "expected": "target.com"
+  },
+  {
+   "input": "login.target.com",
+   "expected": "target.com"
+  },
+  {
+   "input": "bestbuy.com",
+   "expected": "bestbuy.com"
+  },
+  {
+   "input": "login.bestbuy.com",
+   "expected": "bestbuy.com"
+  },
+  {
+   "input": "aliexpress.com",
+   "expected": "aliexpress.com"
+  },
+  {
+   "input": "login.aliexpress.com",
+   "expected": "aliexpress.com"
+  },
+  {
+   "input": "temu.com",
+   "expected": "temu.com"
+  },
+  {
+   "input": "login.temu.com",
+   "expected": "temu.com"
+  },
+  {
+   "input": "rakuten.co.jp",
+   "expected": "rakuten.co.jp"
+  },
+  {
+   "input": "login.rakuten.co.jp",
+   "expected": "rakuten.co.jp"
+  },
+  {
+   "input": "mercari.com",
+   "expected": "mercari.com"
+  },
+  {
+   "input": "login.mercari.com",
+   "expected": "mercari.com"
+  },
+  {
+   "input": "uber.com",
+   "expected": "uber.com"
+  },
+  {
+   "input": "login.uber.com",
+   "expected": "uber.com"
+  },
+  {
+   "input": "lyft.com",
+   "expected": "lyft.com"
+  },
+  {
+   "input": "login.lyft.com",
+   "expected": "lyft.com"
+  },
+  {
+   "input": "doordash.com",
+   "expected": "doordash.com"
+  },
+  {
+   "input": "login.doordash.com",
+   "expected": "doordash.com"
+  },
+  {
+   "input": "airbnb.com",
+   "expected": "airbnb.com"
+  },
+  {
+   "input": "login.airbnb.com",
+   "expected": "airbnb.com"
+  },
+  {
+   "input": "booking.com",
+   "expected": "booking.com"
+  },
+  {
+   "input": "login.booking.com",
+   "expected": "booking.com"
+  },
+  {
+   "input": "expedia.com",
+   "expected": "expedia.com"
+  },
+  {
+   "input": "login.expedia.com",
+   "expected": "expedia.com"
+  },
+  {
+   "input": "github.com",
+   "expected": "github.com"
+  },
+  {
+   "input": "login.github.com",
+   "expected": "github.com"
+  },
+  {
+   "input": "gitlab.com",
+   "expected": "gitlab.com"
+  },
+  {
+   "input": "login.gitlab.com",
+   "expected": "gitlab.com"
+  },
+  {
+   "input": "bitbucket.org",
+   "expected": "bitbucket.org"
+  },
+  {
+   "input": "login.bitbucket.org",
+   "expected": "bitbucket.org"
+  },
+  {
+   "input": "atlassian.com",
+   "expected": "atlassian.com"
+  },
+  {
+   "input": "login.atlassian.com",
+   "expected": "atlassian.com"
+  },
+  {
+   "input": "slack.com",
+   "expected": "slack.com"
+  },
+  {
+   "input": "login.slack.com",
+   "expected": "slack.com"
+  },
+  {
+   "input": "zoom.us",
+   "expected": "zoom.us"
+  },
+  {
+   "input": "login.zoom.us",
+   "expected": "zoom.us"
+  },
+  {
+   "input": "notion.so",
+   "expected": "notion.so"
+  },
+  {
+   "input": "login.notion.so",
+   "expected": "notion.so"
+  },
+  {
+   "input": "figma.com",
+   "expected": "figma.com"
+  },
+  {
+   "input": "login.figma.com",
+   "expected": "figma.com"
+  },
+  {
+   "input": "canva.com",
+   "expected": "canva.com"
+  },
+  {
+   "input": "login.canva.com",
+   "expected": "canva.com"
+  },
+  {
+   "input": "dropbox.com",
+   "expected": "dropbox.com"
+  },
+  {
+   "input": "login.dropbox.com",
+   "expected": "dropbox.com"
+  },
+  {
+   "input": "box.com",
+   "expected": "box.com"
+  },
+  {
+   "input": "login.box.com",
+   "expected": "box.com"
+  },
+  {
+   "input": "adobe.com",
+   "expected": "adobe.com"
+  },
+  {
+   "input": "login.adobe.com",
+   "expected": "adobe.com"
+  },
+  {
+   "input": "salesforce.com",
+   "expected": "salesforce.com"
+  },
+  {
+   "input": "login.salesforce.com",
+   "expected": "salesforce.com"
+  },
+  {
+   "input": "hubspot.com",
+   "expected": "hubspot.com"
+  },
+  {
+   "input": "login.hubspot.com",
+   "expected": "hubspot.com"
+  },
+  {
+   "input": "openai.com",
+   "expected": "openai.com"
+  },
+  {
+   "input": "login.openai.com",
+   "expected": "openai.com"
+  },
+  {
+   "input": "chatgpt.com",
+   "expected": "chatgpt.com"
+  },
+  {
+   "input": "login.chatgpt.com",
+   "expected": "chatgpt.com"
+  },
+  {
+   "input": "anthropic.com",
+   "expected": "anthropic.com"
+  },
+  {
+   "input": "login.anthropic.com",
+   "expected": "anthropic.com"
+  },
+  {
+   "input": "claude.ai",
+   "expected": "claude.ai"
+  },
+  {
+   "input": "login.claude.ai",
+   "expected": "claude.ai"
+  },
+  {
+   "input": "vercel.com",
+   "expected": "vercel.com"
+  },
+  {
+   "input": "login.vercel.com",
+   "expected": "vercel.com"
+  },
+  {
+   "input": "netlify.com",
+   "expected": "netlify.com"
+  },
+  {
+   "input": "login.netlify.com",
+   "expected": "netlify.com"
+  },
+  {
+   "input": "cloudflare.com",
+   "expected": "cloudflare.com"
+  },
+  {
+   "input": "login.cloudflare.com",
+   "expected": "cloudflare.com"
+  },
+  {
+   "input": "digitalocean.com",
+   "expected": "digitalocean.com"
+  },
+  {
+   "input": "login.digitalocean.com",
+   "expected": "digitalocean.com"
+  },
+  {
+   "input": "heroku.com",
+   "expected": "heroku.com"
+  },
+  {
+   "input": "login.heroku.com",
+   "expected": "heroku.com"
+  },
+  {
+   "input": "yahoo.com",
+   "expected": "yahoo.com"
+  },
+  {
+   "input": "login.yahoo.com",
+   "expected": "yahoo.com"
+  },
+  {
+   "input": "yahoo.co.jp",
+   "expected": "yahoo.co.jp"
+  },
+  {
+   "input": "login.yahoo.co.jp",
+   "expected": "yahoo.co.jp"
+  },
+  {
+   "input": "line.me",
+   "expected": "line.me"
+  },
+  {
+   "input": "login.line.me",
+   "expected": "line.me"
+  },
+  {
+   "input": "proton.me",
+   "expected": "proton.me"
+  },
+  {
+   "input": "login.proton.me",
+   "expected": "proton.me"
+  },
+  {
+   "input": "zoho.com",
+   "expected": "zoho.com"
+  },
+  {
+   "input": "login.zoho.com",
+   "expected": "zoho.com"
+  },
+  {
+   "input": "fastmail.com",
+   "expected": "fastmail.com"
+  },
+  {
+   "input": "login.fastmail.com",
+   "expected": "fastmail.com"
+  },
+  {
+   "input": "steampowered.com",
+   "expected": "steampowered.com"
+  },
+  {
+   "input": "login.steampowered.com",
+   "expected": "steampowered.com"
+  },
+  {
+   "input": "epicgames.com",
+   "expected": "epicgames.com"
+  },
+  {
+   "input": "login.epicgames.com",
+   "expected": "epicgames.com"
+  },
+  {
+   "input": "playstation.com",
+   "expected": "playstation.com"
+  },
+  {
+   "input": "login.playstation.com",
+   "expected": "playstation.com"
+  },
+  {
+   "input": "xbox.com",
+   "expected": "xbox.com"
+  },
+  {
+   "input": "login.xbox.com",
+   "expected": "xbox.com"
+  },
+  {
+   "input": "nintendo.com",
+   "expected": "nintendo.com"
+  },
+  {
+   "input": "login.nintendo.com",
+   "expected": "nintendo.com"
+  },
+  {
+   "input": "roblox.com",
+   "expected": "roblox.com"
+  },
+  {
+   "input": "login.roblox.com",
+   "expected": "roblox.com"
+  },
+  {
+   "input": "duolingo.com",
+   "expected": "duolingo.com"
+  },
+  {
+   "input": "login.duolingo.com",
+   "expected": "duolingo.com"
+  },
+  {
+   "input": "medium.com",
+   "expected": "medium.com"
+  },
+  {
+   "input": "login.medium.com",
+   "expected": "medium.com"
+  },
+  {
+   "input": "substack.com",
+   "expected": "substack.com"
+  },
+  {
+   "input": "login.substack.com",
+   "expected": "substack.com"
+  },
+  {
+   "input": "quora.com",
+   "expected": "quora.com"
+  },
+  {
+   "input": "login.quora.com",
+   "expected": "quora.com"
+  },
+  {
+   "input": "okta.com",
+   "expected": "okta.com"
+  },
+  {
+   "input": "login.okta.com",
+   "expected": "okta.com"
+  },
+  {
+   "input": "docusign.com",
+   "expected": "docusign.com"
+  },
+  {
+   "input": "login.docusign.com",
+   "expected": "docusign.com"
+  },
+  {
+   "input": "intuit.com",
+   "expected": "intuit.com"
+  },
+  {
+   "input": "login.intuit.com",
+   "expected": "intuit.com"
+  },
+  {
+   "input": "skipass-demo.vercel.app",
+   "expected": "skipass-demo.vercel.app"
+  },
+  {
+   "input": "https://skipass-demo.vercel.app/verify",
+   "expected": "skipass-demo.vercel.app"
+  },
+  {
+   "input": "vercel.app",
+   "expected": "vercel.app"
+  },
+  {
+   "input": "login.leumi.co.il",
+   "expected": "leumi.co.il"
+  },
+  {
+   "input": "www.almarai.com.sa",
+   "expected": "almarai.com.sa"
+  },
+  {
+   "input": "portal.uidai.gov.in",
+   "expected": "uidai.gov.in"
+  },
+  {
+   "input": "id.tiki.com.vn",
+   "expected": "tiki.com.vn"
+  },
+  {
+   "input": "www.safaricom.co.ke",
+   "expected": "safaricom.co.ke"
+  },
+  {
+   "input": "secure.bank.org.il",
+   "expected": "bank.org.il"
+  },
+  {
+   "input": "shop.example.com.eg",
+   "expected": "example.com.eg"
+  },
+  {
+   "input": "login.example.co.ug",
+   "expected": "example.co.ug"
+  },
+  {
+   "input": "app.example.com.pk",
+   "expected": "example.com.pk"
+  },
+  {
+   "input": "www.example.com.ng",
+   "expected": "example.com.ng"
+  },
+  {
+   "input": "my.example.com.ph",
+   "expected": "example.com.ph"
+  },
+  {
+   "input": "id.example.co.jp",
+   "expected": "example.co.jp"
+  },
+  {
+   "input": "www.bbc.co.uk",
+   "expected": "bbc.co.uk"
+  },
+  {
+   "input": "https://www.bbc.co.uk/account/signin",
+   "expected": "bbc.co.uk"
+  },
+  {
+   "input": "accounts.google.com",
+   "expected": "google.com"
+  },
+  {
+   "input": "example.com",
+   "expected": "example.com"
+  },
+  {
+   "input": "Example.COM",
+   "expected": "example.com"
+  },
+  {
+   "input": "a.b.c.example.org",
+   "expected": "example.org"
+  },
+  {
+   "input": "rkceve.github.io",
+   "expected": "rkceve.github.io"
+  },
+  {
+   "input": "docs.rkceve.github.io",
+   "expected": "rkceve.github.io"
+  },
+  {
+   "input": "github.io",
+   "expected": "github.io"
+  },
+  {
+   "input": "my-app.netlify.app",
+   "expected": "my-app.netlify.app"
+  },
+  {
+   "input": "preview.my-app.pages.dev",
+   "expected": "my-app.pages.dev"
+  },
+  {
+   "input": "my-app.web.app",
+   "expected": "my-app.web.app"
+  },
+  {
+   "input": "my-app.firebaseapp.com",
+   "expected": "my-app.firebaseapp.com"
+  },
+  {
+   "input": "my-app.herokuapp.com",
+   "expected": "my-app.herokuapp.com"
+  },
+  {
+   "input": "api.my-app.workers.dev",
+   "expected": "my-app.workers.dev"
+  },
+  {
+   "input": "site.azurewebsites.net",
+   "expected": "site.azurewebsites.net"
+  },
+  {
+   "input": "x.appspot.com",
+   "expected": "x.appspot.com"
+  },
+  {
+   "input": "blog.blogspot.com",
+   "expected": "blog.blogspot.com"
+  },
+  {
+   "input": "d123.cloudfront.net",
+   "expected": "d123.cloudfront.net"
+  },
+  {
+   "input": "my-app.onrender.com",
+   "expected": "my-app.onrender.com"
+  },
+  {
+   "input": "my-app.fly.dev",
+   "expected": "my-app.fly.dev"
+  },
+  {
+   "input": "me.gitlab.io",
+   "expected": "me.gitlab.io"
+  },
+  {
+   "input": "login.example.com.au",
+   "expected": "example.com.au"
+  },
+  {
+   "input": "login.example.com.br",
+   "expected": "example.com.br"
+  },
+  {
+   "input": "login.example.co.nz",
+   "expected": "example.co.nz"
+  },
+  {
+   "input": "login.example.co.za",
+   "expected": "example.co.za"
+  },
+  {
+   "input": "login.example.com.mx",
+   "expected": "example.com.mx"
+  }
+ ]
+}

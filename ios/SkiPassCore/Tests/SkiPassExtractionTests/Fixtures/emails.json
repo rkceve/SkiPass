@@ -49,6 +49,20 @@
       "from": "Acme Store <auto-confirm@store.acme.example>",
       "subject": "Your Acme Store order #112-4567890-1234567 is confirmed",
       "expected": null
+    },
+    {
+      "name": "promotional coupon code alone in a box after 'use this code at checkout'",
+      "file": "emails/promo-code.html",
+      "from": "Acme Store <news@store.acme.example>",
+      "subject": "Fall Sale: 20% off everything",
+      "expected": null
+    },
+    {
+      "name": "Japanese verification code in a table row",
+      "file": "emails/ja-ninsho-code.html",
+      "from": "Acme <no-reply@acme.example.jp>",
+      "subject": "【Acme】認証コードのお知らせ",
+      "expected": "615203"
     }
   ]
 }

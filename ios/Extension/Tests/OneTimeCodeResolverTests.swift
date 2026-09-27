@@ -227,13 +227,23 @@ final class OneTimeCodeResolverTests: XCTestCase {
         XCTAssertEqual(reported, ["box:42"])
     }
 
-    func testReportFillSwallowsErrors() async {
+    /// TRIAGE D4: a failed fill report is retried, up to 3 attempts in total, and never surfaces.
+    func testReportFillRetriesThreeTimesThenGivesUp() async {
         let usage = FakeUsage(fails: true)
         let resolver = makeResolver(mailboxes: [], fetcher: FakeFetcher(results: [:]),
                                     judge: FakeJudge(outcome: .quotaExhausted), usage: usage)
         await resolver.reportFill(messageID: "box:42")
         let reported = await usage.reported
-        XCTAssertEqual(reported, ["box:42"])
+        XCTAssertEqual(reported, ["box:42", "box:42", "box:42"])
+    }
+
+    func testReportFillStopsRetryingAfterSuccess() async {
+        let usage = FakeUsage(failures: 1)
+        let resolver = makeResolver(mailboxes: [], fetcher: FakeFetcher(results: [:]),
+                                    judge: FakeJudge(outcome: .quotaExhausted), usage: usage)
+        await resolver.reportFill(messageID: "box:42")
+        let reported = await usage.reported
+        XCTAssertEqual(reported, ["box:42", "box:42"])
     }
 
     func testResolveDoesNotReportFill() async {
@@ -318,14 +328,19 @@ private actor FakeJudge: CandidateJudging {
 }
 
 private actor FakeUsage: UsageReporting {
-    private let fails: Bool
+    /// Number of calls that fail before the first success (`Int.max` = always fails).
+    private var remainingFailures: Int
     private(set) var reported: [String] = []
 
-    init(fails: Bool = false) { self.fails = fails }
+    init(fails: Bool = false) { remainingFailures = fails ? Int.max : 0 }
+    init(failures: Int) { remainingFailures = failures }
 
     func reportFill(messageID: String) async throws -> Int {
         reported.append(messageID)
-        if fails { throw FakeError.failed }
+        if remainingFailures > 0 {
+            remainingFailures -= 1
+            throw FakeError.failed
+        }
         return 9
     }
 
