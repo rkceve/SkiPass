@@ -1,10 +1,14 @@
 import Foundation
 
 /// Identifiers fixed by docs/CONTRACTS.md §2 and §4.
+///
+/// `appGroupID` and `keychainAccessGroup` are the canonical names of a normally signed build. A
+/// re-signed (sideloaded) build gets different ones, so storage uses the identifiers resolved at
+/// runtime by `SharedStorageEnvironment.current`; the canonical names are among its candidates.
 public enum StorageConstants {
-    /// App Group shared by the app and the AutoFill extension.
+    /// Canonical App Group shared by the app and the AutoFill extension.
     public static let appGroupID = "group.io.github.rkceve.skipass"
-    /// Keychain access group: same string as the App Group (CONTRACTS §2).
+    /// Canonical Keychain access group: same string as the App Group (CONTRACTS §2).
     public static let keychainAccessGroup = appGroupID
     /// Keychain generic-password service (CONTRACTS §4).
     public static let keychainService = "io.github.rkceve.skipass"
@@ -22,9 +26,10 @@ public enum StorageConstants {
         public static func oauth(_ mailboxID: UUID) -> String { "oauth.\(mailboxID.uuidString)" }
     }
 
-    /// The shared App Group defaults. Nil when the process lacks the App Group entitlement.
+    /// The shared App Group defaults of the runtime-resolved group. Nil when no App Group container
+    /// is available to this process.
     public static func sharedDefaults() -> UserDefaults? {
-        UserDefaults(suiteName: appGroupID)
+        SharedStorageEnvironment.current.sharedDefaults
     }
 }
 

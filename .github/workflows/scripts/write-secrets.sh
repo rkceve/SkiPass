@@ -18,3 +18,11 @@ fi
 [ -n "${REVENUECAT_API_KEY:-}" ] && echo "REVENUECAT_API_KEY = $REVENUECAT_API_KEY" >> "$out"
 
 echo "Secrets.xcconfig keys: $(cut -d' ' -f1 "$out" | tr '\n' ' ')"
+
+# Unset secrets leave the example placeholders in Info.plist; the app then treats Google /
+# Microsoft sign-in as not configured and shows no purchasable plans.
+for name in SKIPASS_SERVER_URL SKIPASS_APP_TOKEN GOOGLE_CLIENT_ID MICROSOFT_CLIENT_ID REVENUECAT_API_KEY; do
+  if [ -z "${!name:-}" ]; then
+    echo "::warning::GitHub secret $name is not set; this build keeps the example placeholder"
+  fi
+done

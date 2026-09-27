@@ -26,6 +26,7 @@ struct AccountFormSheet: View {
     @State private var password: String
     @State private var isWorking: Bool
     @State private var errorMessage: String?
+    @State private var emailSubmitAttempted = false
     @FocusState private var focusedField: Field?
 
     private let editingAccount: MailAccount?
@@ -55,24 +56,20 @@ struct AccountFormSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            Group {
                 switch step {
                 case .email:
-                    emailSection
+                    emailStep
                 case .imap:
-                    imapSections
-                }
-
-                if let errorMessage {
-                    Section {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Theme.destructive)
-                            .accessibilityIdentifier("accountForm.error")
+                    Form {
+                        imapSections
+                        if let errorMessage {
+                            Section { errorText(errorMessage) }
+                        }
                     }
+                    .scrollContentBackground(.hidden)
                 }
             }
-            .scrollContentBackground(.hidden)
             .modifier(SheetBackground())
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle(editingAccount == nil ? Copy.addAccountTitle : Copy.editAccountTitle)
@@ -83,21 +80,143 @@ struct AccountFormSheet: View {
         }
     }
 
-    // MARK: Sections
+    private func errorText(_ message: String) -> some View {
+        Text(message)
+            .font(.footnote)
+            .foregroundStyle(Theme.destructive)
+            .accessibilityIdentifier("accountForm.error")
+    }
 
-    private var emailSection: some View {
-        Section(Copy.emailAddress) {
+    // MARK: Email step
+
+    /// Label above a large bordered field, inline validation, what happens next, and a prominent
+    /// Continue that stays disabled until the text looks like an email address.
+    private var emailStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(Copy.emailAddress)
+                    .font(.headline)
+                    .accessibilityHidden(true)  // the field carries the label for VoiceOver
+
+                emailField
+
+                if showsInvalidEmail {
+                    Label(Copy.emailInvalid, systemImage: "exclamationmark.circle.fill")
+                        .font(.footnote)
+                        .foregroundStyle(Theme.destructive)
+                        .accessibilityIdentifier("accountForm.emailInvalid")
+                        .transition(.opacity)
+                }
+
+                Text(Copy.emailHelper)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let errorMessage {
+                    errorText(errorMessage)
+                        .padding(.top, 4)
+                }
+
+                continueButton
+                    .padding(.top, 14)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .animation(.smooth, value: showsInvalidEmail)
+        }
+        .defaultFocus($focusedField, .email)
+        .onAppear { focusedField = .email }
+    }
+
+    private var emailField: some View {
+        let isFocused = focusedField == .email
+        return HStack(spacing: 12) {
+            Image(systemName: "envelope")
+                .font(.title3)
+                .foregroundStyle(isFocused ? Theme.accent : Color.secondary)
+                .accessibilityHidden(true)
             TextField(Copy.emailPlaceholder, text: $email)
+                .font(.title3)
                 .keyboardType(.emailAddress)
                 .textContentType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.continue)
                 .focused($focusedField, equals: .email)
-                .onSubmit { Task { await submit() } }
+                .onSubmit {
+                    emailSubmitAttempted = true
+                    Task { await submit() }
+                }
+                .accessibilityLabel(Copy.emailAddress)
                 .accessibilityIdentifier("accountForm.email")
+            if !email.isEmpty {
+                Button {
+                    email = ""
+                    emailSubmitAttempted = false
+                    focusedField = .email
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Copy.clearEmail)
+                .accessibilityIdentifier("accountForm.email.clear")
+            }
         }
-        .defaultFocus($focusedField, .email)
+        .padding(.horizontal, 16)
+        .frame(minHeight: 58)
+        .background(Theme.innerFill, in: RoundedRectangle(cornerRadius: Theme.buttonRadius, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: Theme.buttonRadius, style: .continuous)
+                .strokeBorder(emailBorderColor(focused: isFocused), lineWidth: isFocused || showsInvalidEmail ? 2 : 1)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { focusedField = .email }
+    }
+
+    private func emailBorderColor(focused: Bool) -> Color {
+        if showsInvalidEmail { return Theme.destructive }
+        return focused ? Theme.accent : Color(uiColor: .systemGray3)
+    }
+
+    /// iOS 26+: Liquid Glass prominent capsule like the Add button; before: bordered prominent.
+    @ViewBuilder
+    private var continueButton: some View {
+        let button = Button {
+            emailSubmitAttempted = true
+            Task { await submit() }
+        } label: {
+            ZStack {
+                Text(Copy.continueAction).opacity(isWorking ? 0 : 1)
+                if isWorking { ProgressView() }
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
+        }
+        .buttonBorderShape(.capsule)
+        .controlSize(.large)
+        .disabled(!canSubmit || isWorking)
+        .accessibilityIdentifier("accountForm.continue")
+
+        if #available(iOS 26, *) {
+            button
+                .buttonStyle(.glassProminent)
+                .tint(Theme.accent.opacity(0.85))
+        } else {
+            button
+                .buttonStyle(.borderedProminent)
+                .tint(Theme.accent)
+        }
+    }
+
+    /// Shown once the user tried to continue (Return) or left the field with text that is not an address.
+    private var showsInvalidEmail: Bool {
+        !trimmedEmail.isEmpty
+            && !EmailAddressFormat.looksValid(trimmedEmail)
+            && (emailSubmitAttempted || focusedField != .email)
     }
 
     @ViewBuilder
@@ -150,15 +269,18 @@ struct AccountFormSheet: View {
             Button(Copy.cancel) { dismiss() }
                 .accessibilityIdentifier("accountForm.cancel")
         }
-        ToolbarItem(placement: .confirmationAction) {
-            if isWorking {
-                ProgressView()
-            } else {
-                Button(step == .email ? Copy.continueAction : Copy.save) {
-                    Task { await submit() }
+        // The email step has its own prominent Continue button in the content.
+        if step == .imap {
+            ToolbarItem(placement: .confirmationAction) {
+                if isWorking {
+                    ProgressView()
+                } else {
+                    Button(Copy.save) {
+                        Task { await submit() }
+                    }
+                    .disabled(!canSubmit)
+                    .accessibilityIdentifier("accountForm.save")
                 }
-                .disabled(!canSubmit)
-                .accessibilityIdentifier(step == .email ? "accountForm.continue" : "accountForm.save")
             }
         }
     }
@@ -179,7 +301,7 @@ struct AccountFormSheet: View {
     private var canSubmit: Bool {
         switch step {
         case .email:
-            return trimmedEmail.contains("@")
+            return EmailAddressFormat.looksValid(trimmedEmail)
         case .imap:
             return !host.trimmingCharacters(in: .whitespaces).isEmpty
                 && port != nil

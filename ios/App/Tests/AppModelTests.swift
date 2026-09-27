@@ -39,6 +39,11 @@ private final class FakeAccounts: AccountServices {
         passwords[mailboxID] = nil
     }
 
+    /// Providers whose client ID is missing in the simulated build.
+    var unconfiguredKinds: Set<ProviderKind> = []
+
+    func isSignInConfigured(kind: ProviderKind) -> Bool { !unconfiguredKinds.contains(kind) }
+
     func signIn(kind: ProviderKind, loginHint: String) async throws -> OAuthSignInResult {
         if let signInError { throw signInError }
         signIns.append((kind, loginHint))
@@ -271,6 +276,35 @@ struct AppModelTests {
 
         #expect(second.id == first.id)
         #expect(h.accounts.mailboxes.count == 1)
+    }
+
+    @Test func missingClientIDDoesNotOpenProviderAndExplains() async {
+        let h = Harness()
+        h.accounts.unconfiguredKinds = [.google, .microsoft]
+        let model = h.makeModel()
+
+        await #expect(throws: AppModelError.signInNotConfigured(.google)) {
+            _ = try await model.addAccount(email: "hello@gmail.com")
+        }
+        await #expect(throws: AppModelError.signInNotConfigured(.microsoft)) {
+            _ = try await model.addAccount(email: "team@outlook.com")
+        }
+        #expect(h.accounts.signIns.isEmpty)
+        #expect(h.accounts.mailboxes.isEmpty)
+        #expect(AppModelError.signInNotConfigured(.google).localizedDescription
+            == "Google sign-in is not configured in this build.")
+        #expect(AppModelError.signInNotConfigured(.microsoft).localizedDescription
+            == "Microsoft sign-in is not configured in this build.")
+    }
+
+    @Test func missingClientIDDoesNotAffectIMAP() async {
+        let h = Harness()
+        h.accounts.unconfiguredKinds = [.google, .microsoft]
+        let model = h.makeModel()
+
+        await #expect(throws: SkiPassUIError.needsServerSettings) {
+            _ = try await model.addAccount(email: "info@myshop.jp")
+        }
     }
 
     @Test func failedSignInSavesNothing() async {

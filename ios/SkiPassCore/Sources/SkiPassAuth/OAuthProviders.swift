@@ -31,14 +31,33 @@ public struct OAuthClientConfiguration: Sendable, Equatable {
     }
 
     public static func fromInfoPlist(_ bundle: Bundle = .main) -> OAuthClientConfiguration {
-        func value(_ key: String) -> String? {
-            guard let raw = bundle.object(forInfoDictionaryKey: key) as? String else { return nil }
-            let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-            // An unset xcconfig variable leaves an empty string or the literal "$(NAME)".
-            return trimmed.isEmpty || trimmed.hasPrefix("$(") ? nil : trimmed
-        }
-        return OAuthClientConfiguration(googleClientID: value("GoogleClientID"),
-                                        microsoftClientID: value("MicrosoftClientID"))
+        OAuthClientConfiguration(
+            googleClientID: configuredValue(bundle.object(forInfoDictionaryKey: "GoogleClientID")),
+            microsoftClientID: configuredValue(bundle.object(forInfoDictionaryKey: "MicrosoftClientID"))
+        )
+    }
+
+    /// Placeholder client IDs of `ios/Config/Secrets.example.xcconfig`. A build made without the
+    /// `GOOGLE_CLIENT_ID` / `MICROSOFT_CLIENT_ID` secrets carries these; sending them to the
+    /// provider only produces its "invalid client / access blocked" page.
+    package static let exampleClientIDs: Set<String> = [
+        "000000000000-example.apps.googleusercontent.com",
+        "00000000-0000-0000-0000-000000000000",
+    ]
+
+    /// A real, substituted Info.plist value: nil for a missing / non-string value, an empty string
+    /// or a literal "$(NAME)" (unset xcconfig variable), and the example placeholders.
+    package static func configuredValue(_ raw: Any?) -> String? {
+        guard let raw = raw as? String else { return nil }
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !trimmed.hasPrefix("$("), !exampleClientIDs.contains(trimmed) else { return nil }
+        return trimmed
+    }
+
+    /// True when sign-in with `kind` can start: its client ID is present and well-formed.
+    /// Checked before any provider page is opened.
+    public func isConfigured(_ kind: ProviderKind) -> Bool {
+        (try? OAuthProviderSettings.settings(for: kind, clients: self)) != nil
     }
 }
 
@@ -58,6 +77,14 @@ package struct OAuthProviderSettings: Sendable, Equatable {
     /// (OIDAuthorizationService.m L596-L605).
     package let omitIssuer: Bool
 
+    /// Fixed (CONTRACTS §2), deliberately not built from the runtime bundle ID: a sideloaded build's
+    /// ID carries a team suffix, and Entra only string-matches the redirect against the app
+    /// registration ("AADSTS50011: The reply URL specified in the request does not match";
+    /// https://learn.microsoft.com/en-us/entra/identity-platform/reply-url). Bundle-ID checks exist
+    /// only inside MSAL / the broker, which AppAuth does not use. ASWebAuthenticationSession
+    /// receives the callback for its `callbackURLScheme` (AppAuth 3.0.0
+    /// OIDExternalUserAgentIOS.m L100-L108), so the scheme also works without a URL-type registration.
+    /// Google's redirect is the reversed client ID, likewise independent of the bundle ID.
     package static let microsoftRedirect = URL(string: "msauth.io.github.rkceve.skipass://auth")!
 
     package static func settings(for kind: ProviderKind, clients: OAuthClientConfiguration) throws -> OAuthProviderSettings {

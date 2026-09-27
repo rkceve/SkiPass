@@ -44,27 +44,35 @@ jobs:
             ${{ runner.temp }}/core.log
 
   ui-package:
-    name: ui-package (SkiPassUI build)
+    name: ui-package (SkiPassUI build + tests)
     runs-on: macos-15
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
       - name: Select Xcode and simulator
         run: bash .github/workflows/scripts/select-sim.sh
-      - name: Build SkiPassUI
+      - name: Build and test SkiPassUI
         working-directory: ios/SkiPassUI
         run: |
           set -o pipefail
-          xcodebuild build \
-            -scheme SkiPassUI \
-            -destination "generic/platform=iOS Simulator" \
+          # A package whose only product shares its name gets one scheme ("SkiPassUI"); otherwise
+          # Xcode adds "<name>-Package" with every target. Use whichever carries the tests.
+          scheme=SkiPassUI
+          if xcodebuild -list 2>/dev/null | grep -q "SkiPassUI-Package"; then scheme=SkiPassUI-Package; fi
+          echo "Scheme: $scheme"
+          xcodebuild test \
+            -scheme "$scheme" \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -resultBundlePath "$RUNNER_TEMP/ui.xcresult" \
             | tee "$RUNNER_TEMP/ui.log"
       - name: Upload log
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: ui-package-log
-          path: ${{ runner.temp }}/ui.log
+          path: |
+            ${{ runner.temp }}/ui.xcresult
+            ${{ runner.temp }}/ui.log
 
   app:
     name: app (SkiPass build + SkiPassAppTests)

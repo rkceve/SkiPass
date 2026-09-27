@@ -10,13 +10,15 @@ public protocol SecretStoring: Sendable {
 }
 
 /// Keychain generic passwords per CONTRACTS §4: service `io.github.rkceve.skipass`,
-/// access group = App Group, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not synchronizable.
+/// `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not synchronizable. The access group defaults
+/// to the one resolved and verified at runtime (`SharedStorageEnvironment.current`); nil omits
+/// `kSecAttrAccessGroup`, so the process's default group is used (app-only fallback).
 public struct KeychainStore: SecretStoring {
     public let service: String
     public let accessGroup: String?
 
     public init(service: String = StorageConstants.keychainService,
-                accessGroup: String? = StorageConstants.keychainAccessGroup) {
+                accessGroup: String? = SharedStorageEnvironment.current.keychainAccessGroup) {
         self.service = service
         self.accessGroup = accessGroup
     }

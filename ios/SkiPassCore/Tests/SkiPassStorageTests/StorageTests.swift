@@ -175,8 +175,11 @@ final class CredentialStoreTests: XCTestCase {
     }
 
     func testKeychainStoreDefaultsMatchContract() {
-        let keychain = KeychainStore()
+        // The access group is resolved at runtime (SharedStorageResolverTests); the canonical
+        // names stay those of CONTRACTS §2 / §4.
+        let keychain = KeychainStore(accessGroup: StorageConstants.keychainAccessGroup)
         XCTAssertEqual(keychain.service, "io.github.rkceve.skipass")
         XCTAssertEqual(keychain.accessGroup, "group.io.github.rkceve.skipass")
+        XCTAssertEqual(StorageConstants.appGroupID, "group.io.github.rkceve.skipass")
     }
 }

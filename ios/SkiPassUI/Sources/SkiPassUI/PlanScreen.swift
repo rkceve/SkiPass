@@ -17,10 +17,17 @@ struct PlanScreen: View {
                 }
 
                 let others = store.otherPlans
-                if !others.isEmpty {
-                    SectionTitle(text: Copy.otherPlansTitle)
-                        .padding(.top, 8)
+                SectionTitle(text: Copy.otherPlansTitle)
+                    .padding(.top, 8)
 
+                if others.isEmpty {
+                    // No purchasable plans: RevenueCat is not configured in this build (or the
+                    // offering is empty), so only the current plan exists.
+                    Text(Copy.plansUnavailable)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("plan.unavailable")
+                } else {
                     VStack(spacing: 16) {
                         ForEach(others) { plan in
                             PlanRow(plan: plan) {

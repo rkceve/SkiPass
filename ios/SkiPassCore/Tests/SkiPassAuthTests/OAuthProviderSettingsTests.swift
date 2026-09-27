@@ -73,6 +73,30 @@ final class ProviderSettingsTests: XCTestCase {
         }
     }
 
+    func testConfiguredValueRejectsUnsetAndExamplePlaceholders() {
+        XCTAssertNil(OAuthClientConfiguration.configuredValue(nil))
+        XCTAssertNil(OAuthClientConfiguration.configuredValue(42))
+        XCTAssertNil(OAuthClientConfiguration.configuredValue("  "))
+        XCTAssertNil(OAuthClientConfiguration.configuredValue("$(GOOGLE_CLIENT_ID)"))
+        // Values of ios/Config/Secrets.example.xcconfig (what a build without secrets carries).
+        XCTAssertNil(OAuthClientConfiguration.configuredValue("000000000000-example.apps.googleusercontent.com"))
+        XCTAssertNil(OAuthClientConfiguration.configuredValue("00000000-0000-0000-0000-000000000000"))
+        XCTAssertEqual(OAuthClientConfiguration.configuredValue(" 123-abc.apps.googleusercontent.com\n"),
+                       "123-abc.apps.googleusercontent.com")
+    }
+
+    func testIsConfigured() {
+        XCTAssertTrue(clients.isConfigured(.google))
+        XCTAssertTrue(clients.isConfigured(.microsoft))
+        XCTAssertFalse(clients.isConfigured(.imap))
+        let none = OAuthClientConfiguration(googleClientID: nil, microsoftClientID: nil)
+        XCTAssertFalse(none.isConfigured(.google))
+        XCTAssertFalse(none.isConfigured(.microsoft))
+        // An empty prefix (".apps.googleusercontent.com") cannot form the redirect scheme.
+        let bare = OAuthClientConfiguration(googleClientID: ".apps.googleusercontent.com", microsoftClientID: nil)
+        XCTAssertFalse(bare.isConfigured(.google))
+    }
+
     func testIMAPHasNoOAuthProvider() {
         XCTAssertThrowsError(try OAuthProviderSettings.settings(for: .imap, clients: clients)) {
             XCTAssertEqual($0 as? OAuthError, .unsupportedProvider(.imap))

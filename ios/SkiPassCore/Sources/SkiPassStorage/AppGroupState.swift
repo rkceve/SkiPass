@@ -10,11 +10,10 @@ public final class AppGroupState: @unchecked Sendable {
         self.defaults = defaults
     }
 
+    /// Runtime-resolved App Group defaults, or `UserDefaults.standard` when none is available
+    /// (see `MailboxStore.init()`). Still `throws` for source compatibility; it no longer throws.
     public convenience init() throws {
-        guard let defaults = StorageConstants.sharedDefaults() else {
-            throw StorageError.appGroupUnavailable
-        }
-        self.init(defaults: defaults)
+        self.init(defaults: SharedStorageEnvironment.current.defaults)
     }
 
     public var revenueCatAppUserID: String? {
