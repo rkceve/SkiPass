@@ -9,8 +9,10 @@ on:
       configuration:
         description: "Build configuration"
         type: choice
-        options: [Release, Debug]
-        default: Release
+        # Debug is required while the app uses a RevenueCat Test Store key: purchases-ios crashes on purpose
+        # when a Test Store key is used in a Release build (Configuration.swift, checkForSimulatedStoreAPIKeyInRelease).
+        options: [Debug, Release]
+        default: Debug
 
 jobs:
   ipa:
@@ -57,7 +59,7 @@ jobs:
         run: xcodegen generate
       - name: Build for device
         env:
-          CONFIG: ${{ inputs.configuration || 'Release' }}
+          CONFIG: ${{ inputs.configuration || 'Debug' }}
         run: |
           set -o pipefail
           xcodebuild build \
@@ -69,7 +71,7 @@ jobs:
             DEVELOPMENT_TEAM= CURRENT_PROJECT_VERSION=${{ github.run_number }} | tail -30
       - name: Package IPA
         env:
-          CONFIG: ${{ inputs.configuration || 'Release' }}
+          CONFIG: ${{ inputs.configuration || 'Debug' }}
         run: |
           app="$RUNNER_TEMP/dd/Build/Products/$CONFIG-iphoneos/SkiPass.app"
           test -d "$app"
