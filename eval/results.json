@@ -1,6 +1,6 @@
 {
-  "runAt": "2026-09-27T22:47:05.665Z",
-  "finishedAt": "2026-09-27T22:47:15.732Z",
+  "runAt": "2026-09-27T22:49:37.459Z",
+  "finishedAt": "2026-09-27T22:49:47.388Z",
   "endpoint": "https://api.typesafe.ai/v1/systemone",
   "requestModel": "jev-latest",
   "scenarios": 64,
@@ -21,8 +21,8 @@
     },
     "jev": {
       "n": 64,
-      "correct": 62,
-      "false_fill": 2,
+      "correct": 64,
+      "false_fill": 0,
       "miss": 0,
       "error": 0
     }
@@ -45,8 +45,8 @@
       },
       "jev": {
         "n": 56,
-        "correct": 54,
-        "false_fill": 2,
+        "correct": 56,
+        "false_fill": 0,
         "miss": 0,
         "error": 0
       }
@@ -162,8 +162,8 @@
       },
       "jev": {
         "n": 7,
-        "correct": 5,
-        "false_fill": 2,
+        "correct": 7,
+        "false_fill": 0,
         "miss": 0,
         "error": 0
       }
@@ -289,14 +289,14 @@
     "failedRequests": 0,
     "retriedRequests": 0,
     "requestLatencyMs": {
-      "p50": 133.08780000000115,
-      "p95": 187.65589999999975,
-      "max": 297.99710000000005
+      "p50": 134.2572,
+      "p95": 197.47530000000006,
+      "max": 288.1809000000003
     },
     "scenarioLatencyMs": {
-      "p50": 150.6966999999995,
-      "p95": 229.54110000000003,
-      "max": 298.03949999999986
+      "p50": 148.21399999999994,
+      "p95": 231.91539999999986,
+      "max": 288.21039999999994
     },
     "requestsOverProdTimeout": 0,
     "scenariosOverProdTimeout": 0,
@@ -326,12 +326,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 268.2408,
+        "wallMs": 234.8356,
         "calls": [
           {
             "messageId": "older_target-01-m1",
-            "noul": 0.96,
-            "latencyMs": 267.6531,
+            "noul": 0.97,
+            "latencyMs": 222.23630000000003,
             "attempts": 1,
             "inputTokens": 534,
             "outputTokens": 23,
@@ -341,7 +341,7 @@
           {
             "messageId": "older_target-01-m2",
             "noul": 0.01,
-            "latencyMs": 193.1938,
+            "latencyMs": 211.6341,
             "attempts": 1,
             "inputTokens": 535,
             "outputTokens": 23,
@@ -367,12 +367,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 229.54110000000003,
+        "wallMs": 231.91539999999986,
         "calls": [
           {
             "messageId": "older_target-02-m1",
             "noul": 0.98,
-            "latencyMs": 125.61869999999999,
+            "latencyMs": 125.50900000000001,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -382,7 +382,7 @@
           {
             "messageId": "older_target-02-m2",
             "noul": 0.01,
-            "latencyMs": 112.31100000000004,
+            "latencyMs": 117.95420000000001,
             "attempts": 1,
             "inputTokens": 542,
             "outputTokens": 23,
@@ -392,7 +392,7 @@
           {
             "messageId": "older_target-02-m3",
             "noul": 0.01,
-            "latencyMs": 228.59269999999992,
+            "latencyMs": 229.63200000000006,
             "attempts": 1,
             "inputTokens": 530,
             "outputTokens": 23,
@@ -418,12 +418,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 129.64879999999994,
+        "wallMs": 142.2594999999999,
         "calls": [
           {
             "messageId": "older_target-03-m1",
-            "noul": 0.97,
-            "latencyMs": 129.59659999999997,
+            "noul": 0.96,
+            "latencyMs": 142.21870000000013,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -433,7 +433,7 @@
           {
             "messageId": "older_target-03-m2",
             "noul": 0.01,
-            "latencyMs": 121.88,
+            "latencyMs": 126.03099999999995,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -459,12 +459,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 113.43670000000009,
+        "wallMs": 165.04030000000012,
         "calls": [
           {
             "messageId": "older_target-04-m1",
             "noul": 0.97,
-            "latencyMs": 113.37750000000005,
+            "latencyMs": 147.99570000000017,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -474,7 +474,7 @@
           {
             "messageId": "older_target-04-m2",
             "noul": 0.01,
-            "latencyMs": 104.15560000000005,
+            "latencyMs": 164.50959999999986,
             "attempts": 1,
             "inputTokens": 554,
             "outputTokens": 23,
@@ -500,12 +500,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 172.47000000000003,
+        "wallMs": 174.50220000000013,
         "calls": [
           {
             "messageId": "older_target-05-m1",
             "noul": 0.97,
-            "latencyMs": 126.31200000000013,
+            "latencyMs": 148.1168,
             "attempts": 1,
             "inputTokens": 525,
             "outputTokens": 23,
@@ -515,7 +515,7 @@
           {
             "messageId": "older_target-05-m2",
             "noul": 0.01,
-            "latencyMs": 165.32309999999984,
+            "latencyMs": 147.42360000000008,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -525,7 +525,7 @@
           {
             "messageId": "older_target-05-m3",
             "noul": 0.01,
-            "latencyMs": 122.7186999999999,
+            "latencyMs": 147.0317,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -535,7 +535,7 @@
           {
             "messageId": "older_target-05-m4",
             "noul": 0.01,
-            "latencyMs": 170.96810000000005,
+            "latencyMs": 172.97209999999995,
             "attempts": 1,
             "inputTokens": 553,
             "outputTokens": 23,
@@ -561,12 +561,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 176.17949999999996,
+        "wallMs": 148.24009999999998,
         "calls": [
           {
             "messageId": "older_target-06-m1",
             "noul": 0.97,
-            "latencyMs": 121.15519999999992,
+            "latencyMs": 122.49019999999996,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -576,7 +576,7 @@
           {
             "messageId": "older_target-06-m2",
             "noul": 0.01,
-            "latencyMs": 175.71569999999997,
+            "latencyMs": 147.88930000000005,
             "attempts": 1,
             "inputTokens": 554,
             "outputTokens": 23,
@@ -602,12 +602,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 163.28430000000003,
+        "wallMs": 150.35030000000006,
         "calls": [
           {
             "messageId": "older_target-07-m1",
             "noul": 0.98,
-            "latencyMs": 157.93160000000012,
+            "latencyMs": 118.3701000000001,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -617,7 +617,7 @@
           {
             "messageId": "older_target-07-m2",
             "noul": 0.01,
-            "latencyMs": 119.82020000000011,
+            "latencyMs": 124.87069999999994,
             "attempts": 1,
             "inputTokens": 510,
             "outputTokens": 23,
@@ -627,7 +627,7 @@
           {
             "messageId": "older_target-07-m3",
             "noul": 0.01,
-            "latencyMs": 162.88329999999996,
+            "latencyMs": 149.90260000000012,
             "attempts": 1,
             "inputTokens": 542,
             "outputTokens": 23,
@@ -653,12 +653,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 117.04690000000005,
+        "wallMs": 123.2201,
         "calls": [
           {
             "messageId": "brand_via_provider-01-m1",
-            "noul": 0.86,
-            "latencyMs": 117.00509999999986,
+            "noul": 0.81,
+            "latencyMs": 123.19319999999993,
             "attempts": 1,
             "inputTokens": 507,
             "outputTokens": 23,
@@ -668,7 +668,7 @@
           {
             "messageId": "brand_via_provider-01-m2",
             "noul": 0.01,
-            "latencyMs": 107.35979999999995,
+            "latencyMs": 122.89540000000011,
             "attempts": 1,
             "inputTokens": 529,
             "outputTokens": 23,
@@ -694,12 +694,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 140.81860000000006,
+        "wallMs": 113.55569999999989,
         "calls": [
           {
             "messageId": "brand_via_provider-02-m1",
-            "noul": 0.76,
-            "latencyMs": 112.56410000000005,
+            "noul": 0.78,
+            "latencyMs": 110.61440000000016,
             "attempts": 1,
             "inputTokens": 508,
             "outputTokens": 23,
@@ -708,8 +708,8 @@
           },
           {
             "messageId": "brand_via_provider-02-m2",
-            "noul": 0.02,
-            "latencyMs": 140.4286000000002,
+            "noul": 0.01,
+            "latencyMs": 113.2516999999998,
             "attempts": 1,
             "inputTokens": 521,
             "outputTokens": 23,
@@ -735,12 +735,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 138.9905000000001,
+        "wallMs": 177.6786000000002,
         "calls": [
           {
             "messageId": "brand_via_provider-03-m1",
             "noul": 0.01,
-            "latencyMs": 138.93810000000008,
+            "latencyMs": 173.1782000000003,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -749,8 +749,8 @@
           },
           {
             "messageId": "brand_via_provider-03-m2",
-            "noul": 0.86,
-            "latencyMs": 118.95889999999986,
+            "noul": 0.87,
+            "latencyMs": 177.44969999999967,
             "attempts": 1,
             "inputTokens": 472,
             "outputTokens": 23,
@@ -776,12 +776,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 169.58249999999998,
+        "wallMs": 157.6844000000001,
         "calls": [
           {
             "messageId": "brand_via_provider-04-m1",
-            "noul": 0.81,
-            "latencyMs": 169.53420000000006,
+            "noul": 0.75,
+            "latencyMs": 116.64859999999999,
             "attempts": 1,
             "inputTokens": 496,
             "outputTokens": 23,
@@ -791,7 +791,7 @@
           {
             "messageId": "brand_via_provider-04-m2",
             "noul": 0.01,
-            "latencyMs": 152.47379999999998,
+            "latencyMs": 157.21889999999985,
             "attempts": 1,
             "inputTokens": 522,
             "outputTokens": 23,
@@ -801,7 +801,7 @@
           {
             "messageId": "brand_via_provider-04-m3",
             "noul": 0.01,
-            "latencyMs": 119.97780000000012,
+            "latencyMs": 156.9342999999999,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -827,12 +827,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 248.3696,
+        "wallMs": 165.23399999999992,
         "calls": [
           {
             "messageId": "brand_via_provider-05-m1",
             "noul": 0.01,
-            "latencyMs": 142.43809999999985,
+            "latencyMs": 165.1605000000004,
             "attempts": 1,
             "inputTokens": 558,
             "outputTokens": 23,
@@ -841,8 +841,8 @@
           },
           {
             "messageId": "brand_via_provider-05-m2",
-            "noul": 0.8,
-            "latencyMs": 247.4328999999998,
+            "noul": 0.79,
+            "latencyMs": 107.20699999999988,
             "attempts": 1,
             "inputTokens": 517,
             "outputTokens": 23,
@@ -852,7 +852,7 @@
           {
             "messageId": "brand_via_provider-05-m3",
             "noul": 0.02,
-            "latencyMs": 123.76340000000027,
+            "latencyMs": 164.86799999999994,
             "attempts": 1,
             "inputTokens": 480,
             "outputTokens": 23,
@@ -878,12 +878,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 188.98070000000007,
+        "wallMs": 163.64310000000023,
         "calls": [
           {
             "messageId": "brand_via_provider-06-m1",
             "noul": 0.01,
-            "latencyMs": 125.10860000000002,
+            "latencyMs": 163.61799999999994,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -893,7 +893,7 @@
           {
             "messageId": "brand_via_provider-06-m2",
             "noul": 0.01,
-            "latencyMs": 188.06449999999995,
+            "latencyMs": 104.40000000000009,
             "attempts": 1,
             "inputTokens": 511,
             "outputTokens": 23,
@@ -902,8 +902,8 @@
           },
           {
             "messageId": "brand_via_provider-06-m3",
-            "noul": 0.78,
-            "latencyMs": 148.67309999999998,
+            "noul": 0.85,
+            "latencyMs": 108.04439999999977,
             "attempts": 1,
             "inputTokens": 486,
             "outputTokens": 23,
@@ -929,12 +929,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 165.60969999999998,
+        "wallMs": 140.57720000000018,
         "calls": [
           {
             "messageId": "brand_via_provider-07-m1",
-            "noul": 0.84,
-            "latencyMs": 165.5697,
+            "noul": 0.83,
+            "latencyMs": 135.96050000000014,
             "attempts": 1,
             "inputTokens": 480,
             "outputTokens": 23,
@@ -944,7 +944,7 @@
           {
             "messageId": "brand_via_provider-07-m2",
             "noul": 0.01,
-            "latencyMs": 151.3753999999999,
+            "latencyMs": 140.33410000000003,
             "attempts": 1,
             "inputTokens": 560,
             "outputTokens": 23,
@@ -970,12 +970,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 122.73500000000013,
+        "wallMs": 144.42070000000012,
         "calls": [
           {
             "messageId": "domain_in_link_only-01-m1",
             "noul": 0.97,
-            "latencyMs": 122.6900999999998,
+            "latencyMs": 144.3449999999998,
             "attempts": 1,
             "inputTokens": 535,
             "outputTokens": 23,
@@ -985,7 +985,7 @@
           {
             "messageId": "domain_in_link_only-01-m2",
             "noul": 0.01,
-            "latencyMs": 111.60800000000017,
+            "latencyMs": 144.1648,
             "attempts": 1,
             "inputTokens": 532,
             "outputTokens": 23,
@@ -1011,12 +1011,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 131.60950000000003,
+        "wallMs": 182.6781000000001,
         "calls": [
           {
             "messageId": "domain_in_link_only-02-m1",
-            "noul": 0.87,
-            "latencyMs": 131.58170000000018,
+            "noul": 0.88,
+            "latencyMs": 182.6461000000004,
             "attempts": 1,
             "inputTokens": 495,
             "outputTokens": 23,
@@ -1025,8 +1025,8 @@
           },
           {
             "messageId": "domain_in_link_only-02-m2",
-            "noul": 0.01,
-            "latencyMs": 112.05659999999989,
+            "noul": 0.02,
+            "latencyMs": 163.54100000000017,
             "attempts": 1,
             "inputTokens": 558,
             "outputTokens": 23,
@@ -1052,12 +1052,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 127.05139999999983,
+        "wallMs": 147.14440000000013,
         "calls": [
           {
             "messageId": "domain_in_link_only-03-m1",
             "noul": 0.97,
-            "latencyMs": 109.43499999999995,
+            "latencyMs": 147.11910000000034,
             "attempts": 1,
             "inputTokens": 525,
             "outputTokens": 23,
@@ -1067,7 +1067,7 @@
           {
             "messageId": "domain_in_link_only-03-m2",
             "noul": 0.01,
-            "latencyMs": 126.77289999999994,
+            "latencyMs": 146.79519999999957,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -1093,12 +1093,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 161.2195999999999,
+        "wallMs": 144.38819999999987,
         "calls": [
           {
             "messageId": "domain_in_link_only-04-m1",
             "noul": 0.01,
-            "latencyMs": 161.16229999999996,
+            "latencyMs": 144.3393000000001,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -1108,7 +1108,7 @@
           {
             "messageId": "domain_in_link_only-04-m2",
             "noul": 0.96,
-            "latencyMs": 156.92180000000008,
+            "latencyMs": 110.79219999999987,
             "attempts": 1,
             "inputTokens": 510,
             "outputTokens": 23,
@@ -1118,7 +1118,7 @@
           {
             "messageId": "domain_in_link_only-04-m3",
             "noul": 0.01,
-            "latencyMs": 131.33449999999993,
+            "latencyMs": 110.51940000000013,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -1144,12 +1144,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 298.03949999999986,
+        "wallMs": 139.45010000000002,
         "calls": [
           {
             "messageId": "domain_in_link_only-05-m1",
             "noul": 0.01,
-            "latencyMs": 297.99710000000005,
+            "latencyMs": 139.42769999999973,
             "attempts": 1,
             "inputTokens": 540,
             "outputTokens": 23,
@@ -1159,7 +1159,7 @@
           {
             "messageId": "domain_in_link_only-05-m2",
             "noul": 0.97,
-            "latencyMs": 127.7813000000001,
+            "latencyMs": 139.1532000000002,
             "attempts": 1,
             "inputTokens": 504,
             "outputTokens": 23,
@@ -1185,12 +1185,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 151.79050000000007,
+        "wallMs": 167.30999999999995,
         "calls": [
           {
             "messageId": "domain_in_link_only-06-m1",
             "noul": 0.88,
-            "latencyMs": 151.76220000000012,
+            "latencyMs": 167.14499999999998,
             "attempts": 1,
             "inputTokens": 495,
             "outputTokens": 23,
@@ -1199,8 +1199,8 @@
           },
           {
             "messageId": "domain_in_link_only-06-m2",
-            "noul": 0.03,
-            "latencyMs": 115.46590000000015,
+            "noul": 0.04,
+            "latencyMs": 167.0876000000003,
             "attempts": 1,
             "inputTokens": 488,
             "outputTokens": 23,
@@ -1226,12 +1226,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 128.4632999999999,
+        "wallMs": 135.0322000000001,
         "calls": [
           {
             "messageId": "domain_in_link_only-07-m1",
             "noul": 0.97,
-            "latencyMs": 128.42300000000023,
+            "latencyMs": 129.11839999999984,
             "attempts": 1,
             "inputTokens": 528,
             "outputTokens": 23,
@@ -1241,7 +1241,7 @@
           {
             "messageId": "domain_in_link_only-07-m2",
             "noul": 0.01,
-            "latencyMs": 112.79349999999977,
+            "latencyMs": 134.7467999999999,
             "attempts": 1,
             "inputTokens": 511,
             "outputTokens": 23,
@@ -1259,20 +1259,20 @@
       "picks": {
         "baseline": "same_site_two_codes-01-m2",
         "heuristic": "same_site_two_codes-01-m2",
-        "jev": "same_site_two_codes-01-m1"
+        "jev": "same_site_two_codes-01-m2"
       },
       "outcomes": {
         "baseline": "correct",
         "heuristic": "correct",
-        "jev": "false_fill"
+        "jev": "correct"
       },
       "jev": {
-        "wallMs": 158.85300000000007,
+        "wallMs": 175.33770000000004,
         "calls": [
           {
             "messageId": "same_site_two_codes-01-m1",
             "noul": 0.97,
-            "latencyMs": 158.78920000000016,
+            "latencyMs": 159.1011999999996,
             "attempts": 1,
             "inputTokens": 534,
             "outputTokens": 23,
@@ -1281,8 +1281,8 @@
           },
           {
             "messageId": "same_site_two_codes-01-m2",
-            "noul": 0.96,
-            "latencyMs": 118.32089999999971,
+            "noul": 0.97,
+            "latencyMs": 175.08460000000014,
             "attempts": 1,
             "inputTokens": 534,
             "outputTokens": 23,
@@ -1300,20 +1300,20 @@
       "picks": {
         "baseline": "same_site_two_codes-02-m3",
         "heuristic": "same_site_two_codes-02-m2",
-        "jev": "same_site_two_codes-02-m1"
+        "jev": "same_site_two_codes-02-m2"
       },
       "outcomes": {
         "baseline": "false_fill",
         "heuristic": "correct",
-        "jev": "false_fill"
+        "jev": "correct"
       },
       "jev": {
-        "wallMs": 141.57549999999947,
+        "wallMs": 288.21039999999994,
         "calls": [
           {
             "messageId": "same_site_two_codes-02-m1",
             "noul": 0.97,
-            "latencyMs": 131.22910000000047,
+            "latencyMs": 288.1809000000003,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -1322,8 +1322,8 @@
           },
           {
             "messageId": "same_site_two_codes-02-m2",
-            "noul": 0.96,
-            "latencyMs": 140.9677999999999,
+            "noul": 0.97,
+            "latencyMs": 178.8050000000003,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -1333,7 +1333,7 @@
           {
             "messageId": "same_site_two_codes-02-m3",
             "noul": 0.01,
-            "latencyMs": 113.2523000000001,
+            "latencyMs": 251.74099999999999,
             "attempts": 1,
             "inputTokens": 538,
             "outputTokens": 23,
@@ -1359,12 +1359,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 154.54680000000008,
+        "wallMs": 195.59280000000035,
         "calls": [
           {
             "messageId": "same_site_two_codes-03-m1",
-            "noul": 0.89,
-            "latencyMs": 154.4992999999995,
+            "noul": 0.87,
+            "latencyMs": 144.15920000000006,
             "attempts": 1,
             "inputTokens": 495,
             "outputTokens": 23,
@@ -1373,8 +1373,8 @@
           },
           {
             "messageId": "same_site_two_codes-03-m2",
-            "noul": 0.89,
-            "latencyMs": 116.81970000000001,
+            "noul": 0.86,
+            "latencyMs": 195.14379999999983,
             "attempts": 1,
             "inputTokens": 495,
             "outputTokens": 23,
@@ -1400,12 +1400,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 157.33590000000004,
+        "wallMs": 126.01010000000042,
         "calls": [
           {
             "messageId": "same_site_two_codes-04-m1",
             "noul": 0.96,
-            "latencyMs": 157.3036000000002,
+            "latencyMs": 125.95179999999982,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -1415,7 +1415,7 @@
           {
             "messageId": "same_site_two_codes-04-m2",
             "noul": 0.98,
-            "latencyMs": 121.21210000000065,
+            "latencyMs": 124.53049999999985,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -1425,7 +1425,7 @@
           {
             "messageId": "same_site_two_codes-04-m3",
             "noul": 0.01,
-            "latencyMs": 146.46290000000045,
+            "latencyMs": 122.56829999999991,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -1451,12 +1451,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 166.67720000000008,
+        "wallMs": 156.0619000000006,
         "calls": [
           {
             "messageId": "same_site_two_codes-05-m1",
             "noul": 0.97,
-            "latencyMs": 110.08289999999943,
+            "latencyMs": 137.3640000000005,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -1466,7 +1466,7 @@
           {
             "messageId": "same_site_two_codes-05-m2",
             "noul": 0.97,
-            "latencyMs": 128.19959999999992,
+            "latencyMs": 155.65540000000055,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -1476,7 +1476,7 @@
           {
             "messageId": "same_site_two_codes-05-m3",
             "noul": 0.97,
-            "latencyMs": 166.11160000000018,
+            "latencyMs": 120.11149999999998,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -1502,12 +1502,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 148.9399000000003,
+        "wallMs": 151.58790000000045,
         "calls": [
           {
             "messageId": "same_site_two_codes-06-m1",
-            "noul": 0.62,
-            "latencyMs": 148.88839999999982,
+            "noul": 0.65,
+            "latencyMs": 113.29969999999958,
             "attempts": 1,
             "inputTokens": 512,
             "outputTokens": 23,
@@ -1517,7 +1517,7 @@
           {
             "messageId": "same_site_two_codes-06-m2",
             "noul": 0.01,
-            "latencyMs": 138.933,
+            "latencyMs": 151.3146999999999,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -1526,8 +1526,8 @@
           },
           {
             "messageId": "same_site_two_codes-06-m3",
-            "noul": 0.69,
-            "latencyMs": 135.8679000000002,
+            "noul": 0.65,
+            "latencyMs": 128.6840000000002,
             "attempts": 1,
             "inputTokens": 513,
             "outputTokens": 23,
@@ -1553,12 +1553,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 179.21590000000015,
+        "wallMs": 133.26850000000013,
         "calls": [
           {
             "messageId": "same_site_two_codes-07-m1",
             "noul": 0.97,
-            "latencyMs": 117.02430000000004,
+            "latencyMs": 133.23669999999947,
             "attempts": 1,
             "inputTokens": 529,
             "outputTokens": 23,
@@ -1568,7 +1568,7 @@
           {
             "messageId": "same_site_two_codes-07-m2",
             "noul": 0.97,
-            "latencyMs": 145.76789999999983,
+            "latencyMs": 114.34699999999975,
             "attempts": 1,
             "inputTokens": 529,
             "outputTokens": 23,
@@ -1577,8 +1577,8 @@
           },
           {
             "messageId": "same_site_two_codes-07-m3",
-            "noul": 0.17,
-            "latencyMs": 178.32949999999983,
+            "noul": 0.16,
+            "latencyMs": 128.40209999999934,
             "attempts": 1,
             "inputTokens": 561,
             "outputTokens": 23,
@@ -1604,12 +1604,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 150.6966999999995,
+        "wallMs": 118.81770000000051,
         "calls": [
           {
             "messageId": "promo_codes-01-m1",
             "noul": 0.97,
-            "latencyMs": 150.65539999999964,
+            "latencyMs": 118.76850000000013,
             "attempts": 1,
             "inputTokens": 558,
             "outputTokens": 23,
@@ -1619,7 +1619,7 @@
           {
             "messageId": "promo_codes-01-m2",
             "noul": 0.02,
-            "latencyMs": 142.28600000000006,
+            "latencyMs": 114.79730000000018,
             "attempts": 1,
             "inputTokens": 569,
             "outputTokens": 23,
@@ -1645,12 +1645,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 188.10069999999996,
+        "wallMs": 110.54939999999988,
         "calls": [
           {
             "messageId": "promo_codes-02-m1",
             "noul": 0.97,
-            "latencyMs": 146.21440000000075,
+            "latencyMs": 110.52469999999994,
             "attempts": 1,
             "inputTokens": 528,
             "outputTokens": 23,
@@ -1659,8 +1659,8 @@
           },
           {
             "messageId": "promo_codes-02-m2",
-            "noul": 0.14,
-            "latencyMs": 187.65589999999975,
+            "noul": 0.15,
+            "latencyMs": 110.22519999999986,
             "attempts": 1,
             "inputTokens": 544,
             "outputTokens": 23,
@@ -1686,12 +1686,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 137.6868000000004,
+        "wallMs": 255.79660000000058,
         "calls": [
           {
             "messageId": "promo_codes-03-m1",
             "noul": 0.98,
-            "latencyMs": 137.65660000000025,
+            "latencyMs": 107.08010000000013,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -1701,7 +1701,7 @@
           {
             "messageId": "promo_codes-03-m2",
             "noul": 0.03,
-            "latencyMs": 137.3083999999999,
+            "latencyMs": 255.46919999999955,
             "attempts": 1,
             "inputTokens": 526,
             "outputTokens": 23,
@@ -1727,12 +1727,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 138.39329999999973,
+        "wallMs": 134.72489999999925,
         "calls": [
           {
             "messageId": "promo_codes-04-m1",
             "noul": 0.96,
-            "latencyMs": 138.36079999999947,
+            "latencyMs": 122.65890000000036,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -1742,7 +1742,7 @@
           {
             "messageId": "promo_codes-04-m2",
             "noul": 0.01,
-            "latencyMs": 108.2430000000004,
+            "latencyMs": 134.2572,
             "attempts": 1,
             "inputTokens": 563,
             "outputTokens": 23,
@@ -1768,12 +1768,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 164.41129999999976,
+        "wallMs": 154.0051999999996,
         "calls": [
           {
             "messageId": "promo_codes-05-m1",
-            "noul": 0.82,
-            "latencyMs": 108.75650000000041,
+            "noul": 0.83,
+            "latencyMs": 153.95939999999973,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -1783,7 +1783,7 @@
           {
             "messageId": "promo_codes-05-m2",
             "noul": 0.14,
-            "latencyMs": 163.79079999999976,
+            "latencyMs": 137.7567999999992,
             "attempts": 1,
             "inputTokens": 556,
             "outputTokens": 23,
@@ -1809,12 +1809,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 144.66600000000017,
+        "wallMs": 150.59540000000015,
         "calls": [
           {
             "messageId": "promo_codes-06-m1",
             "noul": 0.03,
-            "latencyMs": 119.17950000000019,
+            "latencyMs": 146.98719999999958,
             "attempts": 1,
             "inputTokens": 569,
             "outputTokens": 23,
@@ -1824,7 +1824,7 @@
           {
             "messageId": "promo_codes-06-m2",
             "noul": 0.97,
-            "latencyMs": 144.1823000000004,
+            "latencyMs": 150.3680000000004,
             "attempts": 1,
             "inputTokens": 550,
             "outputTokens": 23,
@@ -1850,12 +1850,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 154.00690000000031,
+        "wallMs": 158.03639999999996,
         "calls": [
           {
             "messageId": "promo_codes-07-m1",
             "noul": 0.98,
-            "latencyMs": 128.03020000000015,
+            "latencyMs": 134.53880000000026,
             "attempts": 1,
             "inputTokens": 544,
             "outputTokens": 23,
@@ -1865,7 +1865,7 @@
           {
             "messageId": "promo_codes-07-m2",
             "noul": 0.01,
-            "latencyMs": 152.95390000000043,
+            "latencyMs": 128.80339999999978,
             "attempts": 1,
             "inputTokens": 539,
             "outputTokens": 23,
@@ -1874,8 +1874,8 @@
           },
           {
             "messageId": "promo_codes-07-m3",
-            "noul": 0.14,
-            "latencyMs": 116.4377999999997,
+            "noul": 0.15,
+            "latencyMs": 157.4302000000007,
             "attempts": 1,
             "inputTokens": 567,
             "outputTokens": 23,
@@ -1901,12 +1901,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 149.39109999999982,
+        "wallMs": 137.91089999999986,
         "calls": [
           {
             "messageId": "order_invoice_numbers-01-m1",
             "noul": 0.97,
-            "latencyMs": 135.10279999999966,
+            "latencyMs": 118.02369999999974,
             "attempts": 1,
             "inputTokens": 549,
             "outputTokens": 23,
@@ -1916,7 +1916,7 @@
           {
             "messageId": "order_invoice_numbers-01-m2",
             "noul": 0.02,
-            "latencyMs": 149.00970000000052,
+            "latencyMs": 137.64289999999983,
             "attempts": 1,
             "inputTokens": 573,
             "outputTokens": 23,
@@ -1942,12 +1942,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 164.88819999999942,
+        "wallMs": 135.47389999999996,
         "calls": [
           {
             "messageId": "order_invoice_numbers-02-m1",
             "noul": 0.96,
-            "latencyMs": 111.88349999999991,
+            "latencyMs": 120.3198999999995,
             "attempts": 1,
             "inputTokens": 538,
             "outputTokens": 23,
@@ -1957,7 +1957,7 @@
           {
             "messageId": "order_invoice_numbers-02-m2",
             "noul": 0.02,
-            "latencyMs": 164.3765999999996,
+            "latencyMs": 134.54590000000007,
             "attempts": 1,
             "inputTokens": 550,
             "outputTokens": 23,
@@ -1983,12 +1983,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 161.8082000000004,
+        "wallMs": 108.2530999999999,
         "calls": [
           {
             "messageId": "order_invoice_numbers-03-m1",
             "noul": 0.98,
-            "latencyMs": 161.76170000000002,
+            "latencyMs": 108.17790000000059,
             "attempts": 1,
             "inputTokens": 533,
             "outputTokens": 23,
@@ -1998,7 +1998,7 @@
           {
             "messageId": "order_invoice_numbers-03-m2",
             "noul": 0.03,
-            "latencyMs": 145.36509999999998,
+            "latencyMs": 107.84310000000005,
             "attempts": 1,
             "inputTokens": 550,
             "outputTokens": 23,
@@ -2024,12 +2024,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 169.38749999999982,
+        "wallMs": 137.38360000000011,
         "calls": [
           {
             "messageId": "order_invoice_numbers-04-m1",
-            "noul": 0.97,
-            "latencyMs": 136.3154000000004,
+            "noul": 0.96,
+            "latencyMs": 104.17389999999978,
             "attempts": 1,
             "inputTokens": 522,
             "outputTokens": 23,
@@ -2039,7 +2039,7 @@
           {
             "messageId": "order_invoice_numbers-04-m2",
             "noul": 0.01,
-            "latencyMs": 169.10260000000017,
+            "latencyMs": 137.14879999999994,
             "attempts": 1,
             "inputTokens": 527,
             "outputTokens": 23,
@@ -2065,12 +2065,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 159.05249999999978,
+        "wallMs": 168.65580000000045,
         "calls": [
           {
             "messageId": "order_invoice_numbers-05-m1",
-            "noul": 0.8,
-            "latencyMs": 159.01240000000053,
+            "noul": 0.76,
+            "latencyMs": 117.45970000000034,
             "attempts": 1,
             "inputTokens": 501,
             "outputTokens": 23,
@@ -2080,7 +2080,7 @@
           {
             "messageId": "order_invoice_numbers-05-m2",
             "noul": 0.02,
-            "latencyMs": 112.38209999999981,
+            "latencyMs": 168.16280000000006,
             "attempts": 1,
             "inputTokens": 517,
             "outputTokens": 23,
@@ -2106,12 +2106,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 158.4282000000003,
+        "wallMs": 121.60819999999967,
         "calls": [
           {
             "messageId": "order_invoice_numbers-06-m1",
             "noul": 0.02,
-            "latencyMs": 158.39499999999953,
+            "latencyMs": 114.8100999999997,
             "attempts": 1,
             "inputTokens": 569,
             "outputTokens": 23,
@@ -2121,7 +2121,7 @@
           {
             "messageId": "order_invoice_numbers-06-m2",
             "noul": 0.97,
-            "latencyMs": 129.7527,
+            "latencyMs": 121.19759999999951,
             "attempts": 1,
             "inputTokens": 546,
             "outputTokens": 23,
@@ -2131,7 +2131,7 @@
           {
             "messageId": "order_invoice_numbers-06-m3",
             "noul": 0.01,
-            "latencyMs": 129.61509999999998,
+            "latencyMs": 118.52310000000034,
             "attempts": 1,
             "inputTokens": 551,
             "outputTokens": 23,
@@ -2157,12 +2157,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 184.1207000000004,
+        "wallMs": 114.36229999999978,
         "calls": [
           {
             "messageId": "order_invoice_numbers-07-m1",
             "noul": 0.97,
-            "latencyMs": 184.07859999999982,
+            "latencyMs": 114.33290000000034,
             "attempts": 1,
             "inputTokens": 526,
             "outputTokens": 23,
@@ -2172,7 +2172,7 @@
           {
             "messageId": "order_invoice_numbers-07-m2",
             "noul": 0.07,
-            "latencyMs": 150.3816999999999,
+            "latencyMs": 111.38730000000032,
             "attempts": 1,
             "inputTokens": 549,
             "outputTokens": 23,
@@ -2198,12 +2198,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 171.03679999999986,
+        "wallMs": 152.71289999999954,
         "calls": [
           {
             "messageId": "japanese-01-m1",
-            "noul": 0.97,
-            "latencyMs": 159.77170000000024,
+            "noul": 0.98,
+            "latencyMs": 105.3109999999997,
             "attempts": 1,
             "inputTokens": 616,
             "outputTokens": 23,
@@ -2212,8 +2212,8 @@
           },
           {
             "messageId": "japanese-01-m2",
-            "noul": 0.01,
-            "latencyMs": 170.6891999999998,
+            "noul": 0.02,
+            "latencyMs": 152.1333999999997,
             "attempts": 1,
             "inputTokens": 618,
             "outputTokens": 23,
@@ -2239,12 +2239,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 123.05379999999968,
+        "wallMs": 124.50929999999971,
         "calls": [
           {
             "messageId": "japanese-02-m1",
             "noul": 0.01,
-            "latencyMs": 118.64220000000023,
+            "latencyMs": 124.47360000000026,
             "attempts": 1,
             "inputTokens": 614,
             "outputTokens": 23,
@@ -2254,7 +2254,7 @@
           {
             "messageId": "japanese-02-m2",
             "noul": 0.98,
-            "latencyMs": 122.48019999999997,
+            "latencyMs": 119.94930000000022,
             "attempts": 1,
             "inputTokens": 579,
             "outputTokens": 23,
@@ -2280,12 +2280,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 140.70090000000073,
+        "wallMs": 134.85509999999977,
         "calls": [
           {
             "messageId": "japanese-03-m1",
-            "noul": 0.98,
-            "latencyMs": 140.65319999999974,
+            "noul": 0.97,
+            "latencyMs": 115.62960000000021,
             "attempts": 1,
             "inputTokens": 620,
             "outputTokens": 23,
@@ -2295,7 +2295,7 @@
           {
             "messageId": "japanese-03-m2",
             "noul": 0.06,
-            "latencyMs": 118.9965000000002,
+            "latencyMs": 134.5729999999994,
             "attempts": 1,
             "inputTokens": 639,
             "outputTokens": 23,
@@ -2321,12 +2321,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 127.83289999999943,
+        "wallMs": 123.61459999999988,
         "calls": [
           {
             "messageId": "japanese-04-m1",
-            "noul": 0.77,
-            "latencyMs": 127.73919999999998,
+            "noul": 0.75,
+            "latencyMs": 123.57189999999991,
             "attempts": 1,
             "inputTokens": 610,
             "outputTokens": 23,
@@ -2336,7 +2336,7 @@
           {
             "messageId": "japanese-04-m2",
             "noul": 0.02,
-            "latencyMs": 127.56810000000041,
+            "latencyMs": 114.87890000000061,
             "attempts": 1,
             "inputTokens": 659,
             "outputTokens": 23,
@@ -2362,12 +2362,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 150.34280000000035,
+        "wallMs": 197.51130000000012,
         "calls": [
           {
             "messageId": "japanese-05-m1",
             "noul": 0.96,
-            "latencyMs": 150.3158000000003,
+            "latencyMs": 197.47530000000006,
             "attempts": 1,
             "inputTokens": 614,
             "outputTokens": 23,
@@ -2377,7 +2377,7 @@
           {
             "messageId": "japanese-05-m2",
             "noul": 0.01,
-            "latencyMs": 132.83969999999954,
+            "latencyMs": 157.13789999999972,
             "attempts": 1,
             "inputTokens": 543,
             "outputTokens": 23,
@@ -2403,12 +2403,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 153.02189999999973,
+        "wallMs": 189.32780000000002,
         "calls": [
           {
             "messageId": "japanese-06-m1",
             "noul": 0.97,
-            "latencyMs": 142.8709000000008,
+            "latencyMs": 140.8780999999999,
             "attempts": 1,
             "inputTokens": 578,
             "outputTokens": 23,
@@ -2417,8 +2417,8 @@
           },
           {
             "messageId": "japanese-06-m2",
-            "noul": 0.03,
-            "latencyMs": 118.17090000000007,
+            "noul": 0.02,
+            "latencyMs": 188.90359999999964,
             "attempts": 1,
             "inputTokens": 612,
             "outputTokens": 23,
@@ -2428,7 +2428,7 @@
           {
             "messageId": "japanese-06-m3",
             "noul": 0.06,
-            "latencyMs": 152.48340000000007,
+            "latencyMs": 108.23499999999967,
             "attempts": 1,
             "inputTokens": 622,
             "outputTokens": 23,
@@ -2454,12 +2454,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 144.1237999999994,
+        "wallMs": 128.19949999999972,
         "calls": [
           {
             "messageId": "japanese-07-m1",
-            "noul": 0.98,
-            "latencyMs": 108.79809999999998,
+            "noul": 0.97,
+            "latencyMs": 114.89900000000034,
             "attempts": 1,
             "inputTokens": 616,
             "outputTokens": 23,
@@ -2469,7 +2469,7 @@
           {
             "messageId": "japanese-07-m2",
             "noul": 0.98,
-            "latencyMs": 131.9317000000001,
+            "latencyMs": 121.73600000000079,
             "attempts": 1,
             "inputTokens": 616,
             "outputTokens": 23,
@@ -2479,7 +2479,7 @@
           {
             "messageId": "japanese-07-m3",
             "noul": 0.02,
-            "latencyMs": 143.64229999999952,
+            "latencyMs": 127.59619999999995,
             "attempts": 1,
             "inputTokens": 620,
             "outputTokens": 23,
@@ -2505,12 +2505,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 148.96659999999974,
+        "wallMs": 208.19250000000102,
         "calls": [
           {
             "messageId": "subdomain_site-01-m1",
-            "noul": 0.92,
-            "latencyMs": 148.92230000000018,
+            "noul": 0.94,
+            "latencyMs": 112.88130000000092,
             "attempts": 1,
             "inputTokens": 583,
             "outputTokens": 23,
@@ -2520,7 +2520,7 @@
           {
             "messageId": "subdomain_site-01-m2",
             "noul": 0.01,
-            "latencyMs": 134.79219999999987,
+            "latencyMs": 207.41160000000127,
             "attempts": 1,
             "inputTokens": 567,
             "outputTokens": 23,
@@ -2546,12 +2546,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 170.39829999999893,
+        "wallMs": 159.10530000000108,
         "calls": [
           {
             "messageId": "subdomain_site-02-m1",
-            "noul": 0.01,
-            "latencyMs": 170.35900000000038,
+            "noul": 0.02,
+            "latencyMs": 159.0629000000008,
             "attempts": 1,
             "inputTokens": 555,
             "outputTokens": 23,
@@ -2561,7 +2561,7 @@
           {
             "messageId": "subdomain_site-02-m2",
             "noul": 0.96,
-            "latencyMs": 119.02859999999964,
+            "latencyMs": 129.5583000000006,
             "attempts": 1,
             "inputTokens": 549,
             "outputTokens": 23,
@@ -2587,12 +2587,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 142.1152000000002,
+        "wallMs": 120.5688999999984,
         "calls": [
           {
             "messageId": "subdomain_site-03-m1",
             "noul": 0.96,
-            "latencyMs": 135.97179999999935,
+            "latencyMs": 120.52230000000054,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -2602,7 +2602,7 @@
           {
             "messageId": "subdomain_site-03-m2",
             "noul": 0.01,
-            "latencyMs": 141.65119999999843,
+            "latencyMs": 102.28579999999965,
             "attempts": 1,
             "inputTokens": 542,
             "outputTokens": 23,
@@ -2628,12 +2628,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 162.36399999999958,
+        "wallMs": 163.98849999999948,
         "calls": [
           {
             "messageId": "subdomain_site-04-m1",
             "noul": 0.97,
-            "latencyMs": 162.306700000001,
+            "latencyMs": 163.9496999999992,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -2643,7 +2643,7 @@
           {
             "messageId": "subdomain_site-04-m2",
             "noul": 0.01,
-            "latencyMs": 143.34649999999965,
+            "latencyMs": 113.11340000000018,
             "attempts": 1,
             "inputTokens": 549,
             "outputTokens": 23,
@@ -2669,12 +2669,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 127.46039999999994,
+        "wallMs": 197.3111000000008,
         "calls": [
           {
             "messageId": "subdomain_site-05-m1",
             "noul": 0.95,
-            "latencyMs": 127.40170000000035,
+            "latencyMs": 197.27260000000024,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -2684,7 +2684,7 @@
           {
             "messageId": "subdomain_site-05-m2",
             "noul": 0.01,
-            "latencyMs": 126.22649999999885,
+            "latencyMs": 149.16909999999916,
             "attempts": 1,
             "inputTokens": 545,
             "outputTokens": 23,
@@ -2710,12 +2710,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 131.23509999999987,
+        "wallMs": 128.84269999999924,
         "calls": [
           {
             "messageId": "subdomain_site-06-m1",
             "noul": 0.85,
-            "latencyMs": 113.3158999999996,
+            "latencyMs": 124.8080000000009,
             "attempts": 1,
             "inputTokens": 495,
             "outputTokens": 23,
@@ -2724,8 +2724,8 @@
           },
           {
             "messageId": "subdomain_site-06-m2",
-            "noul": 0.01,
-            "latencyMs": 130.4964,
+            "noul": 0.02,
+            "latencyMs": 128.5571,
             "attempts": 1,
             "inputTokens": 537,
             "outputTokens": 23,
@@ -2751,12 +2751,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 134.13609999999971,
+        "wallMs": 141.47230000000127,
         "calls": [
           {
             "messageId": "subdomain_site-07-m1",
-            "noul": 0.96,
-            "latencyMs": 113.72539999999935,
+            "noul": 0.95,
+            "latencyMs": 141.323699999999,
             "attempts": 1,
             "inputTokens": 636,
             "outputTokens": 23,
@@ -2766,7 +2766,7 @@
           {
             "messageId": "subdomain_site-07-m2",
             "noul": 0.01,
-            "latencyMs": 133.08780000000115,
+            "latencyMs": 121.73139999999876,
             "attempts": 1,
             "inputTokens": 589,
             "outputTokens": 23,
@@ -2792,12 +2792,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 181.91929999999957,
+        "wallMs": 148.21399999999994,
         "calls": [
           {
             "messageId": "no_correct-01-m1",
             "noul": 0.01,
-            "latencyMs": 181.85800000000017,
+            "latencyMs": 148.16649999999936,
             "attempts": 1,
             "inputTokens": 542,
             "outputTokens": 23,
@@ -2807,7 +2807,7 @@
           {
             "messageId": "no_correct-01-m2",
             "noul": 0.01,
-            "latencyMs": 115.19330000000082,
+            "latencyMs": 122.3161,
             "attempts": 1,
             "inputTokens": 521,
             "outputTokens": 23,
@@ -2833,12 +2833,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 137.0048000000006,
+        "wallMs": 106.1278000000002,
         "calls": [
           {
             "messageId": "no_correct-02-m1",
-            "noul": 0.15,
-            "latencyMs": 136.95679999999993,
+            "noul": 0.16,
+            "latencyMs": 102.48320000000058,
             "attempts": 1,
             "inputTokens": 568,
             "outputTokens": 23,
@@ -2848,7 +2848,7 @@
           {
             "messageId": "no_correct-02-m2",
             "noul": 0.01,
-            "latencyMs": 117.3171999999995,
+            "latencyMs": 105.71819999999934,
             "attempts": 1,
             "inputTokens": 543,
             "outputTokens": 23,
@@ -2874,12 +2874,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 195.13490000000093,
+        "wallMs": 156.27210000000014,
         "calls": [
           {
             "messageId": "no_correct-03-m1",
             "noul": 0.01,
-            "latencyMs": 134.6183000000001,
+            "latencyMs": 156.2367000000013,
             "attempts": 1,
             "inputTokens": 516,
             "outputTokens": 23,
@@ -2889,7 +2889,7 @@
           {
             "messageId": "no_correct-03-m2",
             "noul": 0.02,
-            "latencyMs": 194.59389999999985,
+            "latencyMs": 108.42950000000019,
             "attempts": 1,
             "inputTokens": 573,
             "outputTokens": 23,
@@ -2915,12 +2915,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 118.72079999999914,
+        "wallMs": 165.32870000000003,
         "calls": [
           {
             "messageId": "no_correct-04-m1",
             "noul": 0.01,
-            "latencyMs": 118.65769999999975,
+            "latencyMs": 116.6974999999984,
             "attempts": 1,
             "inputTokens": 565,
             "outputTokens": 23,
@@ -2930,7 +2930,7 @@
           {
             "messageId": "no_correct-04-m2",
             "noul": 0.07,
-            "latencyMs": 113.98909999999887,
+            "latencyMs": 164.91339999999946,
             "attempts": 1,
             "inputTokens": 549,
             "outputTokens": 23,
@@ -2956,12 +2956,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 108.16870000000017,
+        "wallMs": 138.97689999999966,
         "calls": [
           {
             "messageId": "no_correct-05-m1",
             "noul": 0.03,
-            "latencyMs": 108.10770000000048,
+            "latencyMs": 117.78940000000148,
             "attempts": 1,
             "inputTokens": 616,
             "outputTokens": 23,
@@ -2971,7 +2971,7 @@
           {
             "messageId": "no_correct-05-m2",
             "noul": 0.06,
-            "latencyMs": 105.31950000000143,
+            "latencyMs": 138.57060000000092,
             "attempts": 1,
             "inputTokens": 639,
             "outputTokens": 23,
@@ -2997,12 +2997,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 130.52319999999963,
+        "wallMs": 126.27019999999902,
         "calls": [
           {
             "messageId": "no_correct-06-m1",
-            "noul": 0.01,
-            "latencyMs": 122.13479999999981,
+            "noul": 0.02,
+            "latencyMs": 126.21750000000065,
             "attempts": 1,
             "inputTokens": 498,
             "outputTokens": 23,
@@ -3012,7 +3012,7 @@
           {
             "messageId": "no_correct-06-m2",
             "noul": 0.01,
-            "latencyMs": 130.01909999999953,
+            "latencyMs": 107.7563999999984,
             "attempts": 1,
             "inputTokens": 521,
             "outputTokens": 23,
@@ -3038,12 +3038,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 149.23619999999937,
+        "wallMs": 143.75520000000142,
         "calls": [
           {
             "messageId": "no_correct-07-m1",
             "noul": 0.01,
-            "latencyMs": 123.53620000000046,
+            "latencyMs": 143.72160000000076,
             "attempts": 1,
             "inputTokens": 553,
             "outputTokens": 23,
@@ -3053,7 +3053,7 @@
           {
             "messageId": "no_correct-07-m2",
             "noul": 0.01,
-            "latencyMs": 148.7598999999991,
+            "latencyMs": 130.53759999999966,
             "attempts": 1,
             "inputTokens": 553,
             "outputTokens": 23,
@@ -3079,12 +3079,12 @@
         "jev": "correct"
       },
       "jev": {
-        "wallMs": 125.53379999999925,
+        "wallMs": 176.14159999999902,
         "calls": [
           {
             "messageId": "no_correct-08-m1",
             "noul": 0.02,
-            "latencyMs": 125.48249999999825,
+            "latencyMs": 118.94380000000092,
             "attempts": 1,
             "inputTokens": 550,
             "outputTokens": 23,
@@ -3094,7 +3094,7 @@
           {
             "messageId": "no_correct-08-m2",
             "noul": 0.01,
-            "latencyMs": 118.72339999999895,
+            "latencyMs": 136.9418999999998,
             "attempts": 1,
             "inputTokens": 553,
             "outputTokens": 23,
@@ -3103,8 +3103,8 @@
           },
           {
             "messageId": "no_correct-08-m3",
-            "noul": 0.04,
-            "latencyMs": 106.16039999999884,
+            "noul": 0.03,
+            "latencyMs": 175.58560000000034,
             "attempts": 1,
             "inputTokens": 525,
             "outputTokens": 23,

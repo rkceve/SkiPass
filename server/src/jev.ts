@@ -114,24 +114,29 @@ function newestOf(messages: JudgeMessage[], indices: number[]): number | null {
   return best
 }
 
-/** Highest noul >= 0.5; ties -> newest Date; none -> null. */
+/**
+ * Scores this close to the best one are treated as a tie. Jev scores a resent code and the
+ * original about equally (0.96 vs 0.97 in eval/RESULTS.md); among near-equal matches the newest
+ * email is the one the user just asked for.
+ */
+export const SCORE_TIE_MARGIN = 0.05
+
+/** Best noul >= 0.5; scores within SCORE_TIE_MARGIN of the best -> newest Date; none -> null. */
 export function selectByScores(
   messages: JudgeMessage[],
   scores: Record<string, number>,
 ): string | null {
   let bestScore = -Infinity
-  let tied: number[] = []
-  messages.forEach((m, i) => {
+  messages.forEach((m) => {
     const s = scores[m.id]
-    if (s === undefined || s < NOUL_THRESHOLD) return
-    if (s > bestScore) {
-      bestScore = s
-      tied = [i]
-    } else if (s === bestScore) {
-      tied.push(i)
-    }
+    if (s !== undefined && s >= NOUL_THRESHOLD && s > bestScore) bestScore = s
   })
-  const i = newestOf(messages, tied)
+  if (bestScore === -Infinity) return null
+  const near = messages
+    .map((m, i) => ({ s: scores[m.id], i }))
+    .filter(({ s }) => s !== undefined && s >= NOUL_THRESHOLD && s >= bestScore - SCORE_TIE_MARGIN)
+    .map(({ i }) => i)
+  const i = newestOf(messages, near)
   return i === null ? null : messages[i].id
 }
 

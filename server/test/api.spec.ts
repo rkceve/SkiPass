@@ -294,6 +294,20 @@ describe('POST /v1/judge — live Jev', () => {
     expect((await body(res)).chosenId).toBe(globexMsg.id) // 10:01 is newer than 10:00
   })
 
+  it('treats scores within the tie margin as equal and fills the newest (resent code)', async () => {
+    const f = jevByText(new Map([[acmeMsg.text, 0.97], [globexMsg.text, 0.96]]))
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn } })
+    const res = await c.judge({ service: null, messages: [acmeMsg, globexMsg] })
+    expect((await body(res)).chosenId).toBe(globexMsg.id) // newer, within 0.05 of the best
+  })
+
+  it('still prefers a clearly higher score over a newer weak match', async () => {
+    const f = jevByText(new Map([[acmeMsg.text, 0.9], [globexMsg.text, 0.6]]))
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn } })
+    const res = await c.judge({ service: null, messages: [acmeMsg, globexMsg] })
+    expect((await body(res)).chosenId).toBe(acmeMsg.id)
+  })
+
   it('accepts exactly 0.5 and rejects everything below it', async () => {
     const f1 = jevByText(new Map([[acmeMsg.text, 0.5]]))
     const r1 = await makeClient({ bindings: live, deps: { fetch: f1.fn } }).judge({ service: SERVICE, messages: [acmeMsg] })

@@ -93,7 +93,23 @@ The question wording was chosen by a live comparison: the source records that th
 
 ## Evaluation
 
-<!-- EVAL_RESULTS -->
+64 synthetic inbox scenarios (2–5 recent code-bearing emails each, 9 categories, 8 with no correct
+email) compare three ways of choosing which email's code to fill, using the production selection code
+and the live Jev API. Full method, per-category results and limitations: [`eval/RESULTS.md`](eval/RESULTS.md).
+
+| Strategy | Accuracy | Wrong code filled |
+|---|---|---|
+| Newest code email (what a naive autofill does) | 10/64 (15.6%) | 54 |
+| Site-domain rule (the on-device / server fallback) | 37/64 (57.8%) | 27 |
+| **Jev, one yes/no question per email** | **64/64 (100%)** | **0** |
+
+Jev latency measured from the client: p50 133 ms / p95 188 ms per request, all emails judged in
+parallel. Cost: about $0.00005 per autofill at $0.042 per million input tokens.
+
+Honest caveats: the scenarios are author-written and deliberately hard for simple rules, so these are
+not real-world rates. The first run scored 62/64; both misses were a resent code scored 0.96 vs the
+original's 0.97, which led to the current rule "scores within 0.05 of the best count as a tie and the
+newest email wins" (`SCORE_TIE_MARGIN` in `server/src/jev.ts`). That rule was tuned on this same set.
 
 ## Monetization with RevenueCat
 
