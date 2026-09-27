@@ -1,0 +1,194 @@
+/* Sowbank - a neighbourhood seed library (fictional). Design plan: demo-web/README.md. */
+
+:root {
+  --tray: #e3e7d6;   /* page: sage seed-tray paper */
+  --kraft: #d8bb8a;  /* the seed packet */
+  --kraft-dark: #c4a26c;
+  --loam: #36281e;   /* text */
+  --loam-soft: #5d4a3b;
+  --chard: #9e2350;  /* actions: ruby chard stem */
+  --chard-press: #7f1a40;
+  --sprout: #3f6a1c; /* success */
+  --frost: #fbfaf3;  /* fields */
+  --error: #a3261c;
+  --display: 'Zilla Slab', Rockwell, 'Roboto Slab', Georgia, serif;
+  --text: 'Atkinson Hyperlegible', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--tray);
+  color: var(--loam);
+  font: 400 17px/1.5 var(--text);
+  padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+
+main { max-width: 440px; margin: 0 auto; }
+
+a { color: var(--chard); text-underline-offset: 3px; }
+
+:focus-visible { outline: 3px solid var(--chard); outline-offset: 3px; }
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--loam);
+  text-decoration: none;
+  font: 700 21px/1 var(--display);
+  margin: 4px 0 36px;
+}
+.brand svg { width: 30px; height: 30px; }
+
+h1 {
+  font: 700 34px/1.08 var(--display);
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+
+.lede { margin: 0 0 34px; color: var(--loam-soft); max-width: 34em; }
+.lede strong { color: var(--loam); overflow-wrap: anywhere; }
+
+/* The seed packet: kraft card with a pinked (zig-zag) top edge, the page's one bold object. */
+.packet {
+  position: relative;
+  background: var(--kraft);
+  border-radius: 0 0 10px 10px;
+  padding: 26px 20px 22px;
+  margin-top: 12px;
+}
+.packet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 8px;
+  background: conic-gradient(from -45deg at 50% 100%, var(--kraft) 90deg, transparent 0) 0 0 / 16px 100% repeat-x;
+}
+
+.packet h2 {
+  font: 700 23px/1.2 var(--display);
+  margin: 0 0 18px;
+}
+
+label { display: block; font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+
+input {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 14px;
+  border: 2px solid var(--loam);
+  border-radius: 8px;
+  background: var(--frost);
+  color: var(--loam);
+  font: 400 18px/1.3 var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+input:focus { outline: none; border-color: var(--chard); box-shadow: 0 0 0 3px rgba(158, 35, 80, 0.25); }
+input[aria-invalid='true'] { border-color: var(--error); }
+
+/* Code digits in Atkinson Hyperlegible: its 0/O and 1/l/I are built to be told apart. */
+input.code {
+  font: 700 32px/1 var(--text);
+  letter-spacing: 0.32em;
+  padding-left: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--chard);
+  color: #fff;
+  font: 700 18px/1.2 var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { background: var(--chard-press); }
+.btn[disabled] { opacity: 0.6; cursor: default; }
+a.btn { text-align: center; text-decoration: none; }
+
+.btn-quiet {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 12px 18px;
+  border: 2px solid var(--loam);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--loam);
+  font: 700 17px/1.2 var(--text);
+  cursor: pointer;
+}
+.btn-quiet[disabled] { border-color: var(--kraft-dark); color: var(--loam-soft); cursor: default; }
+
+.note { margin: 12px 0 0; font-size: 15px; color: var(--loam-soft); }
+
+.status { margin: 14px 0 0; font-weight: 700; min-height: 0; }
+.status:empty { display: none; }
+.status.error { color: var(--error); }
+.status.ok { color: var(--sprout); }
+
+.after-packet { margin-top: 18px; }
+.after-packet a { display: inline-block; padding: 10px 0; font-weight: 700; }
+
+/* How borrowing works: a real sequence, so it is numbered. */
+.steps { margin: 44px 0 0; }
+.steps h2 { font: 700 22px/1.2 var(--display); margin: 0 0 14px; }
+.steps ol { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 2px dotted var(--kraft-dark);
+}
+.steps li::before {
+  content: counter(step);
+  font: 700 26px/1 var(--display);
+  color: var(--chard);
+  padding-top: 2px;
+}
+
+footer { margin-top: 40px; font-size: 14px; color: var(--loam-soft); }
+
+/* Success: the packet gets a rubber stamp. */
+.stamp {
+  display: inline-block;
+  margin: 2px 0 16px;
+  padding: 8px 14px 6px;
+  border: 3px solid var(--sprout);
+  border-radius: 6px;
+  color: var(--sprout);
+  font: 700 24px/1.1 var(--display);
+  transform: rotate(-4deg);
+}
+.stamp small { display: block; font: 700 14px/1.3 var(--text); }
+.stamped .stamp { animation: stamp 260ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes stamp {
+  from { transform: rotate(-4deg) scale(1.6); opacity: 0; }
+  to { transform: rotate(-4deg) scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamped .stamp { animation: none; }
+}
+
+[hidden] { display: none !important; }

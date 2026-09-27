@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e3e7d6">
+<title>Sowbank – Get a borrower card</title>
+<meta name="description" content="Sowbank is a free neighbourhood seed library. Get a borrower card with your email.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Zilla+Slab:wght@700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main>
+  <a class="brand" href="/" aria-label="Sowbank home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#d8bb8a"/><path d="M16 27V15" stroke="#36281e" stroke-width="2.4" stroke-linecap="round"/><path d="M16 16c0-5 3-8 9-8 0 5-3 8-9 8z" fill="#3f6a1c"/><path d="M16 18c0-4-2.5-6.5-8-6.5 0 4 2.5 6.5 8 6.5z" fill="#9e2350"/></svg>
+    Sowbank
+  </a>
+
+  <h1>Borrow seeds in spring. Bring some back in autumn.</h1>
+  <p class="lede">Sowbank is a free seed library run by gardeners on Alder Street. A borrower card lets you reserve packets from this season’s shelf.</p>
+
+  <section class="packet" aria-labelledby="card-title">
+    <h2 id="card-title">Get a borrower card</h2>
+    <form id="signup" novalidate>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com" required aria-describedby="signup-status">
+      <button class="btn" id="send" type="submit">Email me a code</button>
+    </form>
+    <p class="status error" id="signup-status" role="alert"></p>
+    <p class="note">We’ll send a 6-digit code to confirm it’s your address. There’s no password.</p>
+  </section>
+
+  <section class="steps" aria-labelledby="steps-title">
+    <h2 id="steps-title">How borrowing works</h2>
+    <ol>
+      <li><span>Reserve up to five packets from the shelf list.</span></li>
+      <li><span>Pick them up at the Alder Street library during any open hour.</span></li>
+      <li><span>Save seed from your strongest plants and bring back a packet by October.</span></li>
+    </ol>
+  </section>
+
+  <footer>Sowbank is a fictional seed library. This page demonstrates one-time-code AutoFill with SkiPass.</footer>
+</main>
+<script>
+(function () {
+  var form = document.getElementById('signup');
+  var input = document.getElementById('email');
+  var button = document.getElementById('send');
+  var status = document.getElementById('signup-status');
+
+  function fail(html) {
+    status.innerHTML = html;
+    input.setAttribute('aria-invalid', 'true');
+    button.disabled = false;
+    button.textContent = 'Email me a code';
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var email = input.value.trim();
+    status.textContent = '';
+    input.removeAttribute('aria-invalid');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      fail('Enter an email address like name@example.com.');
+      input.focus();
+      return;
+    }
+    button.disabled = true;
+    button.textContent = 'Sending code…';
+    fetch('/api/send-code', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; });
+    }).then(function (res) {
+      if (res.status === 200 && res.body.sent) {
+        try { sessionStorage.setItem('sowbank.email', res.body.email); } catch (e) {}
+        location.href = '/verify';
+        return;
+      }
+      if (res.status === 429) {
+        try { sessionStorage.setItem('sowbank.email', email); } catch (e) {}
+        fail(escapeText(res.body.message || 'A code was sent a moment ago.') + ' <a href="/verify">Enter the code you already have</a>.');
+        return;
+      }
+      fail(escapeText(res.body.message || 'The code couldn’t be sent. Try again in a moment.'));
+    }).catch(function () {
+      fail('No connection. Check your signal and try again.');
+    });
+  });
+
+  function escapeText(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>
