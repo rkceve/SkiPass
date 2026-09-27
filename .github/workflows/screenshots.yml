@@ -5,8 +5,6 @@ name: screenshots
 # no network). Output artifact `screenshots`: 01-home.png, 02-imap-expanded.png, 03-plan.png.
 on:
   workflow_dispatch:
-  push:
-    branches: [wip/p3]
 
 concurrency:
   group: screenshots-${{ github.ref }}
