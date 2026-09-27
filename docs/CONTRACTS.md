@@ -89,11 +89,11 @@ request:  {"messageId": "uuid:123"}
 ```
 Jev call (per message, in parallel; `POST https://api.typesafe.ai/v1/systemone`, `model: "jev-latest"`, one Noul question id `is_code_for_service`):
 - state: the message `text` (full message, decided).
-- instructions (service known): `Is this email delivering a one-time verification or sign-in code for the service at <service>?`
-  criteria.true: `It delivers a one-time code for <service>` / criteria.false: `It is for another service, or it does not deliver a one-time code`.
+- instructions (service known): `A user is signing in on the website <service> and needs the one-time code that this website just emailed them. Is this email that code email from <service> (the sender may use a different brand name or email provider, but the email mentions or links to <service>)?`
+  criteria.true: `A one-time verification code email sent by or for <service>` / criteria.false: `A code email from a different website, a promotional email, or an email without a one-time code`.
 - instructions (service null): `Is this email delivering a one-time verification or sign-in code?`
 - Choose the highest `noul` ≥ 0.5; ties → newest `Date`. None ≥ 0.5 → `chosenId: null`.
-- Jev failure/timeout (2 s) → fallback: newest message whose text contains the service's registrable domain, else newest message; `source: "fallback"`.
+- Jev failure/timeout (3 s) → fallback: newest message whose text contains the service's registrable domain, else newest message; `source: "fallback"`.
 Plans/limits/entitlement IDs: values are [Open]; keep them in one `server/src/plans.ts` table.
 Mock modes (env): `JEV_MODE=mock`, `REVENUECAT_MODE=mock`.
 Worker secrets: `JEV_API_KEY`, `REVENUECAT_SECRET_KEY`, `APP_TOKEN`. KV namespace binding: `USAGE`, key `usage:<appUserID>:<YYYY-MM>`.
@@ -115,3 +115,4 @@ Agents with CI duties read runs/logs through the GitHub REST API using the token
 ## 8. Change log
 
 - 2026-09-24: `SkiPassAuth` now depends on `SkiPassMail` + `AppAuthCore` only (extension-safe); new `SkiPassAuthUI` (app only, `AppAuth`) for interactive sign-in; new `SkiPassAuthTests`. The extension links `SkiPassAuth`, never `SkiPassAuthUI`.
+- 2026-09-27: Jev question wording updated after a live comparison (correct email 0.65 -> 0.87); upstream timeout 2 s -> 3 s; Jev live on Vercel.

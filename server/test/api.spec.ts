@@ -246,10 +246,12 @@ describe('POST /v1/judge — live Jev', () => {
         [QUESTION_ID]: {
           type: 'noul',
           instructions:
-            'Is this email delivering a one-time verification or sign-in code for the service at login.acme.co.uk?',
+            'A user is signing in on the website login.acme.co.uk and needs the one-time code that this website just emailed them. ' +
+              'Is this email that code email from login.acme.co.uk (the sender may use a different brand name or email provider, ' +
+              'but the email mentions or links to login.acme.co.uk)?',
           criteria: {
-            true: 'It delivers a one-time code for login.acme.co.uk',
-            false: 'It is for another service, or it does not deliver a one-time code',
+            true: 'A one-time verification code email sent by or for login.acme.co.uk',
+            false: 'A code email from a different website, a promotional email, or an email without a one-time code',
           },
         },
       },

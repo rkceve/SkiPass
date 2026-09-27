@@ -45,10 +45,16 @@ export function buildQuestion(service: string | null): NoulQuestion {
   }
   return {
     type: 'noul',
-    instructions: `Is this email delivering a one-time verification or sign-in code for the service at ${service}?`,
+    // Wording chosen by a live comparison against jev-1.13.0 (2026-09-27): the correct code email
+    // scored 0.87 vs 0.65 with the original wording, while other-site code emails and promotions
+    // stayed at 0.01-0.02.
+    instructions:
+      `A user is signing in on the website ${service} and needs the one-time code that this website just emailed them. ` +
+      `Is this email that code email from ${service} (the sender may use a different brand name or email provider, ` +
+      `but the email mentions or links to ${service})?`,
     criteria: {
-      true: `It delivers a one-time code for ${service}`,
-      false: 'It is for another service, or it does not deliver a one-time code',
+      true: `A one-time verification code email sent by or for ${service}`,
+      false: 'A code email from a different website, a promotional email, or an email without a one-time code',
     },
   }
 }

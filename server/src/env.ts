@@ -32,7 +32,7 @@ export const defaultDeps: Deps = {
   // Wrapped so `fetch` is never invoked with a foreign `this`.
   fetch: (input, init) => fetch(input, init),
   now: () => new Date(),
-  upstreamTimeoutMs: 2000,
+  upstreamTimeoutMs: 3000, // Jev p95 observed 0.2-0.4 s with occasional multi-second spikes
   // Cloudflare: the `USAGE` KV binding. The Vercel entry (src/vercel.ts) overrides this with Redis.
   usageCounter: (env) => {
     if (env.USAGE === undefined) throw new Error('USAGE KV binding missing')
