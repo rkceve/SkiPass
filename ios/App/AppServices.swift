@@ -59,6 +59,17 @@ protocol BillingServices: AnyObject {
     /// Purchases the package with `Package.identifier == packageID`.
     /// Returns false when the user cancelled.
     func purchase(packageID: String) async throws -> Bool
+    /// RevenueCat's cancellation path (`Purchases.showManageSubscriptions()`): opens the store's
+    /// subscription management for the customer's active subscription.
+    func showManageSubscriptions() async throws
+}
+
+/// One-time-code identity registration (`IdentityRegistrar`, shared with the extension).
+@MainActor
+protocol IdentityServices: AnyObject {
+    /// Registers identities for the popular / demo / seen domains, labelled with the first mailbox;
+    /// removes them all when there is no mailbox. Background work, errors are only logged.
+    func syncIdentities(mailboxAddresses: [String]) async
 }
 
 /// SkiPass server usage endpoint (CONTRACTS §5 `GET /v1/usage`).
@@ -80,4 +91,5 @@ struct AppServicesBundle {
     var billing: any BillingServices
     var usage: any UsageServices
     var sharedState: any SharedStateServices
+    var identities: any IdentityServices
 }

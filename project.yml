@@ -14,7 +14,7 @@ configFiles:
 
 settings:
   base:
-    MARKETING_VERSION: "0.1.4"
+    MARKETING_VERSION: "0.1.5"
     CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY: "-"
@@ -38,6 +38,8 @@ targets:
       - path: ios/App
         excludes:
           - Tests
+      # One-time-code identity registration + bundled sign-in-domains.json, shared with the extension.
+      - path: ios/Extension/Identity
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass
@@ -124,6 +126,7 @@ targets:
     platform: iOS
     sources:
       - path: ios/Extension/Resolver
+      - path: ios/Extension/Identity
       - path: ios/Extension/Tests
     settings:
       base:

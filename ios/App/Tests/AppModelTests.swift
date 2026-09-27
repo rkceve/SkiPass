@@ -61,6 +61,15 @@ private final class FakeBilling: BillingServices {
     var purchased: [String] = []
     var purchaseCompletes = true
     var activeAfterPurchase: Set<String>?
+    /// Test Store behaviour: a completed purchase adds its product to the active set
+    /// (no product change; earlier subscriptions stay active).
+    var addsPurchasedProduct = false
+    var purchaseError: Error?
+    var manageSubscriptionsCalls = 0
+    /// When true, purchases wait until `releasePurchases()` (a purchase sheet that is still open).
+    var holdPurchases = false
+    private var held: [CheckedContinuation<Void, Never>] = []
+    var heldCount: Int { held.count }
 
     func configure() -> String? { appUserID }
     func currentPackages() async throws -> [StorePackageInfo] { packages }
@@ -68,8 +77,35 @@ private final class FakeBilling: BillingServices {
 
     func purchase(packageID: String) async throws -> Bool {
         purchased.append(packageID)
+        if holdPurchases {
+            await withCheckedContinuation { held.append($0) }
+        }
+        if let purchaseError { throw purchaseError }
         if purchaseCompletes, let activeAfterPurchase { active = activeAfterPurchase }
+        if purchaseCompletes, addsPurchasedProduct,
+           let product = packages.first(where: { $0.id == packageID })?.productID {
+            active.insert(product)
+        }
         return purchaseCompletes
+    }
+
+    func releasePurchases() {
+        let waiting = held
+        held = []
+        waiting.forEach { $0.resume() }
+    }
+
+    func showManageSubscriptions() async throws {
+        manageSubscriptionsCalls += 1
+    }
+}
+
+@MainActor
+private final class FakeIdentities: IdentityServices {
+    var syncs: [[String]] = []
+
+    func syncIdentities(mailboxAddresses: [String]) async {
+        syncs.append(mailboxAddresses)
     }
 }
 
@@ -104,9 +140,11 @@ private struct Harness {
     let billing = FakeBilling()
     let usage = FakeUsage()
     let shared = FakeSharedState()
+    let identities = FakeIdentities()
 
     func makeModel() -> AppModel {
-        AppModel(services: AppServicesBundle(accounts: accounts, billing: billing, usage: usage, sharedState: shared))
+        AppModel(services: AppServicesBundle(accounts: accounts, billing: billing, usage: usage,
+                                             sharedState: shared, identities: identities))
     }
 }
 
@@ -166,6 +204,15 @@ struct MappingTests {
     @Test func activeEntitlementMarksItsPackageCurrent() {
         let plans = AppModel.planOptions(packages: [standard, pro], activeProductIDs: ["skipass_pro_monthly"])
         #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+    }
+
+    /// Regression (device, v0.1.4): with Standard and Pro both active (Test Store: buying Pro adds a
+    /// second subscription), both were marked current; the screen showed Standard and hid Pro.
+    @Test func highestActiveTierIsTheOnlyCurrentPlan() {
+        let plans = AppModel.planOptions(packages: [standard, pro],
+                                         activeProductIDs: ["skipass_standard_monthly", "skipass_pro_monthly"])
+        #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+        #expect(plans.filter { !$0.isCurrent }.map(\.id) == ["free", "$rc_monthly"])
     }
 }
 
@@ -390,6 +437,121 @@ struct AppModelTests {
         await model.selectPlan(id: "free")
 
         #expect(h.billing.purchased.isEmpty)
+    }
+
+    @Test func upgradeStandardToProMakesProCurrentAndKeepsOtherRowsSelectable() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.addsPurchasedProduct = true
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "$rc_monthly")
+        #expect(model.plans.first(where: \.isCurrent)?.id == "$rc_monthly")
+        #expect(model.plans.filter { !$0.isCurrent }.map(\.id) == ["free", "pro_monthly"])
+
+        await model.selectPlan(id: "pro_monthly")
+
+        #expect(h.billing.purchased == ["$rc_monthly", "pro_monthly"])
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+        #expect(model.plans.filter { !$0.isCurrent }.map(\.id) == ["free", "$rc_monthly"])
+    }
+
+    @Test func downgradeProToStandardPurchasesButProStaysCurrentWhileActive() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.active = ["skipass_pro_monthly"]
+        h.billing.addsPurchasedProduct = true
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "$rc_monthly")
+
+        #expect(h.billing.purchased == ["$rc_monthly"])
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+
+        // Pro ends (Test Store: after its last renewal): the next foreground refresh shows Standard.
+        h.billing.active = ["skipass_standard_monthly"]
+        await model.didBecomeActive()
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["$rc_monthly"])
+    }
+
+    @Test func freeRowOpensSubscriptionManagementWhenPaid() async {
+        let h = Harness()
+        h.billing.packages = [standard]
+        h.billing.active = ["skipass_standard_monthly"]
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "free")
+
+        #expect(h.billing.manageSubscriptionsCalls == 1)
+        #expect(h.billing.purchased.isEmpty)
+
+        // The subscription ended: Free becomes current on the next foreground refresh.
+        h.billing.active = []
+        await model.didBecomeActive()
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["free"])
+    }
+
+    @Test func freeRowDoesNothingWhenAlreadyFree() async {
+        let h = Harness()
+        h.billing.packages = [standard]
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "free")
+
+        #expect(h.billing.manageSubscriptionsCalls == 0)
+    }
+
+    @Test func tapsWhileAPurchaseIsOpenAreIgnoredAndRowsWorkAfterwards() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.holdPurchases = true
+        let model = h.makeModel()
+        await model.start()
+
+        let first = Task { await model.selectPlan(id: "pro_monthly") }
+        while h.billing.heldCount == 0 { await Task.yield() }
+        await model.selectPlan(id: "$rc_monthly")
+        #expect(h.billing.purchased == ["pro_monthly"])
+
+        h.billing.releasePurchases()
+        await first.value
+        h.billing.holdPurchases = false
+
+        await model.selectPlan(id: "$rc_monthly")
+        #expect(h.billing.purchased == ["pro_monthly", "$rc_monthly"])
+    }
+
+    @Test func failedPurchaseStillAllowsTheNextTap() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.purchaseError = Boom()
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "pro_monthly")
+        h.billing.purchaseError = nil
+        await model.selectPlan(id: "pro_monthly")
+
+        #expect(h.billing.purchased == ["pro_monthly", "pro_monthly"])
+    }
+
+    @Test func identitiesAreSyncedOnStartAddAndDelete() async throws {
+        let h = Harness()
+        let model = h.makeModel()
+
+        await model.start()
+        #expect(h.identities.syncs == [[]])
+
+        let account = try await model.addAccount(email: "hello@gmail.com")
+        #expect(h.identities.syncs.last == ["hello@gmail.com"])
+
+        try await model.deleteAccount(id: account.id)
+        #expect(h.identities.syncs.last == [])
+        #expect(h.identities.syncs.count == 3)
     }
 
     @Test func foregroundRefreshesUsageAfterStart() async {

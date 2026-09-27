@@ -1,0 +1,20 @@
+{
+  "_comment": "Popular sign-in domains registered as ASOneTimeCodeCredentialIdentity entries so SkiPass is offered on the first visit to a site. Hand-picked well-known consumer services, one registrable domain each.",
+  "domains": [
+    "google.com", "youtube.com", "apple.com", "icloud.com", "microsoft.com", "live.com", "outlook.com", "office.com",
+    "amazon.com", "amazon.co.jp", "facebook.com", "instagram.com", "threads.net", "whatsapp.com", "x.com", "twitter.com",
+    "linkedin.com", "tiktok.com", "snapchat.com", "pinterest.com", "reddit.com", "discord.com", "twitch.tv", "telegram.org",
+    "netflix.com", "spotify.com", "hulu.com", "disneyplus.com", "max.com", "primevideo.com",
+    "paypal.com", "stripe.com", "venmo.com", "wise.com", "revolut.com", "coinbase.com", "binance.com", "kraken.com", "robinhood.com",
+    "chase.com", "bankofamerica.com", "wellsfargo.com", "capitalone.com", "americanexpress.com",
+    "ebay.com", "etsy.com", "shopify.com", "walmart.com", "target.com", "bestbuy.com", "aliexpress.com", "temu.com", "rakuten.co.jp", "mercari.com",
+    "uber.com", "lyft.com", "doordash.com", "airbnb.com", "booking.com", "expedia.com",
+    "github.com", "gitlab.com", "bitbucket.org", "atlassian.com", "slack.com", "zoom.us", "notion.so", "figma.com", "canva.com", "dropbox.com", "box.com",
+    "adobe.com", "salesforce.com", "hubspot.com", "openai.com", "chatgpt.com", "anthropic.com", "claude.ai",
+    "vercel.com", "netlify.com", "cloudflare.com", "digitalocean.com", "heroku.com",
+    "yahoo.com", "yahoo.co.jp", "line.me", "proton.me", "zoho.com", "fastmail.com",
+    "steampowered.com", "epicgames.com", "playstation.com", "xbox.com", "nintendo.com", "roblox.com",
+    "duolingo.com", "medium.com", "substack.com", "quora.com",
+    "okta.com", "docusign.com", "intuit.com"
+  ]
+}
