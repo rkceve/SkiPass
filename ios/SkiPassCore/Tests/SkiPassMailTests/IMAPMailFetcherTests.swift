@@ -68,7 +68,7 @@ final class IMAPMailFetcherOrderTests: XCTestCase {
         let start = Date()
         let messages = try await fetcher(scripted, timeout: 0.5).recentMessages(for: mailbox, since: since)
 
-        XCTAssertLessThan(Date().timeIntervalSince(start), 2)
+        XCTAssertLessThan(Date().timeIntervalSince(start), promptBound)
         XCTAssertEqual(messages.map(uidOf), [10, 9, 8, 7, 6], "the first burst (newest five) is kept")
         try await Task.sleep(nanoseconds: 100_000_000)
         let disconnected = await scripted.disconnected
@@ -151,7 +151,7 @@ actor ScriptedSession: MailSession {
         let call = partCalls.count
         partCalls.append(requests.map(\.uid.value))
         if let stall = stallBodyCallsFrom, call >= stall {
-            await uncancellableSleep(3)
+            await uncancellableSleep(stallSeconds)
         }
         var result: [UID: [(section: Section, data: Data)]] = [:]
         for request in requests {

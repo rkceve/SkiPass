@@ -243,7 +243,7 @@ final class ServerClientTests: XCTestCase {
     /// A2-08: the configured timeout bounds the whole request, not only idle time.
     func testJudgeTimeoutBoundsTheWholeRequest() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":1,"source":"jev"}"#,
-                                delay: 3)
+                                delay: 10)
         let id = user
         let client = ServerClient(
             configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { id }, timeout: 0.3),
@@ -254,7 +254,9 @@ final class ServerClientTests: XCTestCase {
             _ = try await client.judge(service: nil, messages: [acme])
             XCTFail("expected a timeout")
         } catch {}
-        XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
+        // Only has to separate "gave up at the 0.3 s timeout" from "waited for the 10 s reply", with
+        // room for slow CI simulators.
+        XCTAssertLessThan(Date().timeIntervalSince(start), 5)
     }
 
     func testMissingAppUserIDMakesNoRequest() async throws {

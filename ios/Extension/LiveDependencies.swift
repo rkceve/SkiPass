@@ -17,12 +17,8 @@ import SkiPassStorage
 ///   - SkiPassMail:    `IMAPMailFetcher(credentials:timeout:)`: `MailFetching`
 ///   - SkiPassExtraction: `OTPCodeExtractor()`: `CodeExtracting`
 ///   - SkiPassServerClient: `ServerClient(configuration: ServerClientConfiguration(baseURL:appToken:appUserID:timeout:anonymousJudgeUserID:))`,
-///     conforming to `CandidateJudging` and `UsageReporting`
+///     conforming to `CandidateJudging` and `UsageReporting`; `ServerBuildConfiguration(bundle:)` (Info.plist values)
 enum LiveDependencies {
-
-    /// Info.plist keys (CONTRACTS §2).
-    static let serverURLKey = "SkiPassServerURL"
-    static let appTokenKey = "SkiPassAppToken"
 
     /// `X-SkiPass-User` for judging when the App Group holds no app user ID (TRIAGE D10).
     static let anonymousJudgeUserID = "anonymous"
@@ -70,10 +66,8 @@ enum LiveDependencies {
     /// does not disable the server (TRIAGE D10): it is logged, judging uses `anonymousJudgeUserID`,
     /// and fills are not reported until the app has written the ID.
     static func makeServerClient(bundle: Bundle) -> ServerClient? {
-        guard let urlString = value(serverURLKey, in: bundle),
-              let baseURL = URL(string: urlString), baseURL.scheme != nil,
-              let appToken = value(appTokenKey, in: bundle)
-        else {
+        // Unset values and the Secrets.example placeholders mean "no server" (same rule as the app, A1-09).
+        guard let config = ServerBuildConfiguration(bundle: bundle) else {
             logger.notice("No server configuration in this build; using the local fallback rule only")
             return nil
         }
@@ -82,8 +76,8 @@ enum LiveDependencies {
             logger.error("No app user ID (rc.appUserID) in the App Group defaults: judging via the server without a user, fills are not counted")
         }
         return ServerClient(configuration: ServerClientConfiguration(
-            baseURL: baseURL,
-            appToken: appToken,
+            baseURL: config.baseURL,
+            appToken: config.appToken,
             // Read on every request, so an ID the app writes later is used at once.
             appUserID: { sharedState?.revenueCatAppUserID },
             timeout: serverTimeout,
@@ -141,14 +135,6 @@ enum LiveDependencies {
             logger.notice("Identity sync: \(String(describing: result), privacy: .public)")
             return result
         }
-    }
-
-    /// Non-empty, substituted Info.plist string (an unset xcconfig variable leaves "" or "$(NAME)").
-    private static func value(_ key: String, in bundle: Bundle) -> String? {
-        guard let raw = bundle.object(forInfoDictionaryKey: key) as? String else { return nil }
-        let value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !value.isEmpty, !value.hasPrefix("$(") else { return nil }
-        return value
     }
 
     private static func seconds(_ duration: Duration) -> TimeInterval {
