@@ -55,7 +55,8 @@ export function planFromLookupKeys(activeLookupKeys: ReadonlySet<string>): Plan 
 }
 
 export interface RevenueCatConfig {
-  mode: 'live' | 'mock'
+  /** `unconfigured` = live mode without a secret key or project id (a config error, D2). */
+  mode: 'live' | 'mock' | 'unconfigured'
   secretKey: string
   projectId: string
 }
@@ -107,27 +108,44 @@ async function entitlementLookupKeys(
   return lookupKeys
 }
 
+/**
+ * Result of a plan lookup:
+ *   - `plan`: RevenueCat answered (mock mode: always the free plan);
+ *   - `unknown_user`: RevenueCat does not know the customer (404 resource_missing) — TRIAGE D1a;
+ *   - `error`: RevenueCat failed, timed out, or is not configured — the caller falls back to the
+ *     last known plan and never downgrades (TRIAGE D2).
+ */
+export type PlanLookup = { kind: 'plan'; plan: Plan } | { kind: 'unknown_user' } | { kind: 'error' }
+
 export async function lookupPlan(
   deps: Deps,
   rc: RevenueCatConfig,
   appUserID: string,
-): Promise<Plan> {
-  if (rc.mode === 'mock') return FREE_PLAN
+): Promise<PlanLookup> {
+  if (rc.mode === 'mock') return { kind: 'plan', plan: FREE_PLAN }
+  if (rc.mode === 'unconfigured') return { kind: 'error' }
   try {
     return await withTimeout(deps, async (signal) => {
-      const [lookupKeys, active] = await Promise.all([
-        entitlementLookupKeys(deps, rc, signal),
+      const [activeR, keysR] = await Promise.allSettled([
         getList<ActiveEntitlementItem>(
           deps,
           rc,
           `/customers/${encodeURIComponent(appUserID)}/active_entitlements`,
           signal,
-        ).catch((e: unknown) => {
-          // Unknown customer (never opened the app with RevenueCat) -> no entitlements.
-          if (e instanceof NotFound) return []
-          throw e
-        }),
+        ),
+        entitlementLookupKeys(deps, rc, signal),
       ])
+      // Unknown customer: the app's RevenueCat SDK creates the customer on first launch, so an id
+      // RevenueCat has never seen did not come from the app. The docs return 404 for an unknown
+      // customer *or project* (https://www.revenuecat.com/docs/api-v2/customer), so the 404 counts as
+      // "unknown user" only when the project's entitlement list loaded; a wrong project id is an error.
+      if (activeR.status === 'rejected' && activeR.reason instanceof NotFound && keysR.status === 'fulfilled') {
+        return { kind: 'unknown_user' } as const
+      }
+      if (activeR.status === 'rejected') throw activeR.reason
+      if (keysR.status === 'rejected') throw keysR.reason
+      const active = activeR.value
+      const lookupKeys = keysR.value
       const now = deps.now()
       const activeKeys = new Set<string>()
       for (const a of active) {
@@ -135,10 +153,10 @@ export async function lookupPlan(
         const key = lookupKeys.get(a.entitlement_id)
         if (key !== undefined) activeKeys.add(key)
       }
-      return planFromLookupKeys(activeKeys)
+      return { kind: 'plan', plan: planFromLookupKeys(activeKeys) } as const
     })
   } catch {
-    // OPEN(billing): behaviour when RevenueCat is unreachable is not decided; degrade to the free plan.
-    return FREE_PLAN
+    // No logging of the error object (it can carry request details); the caller handles `error`.
+    return { kind: 'error' }
   }
 }

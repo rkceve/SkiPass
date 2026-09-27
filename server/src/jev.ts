@@ -24,7 +24,8 @@ export interface JudgeMessage {
 export interface JudgeResult {
   chosenId: string | null
   scores: Record<string, number>
-  source: 'jev' | 'fallback'
+  /** `mock` only when JEV_MODE=mock (CONTRACTS §5 change log 2026-09-27, TRIAGE D3). */
+  source: 'jev' | 'fallback' | 'mock'
 }
 
 interface NoulQuestion {
@@ -67,18 +68,26 @@ export function buildRequestBody(service: string | null, text: string) {
   }
 }
 
-/** Registrable domain (eTLD+1) of a service identifier (bare host or URL), lowercased. */
+/**
+ * Public Suffix List including its PRIVATE section, so hosting suffixes such as `vercel.app` and
+ * `github.io` count as suffixes: `skipass-demo.vercel.app` -> `skipass-demo.vercel.app`, not
+ * `vercel.app` (TRIAGE D6). tldts option `allowPrivateDomains` (default false):
+ * https://github.com/remusao/tldts#readme ("allowPrivateDomains").
+ */
+const TLD_OPTIONS = { allowPrivateDomains: true } as const
+
+/** Registrable domain (eTLD+1, private suffixes included) of a service identifier (bare host or URL), lowercased. */
 export function registrableDomain(service: string): string | null {
   const s = service.trim().toLowerCase()
   if (s === '') return null
-  return getDomain(s) ?? getHostname(s) ?? s
+  return getDomain(s, TLD_OPTIONS) ?? getHostname(s) ?? s
 }
 
-/** Brand word = registrable domain without its public suffix ("acme.co.uk" -> "acme"). */
+/** Brand word = registrable domain without its public suffix ("acme.co.uk" -> "acme", "skipass-demo.vercel.app" -> "skipass-demo"). */
 export function brandWord(service: string): string | null {
   const s = service.trim().toLowerCase()
   if (s === '') return null
-  return getDomainWithoutSuffix(s)
+  return getDomainWithoutSuffix(s, TLD_OPTIONS)
 }
 
 /**
@@ -139,7 +148,7 @@ export function fallbackSelect(service: string | null, messages: JudgeMessage[])
   return i === null ? null : messages[i].id
 }
 
-/** Deterministic stand-in for Jev (JEV_MODE=mock or no key): domain or brand word in text -> 0.9, else 0.1. */
+/** Deterministic stand-in for Jev (JEV_MODE=mock only): domain or brand word in text -> 0.9, else 0.1. */
 export function mockNoul(service: string | null, text: string): number {
   if (service === null) return 0.1
   const lower = text.toLowerCase()
@@ -181,9 +190,16 @@ export async function callJev(
 }
 
 export interface JevConfig {
-  mode: 'live' | 'mock'
+  /** `unconfigured` = live mode without an API key (a config error; every judge uses the fallback rule). */
+  mode: 'live' | 'mock' | 'unconfigured'
   apiKey: string
 }
+
+const fallbackResult = (service: string | null, messages: JudgeMessage[]): JudgeResult => ({
+  chosenId: fallbackSelect(service, messages),
+  scores: {},
+  source: 'fallback',
+})
 
 /**
  * Judges all messages in parallel (one Noul question per message). Any Jev failure or timeout
@@ -196,10 +212,13 @@ export async function judgeMessages(
   messages: JudgeMessage[],
 ): Promise<JudgeResult> {
   if (jev.mode === 'mock') {
+    // Without a service there is nothing to score against: the mock applies the fallback rule.
+    if (service === null) return { chosenId: fallbackSelect(null, messages), scores: {}, source: 'mock' }
     const scores: Record<string, number> = {}
     for (const m of messages) scores[m.id] = mockNoul(service, m.text)
-    return { chosenId: selectByScores(messages, scores), scores, source: 'jev' }
+    return { chosenId: selectByScores(messages, scores), scores, source: 'mock' }
   }
+  if (jev.mode === 'unconfigured') return fallbackResult(service, messages)
   try {
     const values = await Promise.all(messages.map((m) => callJev(deps, jev.apiKey, service, m.text)))
     const scores: Record<string, number> = {}
@@ -207,6 +226,6 @@ export async function judgeMessages(
     return { chosenId: selectByScores(messages, scores), scores, source: 'jev' }
   } catch {
     // Deliberately no logging: error objects could carry request content (SPEC: no email logging).
-    return { chosenId: fallbackSelect(service, messages), scores: {}, source: 'fallback' }
+    return fallbackResult(service, messages)
   }
 }

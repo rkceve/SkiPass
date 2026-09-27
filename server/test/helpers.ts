@@ -38,11 +38,19 @@ export const json = (body: unknown, status = 200) =>
 /** A fetch that never settles (for timeout tests). */
 export const hang: Route = () => new Promise<Response>(() => {})
 
+let ipCounter = 0
+/** A distinct client IP per test client, so the per-IP judge limit of one test never leaks into another. */
+export function freshIp(): string {
+  ipCounter += 1
+  return `203.0.113.${ipCounter % 250}:${Date.now()}`
+}
+
 export function makeClient(opts: {
   bindings?: Partial<Bindings>
   deps?: Partial<Deps>
   user?: string
   token?: string | null
+  ip?: string
 }) {
   // Every client starts with an empty RevenueCat entitlement table cache.
   clearEntitlementCache()
@@ -56,8 +64,13 @@ export function makeClient(opts: {
     ...opts.bindings,
   }
   const user = opts.user ?? freshUser()
+  const ip = opts.ip ?? freshIp()
   const headers = (): Record<string, string> => {
-    const h: Record<string, string> = { 'Content-Type': 'application/json', 'X-SkiPass-User': user }
+    const h: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-SkiPass-User': user,
+      'CF-Connecting-IP': ip,
+    }
     if (opts.token !== null) h['X-SkiPass-App-Token'] = opts.token ?? TOKEN
     return h
   }
