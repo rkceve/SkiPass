@@ -10,11 +10,14 @@ private final class CallFlag: @unchecked Sendable {
     var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
 }
 
-/// Sleeps in small steps and ignores cancellation, like a SwiftMail command waiting on its own timeout.
-private func uncancellableSleep(_ seconds: TimeInterval) async {
-    let end = Date().addingTimeInterval(seconds)
-    while Date() < end {
-        try? await Task.sleep(nanoseconds: 10_000_000)
+/// Waits and ignores cancellation, like a SwiftMail command waiting on its own timeout.
+///
+/// Suspends on a dispatch timer instead of looping over `Task.sleep`: once the task is cancelled,
+/// `Task.sleep` throws at once, and such a loop would spin on a cooperative thread until the end,
+/// starving the (small) simulator thread pool and slowing unrelated tests.
+func uncancellableSleep(_ seconds: TimeInterval) async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        DispatchQueue.global().asyncAfter(deadline: .now() + seconds) { continuation.resume() }
     }
 }
 

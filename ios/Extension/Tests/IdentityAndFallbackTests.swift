@@ -248,7 +248,7 @@ final class LocalFallbackJudgeTests: XCTestCase {
             judge: FallbackJudge(primary: StubJudge(result: .failure(URLError(.timedOut)))),
             usage: StubUsage(),
             now: { LocalFallbackJudgeTests.now },
-            candidateObserver: { observed.set($0.map(\.id)) }
+            chosenObserver: { observed.set([$0.id]) }
         )
 
         let resolved = await resolver.resolve(service: "skipass-demo.vercel.app")

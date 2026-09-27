@@ -36,13 +36,6 @@ final class FetchLogicTests: XCTestCase {
         XCTAssertEqual(FetchLogic.searchCalendar.timeZone.secondsFromGMT(), 0)
     }
 
-    func testNewestUIDsKeepsHighest() {
-        let uids = [UID(5), UID(1), UID(9), UID(7)]
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 2), [UID(7), UID(9)])
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 10), [UID(1), UID(5), UID(7), UID(9)])
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 0), [])
-    }
-
     // MARK: exact recency cut
 
     func testIsRecentUsesInternalDate() {

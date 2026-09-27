@@ -32,8 +32,9 @@ struct LocalFallbackJudge: CandidateJudging {
 }
 
 /// Asks `primary` (the server) and falls back to `LocalFallbackJudge` when it throws
-/// (unreachable, timeout, 5xx, 401, malformed reply) or when there is no server in this build.
-/// A server answer — including `.noMatch` and `.quotaExhausted` — is final.
+/// (unreachable, timeout, 5xx, 401, 429 rate limit, malformed reply), when it chooses a message that
+/// was not sent (a bad reply, A2-06), or when there is no server in this build.
+/// A valid server answer — including `.noMatch` and `.quotaExhausted` — is final.
 struct FallbackJudge: CandidateJudging {
     let primary: (any CandidateJudging)?
     var fallback: any CandidateJudging = LocalFallbackJudge()
@@ -42,10 +43,15 @@ struct FallbackJudge: CandidateJudging {
         guard let primary else {
             return try await fallback.judge(service: service, messages: messages)
         }
+        let outcome: JudgeOutcome
         do {
-            return try await primary.judge(service: service, messages: messages)
+            outcome = try await primary.judge(service: service, messages: messages)
         } catch {
             return try await fallback.judge(service: service, messages: messages)
         }
+        if case .chosen(let id, _) = outcome, !messages.contains(where: { $0.id == id }) {
+            return try await fallback.judge(service: service, messages: messages)
+        }
+        return outcome
     }
 }

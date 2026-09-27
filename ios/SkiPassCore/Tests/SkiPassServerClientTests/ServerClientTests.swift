@@ -170,12 +170,42 @@ final class ServerClientTests: XCTestCase {
 
     func testJudgeRateLimitedThrowsSoTheCallerFallsBack() async throws {
         StubURLProtocol.respond(status: 429, json: #"{"error":"rate_limited"}"#)
-        do {
-            _ = try await makeClient().judge(service: "login.acme.co.uk", messages: [acme])
-            XCTFail("expected an error")
-        } catch {
-            // Any thrown error makes FallbackJudge use the local rule.
+        // Any thrown error makes FallbackJudge use the local rule.
+        await assertThrows(ServerClientError.rateLimited) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
         }
+        XCTAssertTrue(ServerClientError.rateLimited.isTransient)
+        XCTAssertFalse(ServerClientError.quotaExhausted.isTransient)
+        XCTAssertFalse(ServerClientError.httpStatus(404).isTransient)
+        XCTAssertTrue(ServerClientError.httpStatus(503).isTransient)
+    }
+
+    /// TRIAGE D10: without an app user ID the extension still asks the server to judge.
+    func testJudgeWithoutAppUserIDUsesTheAnonymousJudgeUser() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":10,"source":"jev"}"#)
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { nil },
+                                 anonymousJudgeUserID: "anonymous"),
+            session: StubURLProtocol.session()
+        )
+        _ = try await client.judge(service: nil, messages: [acme])
+        XCTAssertEqual(StubURLProtocol.requests.first?.request.value(forHTTPHeaderField: "X-SkiPass-User"), "anonymous")
+    }
+
+    func testFillsAndUsageNeverUseTheAnonymousJudgeUser() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"remaining":9}"#)
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { nil },
+                                 anonymousJudgeUserID: "anonymous"),
+            session: StubURLProtocol.session()
+        )
+        await assertThrows(ServerClientError.missingAppUserID) {
+            _ = try await client.reportFill(messageID: self.acme.id)
+        }
+        await assertThrows(ServerClientError.missingAppUserID) {
+            _ = try await client.currentUsage()
+        }
+        XCTAssertTrue(StubURLProtocol.requests.isEmpty)
     }
 
     /// A2-08: the configured timeout bounds the whole request, not only idle time.

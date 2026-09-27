@@ -109,6 +109,22 @@ public enum SharedStorageResolver {
         (entitlements?["com.apple.security.application-groups"] as? [String]) ?? []
     }
 
+    /// Keychain access groups from provisioning-profile / signing entitlements (`keychain-access-groups`),
+    /// possibly with wildcards such as `ABCDE12345.*`.
+    public static func keychainAccessGroups(fromEntitlements entitlements: [String: Any]?) -> [String] {
+        (entitlements?["keychain-access-groups"] as? [String]) ?? []
+    }
+
+    /// True when an entitlement list (exact names or `prefix*` wildcards) grants `group`.
+    public static func entitlementList(_ granted: [String], covers group: String) -> Bool {
+        granted.contains { entry in
+            if entry.hasSuffix("*") {
+                return group.hasPrefix(String(entry.dropLast()))
+            }
+            return entry == group
+        }
+    }
+
     /// The `Entitlements` dictionary of an `embedded.mobileprovision` file.
     ///
     /// The file is a CMS (PKCS #7) signed message whose payload is an XML property list; the

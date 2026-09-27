@@ -33,7 +33,8 @@ public struct SharedStorageEnvironment: Sendable {
     public let keychainAccessGroup: String?
     /// The keychain group was verified writable by this process and is one the extension can also
     /// name (App Group or team-prefixed app ID). Whether the extension is entitled to it is assumed
-    /// from identical entitlements, not verified from this process.
+    /// from identical entitlements, not verified from this process; both processes log the groups
+    /// they resolved, and the app logs whether the embedded extension's profile grants them.
     public let keychainGroupIsShared: Bool
 
     public init(appGroupID: String?, keychainAccessGroup: String?, keychainGroupIsShared: Bool) {
@@ -84,14 +85,60 @@ public struct SharedStorageEnvironment: Sendable {
             defaultAccessGroup: defaultGroup,
             runtimeBundleIdentifier: bundleID
         )
+        let environment: SharedStorageEnvironment
         if let keychainGroup = SharedStorageResolver.pickFirst(keychainCandidates, where: KeychainProbe.canWrite(accessGroup:)) {
             logger.notice("Keychain access group resolved: \(keychainGroup, privacy: .public)")
-            return SharedStorageEnvironment(appGroupID: appGroup, keychainAccessGroup: keychainGroup, keychainGroupIsShared: true)
+            environment = SharedStorageEnvironment(appGroupID: appGroup, keychainAccessGroup: keychainGroup, keychainGroupIsShared: true)
+        } else {
+            let tried = keychainCandidates.joined(separator: ", ")
+            let fallback = defaultGroup ?? "unknown"
+            logger.error("No shared keychain access group writable (tried \(tried, privacy: .public)); using the default group \(fallback, privacy: .public), not shared with the AutoFill extension")
+            environment = SharedStorageEnvironment(appGroupID: appGroup, keychainAccessGroup: nil, keychainGroupIsShared: false)
         }
-        let tried = keychainCandidates.joined(separator: ", ")
-        let fallback = defaultGroup ?? "unknown"
-        logger.error("No shared keychain access group writable (tried \(tried, privacy: .public)); using the default group \(fallback, privacy: .public), not shared with the AutoFill extension")
-        return SharedStorageEnvironment(appGroupID: appGroup, keychainAccessGroup: nil, keychainGroupIsShared: false)
+        logSummary(environment, bundle: bundle, defaultGroup: defaultGroup)
+        return environment
+    }
+
+    /// One line per process with everything needed to compare the app's and the extension's view
+    /// from a device log (TRIAGE "Not fixed": keychain sharing cannot be verified off-device, so both
+    /// processes log the groups they resolved). The app also checks the embedded extension's signed
+    /// profile, when present, for the groups it chose.
+    private static func logSummary(_ environment: SharedStorageEnvironment, bundle: Bundle, defaultGroup: String?) {
+        let isExtension = bundle.bundleURL.pathExtension == "appex"
+        let role = isExtension ? "extension" : "app"
+        let bundleText = bundle.bundleIdentifier ?? "nil"
+        let appGroupText = environment.appGroupID ?? "none"
+        let keychainText = environment.keychainAccessGroup ?? "default(\(defaultGroup ?? "unknown"))"
+        let profile = profileEntitlements(at: bundle.url(forResource: "embedded", withExtension: "mobileprovision"))
+        let profileKeychain = profile.map { SharedStorageResolver.keychainAccessGroups(fromEntitlements: $0).joined(separator: ",") } ?? "no profile"
+        logger.notice("Shared storage [\(role, privacy: .public)] bundle=\(bundleText, privacy: .public) appGroup=\(appGroupText, privacy: .public) keychainGroup=\(keychainText, privacy: .public) sharedAssumed=\(environment.keychainGroupIsShared, privacy: .public) profileKeychainGroups=\(profileKeychain, privacy: .public)")
+
+        guard !isExtension, let plugIns = bundle.builtInPlugInsURL,
+              let appexes = try? FileManager.default.contentsOfDirectory(at: plugIns, includingPropertiesForKeys: nil)
+        else { return }
+        for appex in appexes where appex.pathExtension == "appex" {
+            let name = appex.lastPathComponent
+            guard let entitlements = profileEntitlements(at: appex.appendingPathComponent("embedded.mobileprovision")) else {
+                logger.notice("Extension \(name, privacy: .public): no embedded profile; keychain sharing not checkable from the app")
+                continue
+            }
+            let keychainGroups = SharedStorageResolver.keychainAccessGroups(fromEntitlements: entitlements)
+            let appGroups = SharedStorageResolver.appGroups(fromEntitlements: entitlements)
+            let granted = keychainGroups + appGroups
+            let keychainOK = environment.keychainAccessGroup.map { SharedStorageResolver.entitlementList(granted, covers: $0) } ?? false
+            let appGroupOK = environment.appGroupID.map { appGroups.contains($0) } ?? false
+            let summary = "Extension \(name): profile grants keychain \(keychainGroups.joined(separator: ",")) / app groups \(appGroups.joined(separator: ",")); app's keychain group covered: \(keychainOK), app's App Group covered: \(appGroupOK)"
+            if keychainOK && appGroupOK {
+                logger.notice("\(summary, privacy: .public)")
+            } else {
+                logger.error("\(summary, privacy: .public) — mailboxes or credentials will not be visible to the AutoFill extension")
+            }
+        }
+    }
+
+    private static func profileEntitlements(at url: URL?) -> [String: Any]? {
+        guard let url, let data = try? Data(contentsOf: url) else { return nil }
+        return SharedStorageResolver.entitlements(fromEmbeddedProvisioningProfile: data)
     }
 
     /// App Groups named by the installed provisioning profile (`embedded.mobileprovision`, present

@@ -10,9 +10,10 @@ final class OTPParserTests: XCTestCase {
 
     func testBundledPatternFilesLoad() {
         let config = OTPParser.shared.configuration
-        // 7 language files and custom-patterns.json at 76a3c02.
+        // 7 language files and custom-patterns.json at 76a3c02, plus SkiPass's ja.json (1 pattern).
         XCTAssertEqual(config.customPatterns.count, 6)
-        XCTAssertEqual(config.languagePatterns.count, 16 + 5 + 5 + 4 + 3 + 4 + 12)
+        XCTAssertEqual(config.languagePatterns.count, 16 + 5 + 5 + 4 + 3 + 4 + 12 + 1)
+        XCTAssertTrue(config.keywords.contains("認証コード"))
         XCTAssertTrue(config.keywords.contains("verification"))
         XCTAssertTrue(config.keywords.contains("验证码"))
     }

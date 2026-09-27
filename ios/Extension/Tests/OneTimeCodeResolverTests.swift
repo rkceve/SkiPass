@@ -27,7 +27,9 @@ final class OneTimeCodeResolverTests: XCTestCase {
                               fetcher: FakeFetcher,
                               judge: FakeJudge,
                               usage: FakeUsage = FakeUsage(),
-                              budget: Duration = .seconds(4)) -> OneTimeCodeResolver {
+                              budget: Duration = .seconds(4),
+                              retry: FillReportRetry = FillReportRetry(delays: [.milliseconds(10)]),
+                              chosenObserver: (@Sendable (FetchedMessage) -> Void)? = nil) -> OneTimeCodeResolver {
         OneTimeCodeResolver(
             mailboxes: { mailboxes },
             fetcher: fetcher,
@@ -35,7 +37,9 @@ final class OneTimeCodeResolverTests: XCTestCase {
             judge: judge,
             usage: usage,
             perMailboxBudget: budget,
-            now: { OneTimeCodeResolverTests.fixedNow }
+            now: { OneTimeCodeResolverTests.fixedNow },
+            fillReportRetry: retry,
+            chosenObserver: chosenObserver
         )
     }
 
@@ -237,6 +241,35 @@ final class OneTimeCodeResolverTests: XCTestCase {
         XCTAssertEqual(reported, ["box:42", "box:42", "box:42"])
     }
 
+    func testReportFillDoesNotRetryPermanentErrors() async {
+        let usage = FakeUsage(fails: true)
+        let resolver = makeResolver(mailboxes: [], fetcher: FakeFetcher(results: [:]),
+                                    judge: FakeJudge(outcome: .quotaExhausted), usage: usage,
+                                    retry: FillReportRetry(delays: [.milliseconds(10)], shouldRetry: { _ in false }))
+        let attempts = await resolver.reportFill(messageID: "box:42")
+        XCTAssertEqual(attempts, 1)
+        let reported = await usage.reported
+        XCTAssertEqual(reported, ["box:42"])
+    }
+
+    func testObserverSeesOnlyTheChosenMessageAndNothingWithoutAChoice() async {
+        let a = mailbox("a@example.com")
+        let m1 = message("\(a.id):1", a, body: "CODE:111111")
+        let m2 = message("\(a.id):2", a, body: "CODE:222222")
+        let seen = SeenIDs()
+        let chosen = makeResolver(mailboxes: [a], fetcher: FakeFetcher(results: [a.id: .messages([m1, m2])]),
+                                  judge: FakeJudge(outcome: .chosen(messageID: m1.id, scores: [:])),
+                                  chosenObserver: { seen.add($0.id) })
+        _ = await chosen.resolve(service: nil)
+        XCTAssertEqual(seen.all, [m1.id])
+
+        let none = makeResolver(mailboxes: [a], fetcher: FakeFetcher(results: [a.id: .messages([m1, m2])]),
+                                judge: FakeJudge(outcome: .noMatch(scores: [:])),
+                                chosenObserver: { seen.add($0.id) })
+        _ = await none.resolve(service: nil)
+        XCTAssertEqual(seen.all, [m1.id])
+    }
+
     func testReportFillStopsRetryingAfterSuccess() async {
         let usage = FakeUsage(failures: 1)
         let resolver = makeResolver(mailboxes: [], fetcher: FakeFetcher(results: [:]),
@@ -261,6 +294,23 @@ final class OneTimeCodeResolverTests: XCTestCase {
 // MARK: - Fakes
 
 private enum FakeError: Error { case failed }
+
+private final class SeenIDs: @unchecked Sendable {
+    private let lock = NSLock()
+    private var ids: [String] = []
+
+    func add(_ id: String) {
+        lock.lock()
+        ids.append(id)
+        lock.unlock()
+    }
+
+    var all: [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return ids
+    }
+}
 
 /// Extracts the code after the literal prefix "CODE:" (test-only format).
 private struct FakeExtractor: CodeExtracting {
