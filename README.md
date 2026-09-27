@@ -229,8 +229,10 @@ No local Mac is needed: the Swift code is compiled and tested on GitHub's macOS 
    - no RevenueCat key: the Plan tab shows "Plans are unavailable in this build."
 3. Actions > **ipa** > Run workflow. It builds a Debug device build (see [DECISIONS](docs/DECISIONS.md#7-debug-ipa-because-of-the-revenuecat-test-store)) and uploads `SkiPass-v<version>-b<run>.ipa` as an artifact, kept for 3 days.
 4. Install the IPA with a sideloading tool that re-signs it with a free Apple ID (the workflow was built for Sideloadly on Windows). Follow the tool's steps for trusting the developer profile and enabling Developer Mode on the iPhone. Apps signed with a free Apple ID must be re-installed every 7 days.
-5. On the iPhone, turn SkiPass on under Settings > General > AutoFill & Passwords.
-6. Open SkiPass, add a mailbox, then open a site with a verification-code field, for example the demo at https://skipass-demo.vercel.app.
+5. Open SkiPass. While AutoFill is off, Home shows a "Turn on AutoFill" card: **Turn On** shows the iOS prompt "Turn on AutoFill from SkiPass?", and **Open Settings** (offered if you decline) opens the AutoFill settings directly. The card disappears once SkiPass is on. You can also turn it on yourself under Settings > General > AutoFill & Passwords.
+6. Add a mailbox, then open a site with a verification-code field, for example the demo at https://skipass-demo.vercel.app.
+
+The (i) button in the app header opens "How SkiPass works": the setup steps (with the same Turn On button), how the right code is chosen, what is sent where, how fills are counted, and the app version.
 
 ### With a Mac (XcodeGen)
 
@@ -280,8 +282,8 @@ Deployment steps for Vercel and Cloudflare are in [server/README.md](server/READ
 | Job | What it runs |
 |---|---|
 | `core` | `SkiPassCore` package tests in the iOS Simulator (storage, IMAP fetch logic, OAuth, extraction including 2FHey cases and HTML fixtures, server client) |
-| `ui-package` | `SkiPassUI` package build and tests |
-| `app` | XcodeGen project, app build, `SkiPassAppTests` (plan selection, entitlements, usage) |
+| `ui-package` | `SkiPassUI` package build and tests (UI store, copy, information sheet rendering) |
+| `app` | XcodeGen project, app build, `SkiPassAppTests` (plan selection, entitlements, usage, AutoFill turn-on state) |
 | `extension` | `SkiPassExtensionTests` (resolver, fallback rule, identity registration, request gate) |
 | `server` | `npm test` (Vitest in the Workers runtime, both Vercel and Cloudflare entries), `npm run typecheck`, Worker bundle dry run |
 | `demo-web` | `npm test` and `npm run typecheck` |
@@ -293,7 +295,6 @@ Other workflows: `ipa` (device IPA for sideloading), `tour` (screen recording of
 - **iOS controls the suggestion.** iOS decides the suggestion's wording and layout; an extension can only set its subtitle (`From <mailbox address>`). The code is not shown before tapping, because mail is read only after the tap.
 - **Several mailboxes share one label.** With more than one mailbox, the suggestion is labelled with the first address only.
 - **First visit needs a registered domain.** iOS only offers SkiPass on sites it has an identity for. SkiPass registers a bundled list of about 100 popular sign-in domains, the demo site, and domains from code emails it has already filled. A site outside that set shows no suggestion until SkiPass has seen one of its emails.
-- **No in-app guide for turning on AutoFill.** You enable SkiPass in iOS Settings yourself.
 - **Quota enforcement is best-effort.** When the server is unreachable (timeout, 5xx, 401, 429, bad reply) the extension still fills using the local fallback rule without a quota check, and reports the fill later if it can. A fill is counted after it happens, so two fills at the same moment can pass the same check. This favours a working demo over strict metering.
 - **The app token is public.** It ships inside the app. Abuse is limited by rejecting user IDs RevenueCat does not know and by rate limits.
 - **RevenueCat outage.** The server uses the last known plan; with none known, the quota is not enforced for that request and `/v1/usage` reports `plan: "unknown"`.

@@ -10,9 +10,16 @@ import SkiPassUI
 
 enum TourFixtures {
     static let launchArgument = "-SkiPassTourFixtures"
+    /// With `-SkiPassTourFixtures`: start with AutoFill off, so Home shows the "Turn on AutoFill"
+    /// card and the information sheet shows the Turn On button.
+    static let autoFillDisabledArgument = "-SkiPassTourAutoFillDisabled"
 
     static var isEnabled: Bool {
         ProcessInfo.processInfo.arguments.contains(launchArgument)
+    }
+
+    static var startsWithAutoFillDisabled: Bool {
+        ProcessInfo.processInfo.arguments.contains(autoFillDisabledArgument)
     }
 }
 
@@ -25,9 +32,11 @@ final class TourFixtureModel: SkiPassUIActions {
     private(set) var accounts: [MailAccount]
     private(set) var plans: [PlanOption]
     private(set) var usage: UsageInfo?
+    private(set) var autoFillEnabled: Bool
     @ObservationIgnored private var passwords: [UUID: String]
 
-    init(now: Date = .now) {
+    init(now: Date = .now, autoFillEnabled: Bool = !TourFixtures.startsWithAutoFillDisabled) {
+        self.autoFillEnabled = autoFillEnabled
         let info = MailAccount(
             address: "info@myshop.example",
             kind: .imap,
@@ -126,6 +135,12 @@ final class TourFixtureModel: SkiPassUIActions {
     }
 
     func selectPlan(id: String) async {}
+
+    /// Stands in for the system prompt: "Turn On" turns AutoFill on at once, so the card leaves.
+    func turnOnAutoFill() -> Bool {
+        autoFillEnabled = true
+        return true
+    }
 
     private func insert(_ account: MailAccount) -> MailAccount {
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {

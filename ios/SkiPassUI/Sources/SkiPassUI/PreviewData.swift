@@ -96,13 +96,20 @@ enum PreviewData {
     // MARK: Store
 
     @MainActor
-    static func makeStore(expanded: UUID? = nil, usage: UsageInfo? = PreviewData.usage) -> SkiPassUIStore {
+    static func makeStore(
+        expanded: UUID? = nil,
+        usage: UsageInfo? = PreviewData.usage,
+        autoFillEnabled: Bool = true
+    ) -> SkiPassUIStore {
         let store = SkiPassUIStore(
             accounts: accounts,
             plans: plans,
             usage: usage,
             actions: PreviewActions(),
-            referenceDate: referenceDate
+            referenceDate: referenceDate,
+            autoFillEnabled: autoFillEnabled,
+            // Previews: the prompt is "declined", so the Settings button appears.
+            onTurnOnAutoFill: { false }
         )
         store.expandedAccountID = expanded
         return store

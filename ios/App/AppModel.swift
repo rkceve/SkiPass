@@ -317,8 +317,11 @@ final class AppModel: SkiPassUIActions {
         await refreshUsage()
     }
 
-    // Note: the app does not guide the user to turn on the AutoFill extension; it is enabled in
-    // Settings > General > AutoFill & Passwords.
+    /// The AutoFill extension was just turned on (`AutoFillSetupModel.onTurnedOn`): the identity
+    /// store only accepts identities while it is on, so register them now.
+    func autoFillDidTurnOn() async {
+        await syncIdentities()
+    }
 
     private func existingMailbox(address: String) -> MailboxConfig? {
         let mailboxes = (try? services.accounts.loadMailboxes()) ?? []

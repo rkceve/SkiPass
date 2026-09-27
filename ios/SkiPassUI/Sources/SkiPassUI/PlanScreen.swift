@@ -8,7 +8,7 @@ struct PlanScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                HeaderView()
+                HeaderView(store: store)
 
                 SectionTitle(text: Copy.planTitle)
 

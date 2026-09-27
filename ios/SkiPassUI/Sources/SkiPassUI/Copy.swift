@@ -75,6 +75,50 @@ enum Copy {
     static let standardPlanName = "Standard"
     static let proPlanName = "Pro"
 
+    // MARK: Turn-on-AutoFill card (Home) and setup controls (not in mockups)
+    static let autoFillCardTitle = "Turn on AutoFill"
+    static let autoFillCardBody = "Codes appear above the keyboard only after you turn on SkiPass in AutoFill."
+    static let autoFillTurnOn = "Turn On"
+    static let autoFillOpenSettings = "Open Settings"
+    static let autoFillIsOn = "AutoFill is on"
+
+    // MARK: Information sheet (not in mockups)
+    static let infoLabel = "How SkiPass works"  // accessibility label of the header (i) button
+    static let infoTitle = "How SkiPass works"
+    static let done = "Done"
+
+    static let infoSetupTitle = "Setup"
+    static let infoSetupAddMailbox = "Add a mailbox on the Home tab."
+    static let infoSetupTurnOnAutoFill = "Turn on AutoFill for SkiPass."
+    static let infoSetupOpenSite = "Open a site and tap its one-time code field."
+    static let infoSetupTapSuggestion = "Tap the SkiPass suggestion above the keyboard."
+
+    static let infoChoiceTitle = "How the right code is chosen"
+    static let infoChoiceLines = [
+        "SkiPass looks only at inbox emails from the last 10 minutes.",
+        "Codes are found on your device.",
+        "Jev then picks the email that belongs to the site you are on.",
+        "If the SkiPass server can't be reached, the newest email that mentions the site is used, or else the newest email.",
+    ]
+
+    static let infoPrivacyTitle = "Privacy"
+    static let infoPrivacyLines = [
+        "Mail is read only when you tap the suggestion.",
+        "Only emails from the last 10 minutes that contain a code are sent to the SkiPass server and Jev to be judged, with the site's address.",
+        "The SkiPass server never stores or logs their text.",
+        "Passwords and sign-in tokens stay in the Keychain on this device.",
+        "Messages are never marked as read.",
+    ]
+
+    static let infoPlansTitle = "Plans"
+    static let infoPlansLines = [
+        "Each code SkiPass fills uses one fill from your monthly allowance. Lookups that fill nothing are free.",
+        "Your plan and the fills left this month are on the Plan tab.",
+    ]
+
+    static let infoVersionTitle = "Version"
+    static let infoVersionUnknown = "Unknown"
+
     static func remainingOfLimit(_ remaining: String, _ limit: String) -> String {
         "\(remaining) of \(limit) left"
     }
@@ -85,6 +129,11 @@ enum Copy {
         case 1: "Resets in 1 day"  // not in mockups
         default: "Resets in \(days) days"
         }
+    }
+
+    /// "0.1.6 (42)": marketing version and build number.
+    static func versionText(version: String, build: String) -> String {
+        "\(version) (\(build))"
     }
 
     /// Message for an error thrown by the host app; nil when nothing should be shown

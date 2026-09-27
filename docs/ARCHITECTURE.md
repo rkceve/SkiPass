@@ -58,7 +58,9 @@ Empty values and the template's placeholders are both treated as "not configured
 
 ## 2. App
 
-- Two tabs in a native `TabView`: **Home** (mail accounts) and **Plan**. Liquid Glass is used on controls only (the Add button, the tab bar); content cards are plain.
+- Two tabs in a native `TabView`: **Home** (mail accounts) and **Plan**. Liquid Glass is used on controls only (the header's (i) button, the Add button, the AutoFill buttons, the tab bar); content cards are plain.
+- **Turn-on-AutoFill guidance.** `AutoFillSetupModel` (`ios/App/AutoFillSetup.swift`) reads `ASCredentialIdentityStore.shared.getState` at launch and whenever the app becomes active. While the extension is off, Home shows a "Turn on AutoFill" card above the accounts. **Turn On** calls `ASSettingsHelper.requestToTurnOnCredentialProviderExtension` (iOS 18 system prompt); a second request within 10 seconds is not sent, as Apple's documentation requires. When a request does not turn AutoFill on, the card also offers **Open Settings** (`ASSettingsHelper.openCredentialProviderAppSettings`). Once the extension is on, the card leaves with an animation and the identities are registered right away. The UI package only receives a Bool and two callbacks.
+- **Information sheet.** The header's (i) button opens "How SkiPass works" (zooms out of the button on iOS 26): setup steps with the same Turn On control, how the code is chosen, privacy, plans, and the app version and build.
 - **Home** lists the registered addresses. Tapping a card expands it in place.
   - IMAP card: incoming host and port, username, masked password with a reveal button, Edit, Delete.
   - Google or Microsoft card: Delete only (no server settings to show).
