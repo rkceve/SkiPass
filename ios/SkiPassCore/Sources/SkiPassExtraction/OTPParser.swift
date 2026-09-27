@@ -16,6 +16,9 @@
 //  - Added `Mode` for email input (SkiPass additions, each marked below: extra forbidden
 //    zones, own-line rule for the unanchored fallback, no short-keyword match inside a word).
 //    `.message` is the upstream behavior unchanged.
+//  - SkiPass additions (TRIAGE D13): `Resources/ja.json` (SkiPass-authored Japanese keywords and an
+//    anchored pattern, not from upstream), full-width digits returned as ASCII, and `EmailGuard`
+//    zones for promotional / coupon codes and Japanese order or member numbers.
 //
 //  Upstream description: extracts one-time codes from message text. Every candidate code
 //  must survive the NumberGuard, which rejects anything that looks like a phone number,
@@ -60,7 +63,8 @@ final class OTPParser: Sendable {
         var customPatterns: [(service: String, regex: NSRegularExpression)] = []
     }
 
-    private static let languageFiles = ["en.json", "fr.json", "zh.json", "es.json", "de.json", "pt.json", "he.json"]
+    private static let languageFiles = ["en.json", "fr.json", "zh.json", "es.json", "de.json", "pt.json", "he.json",
+                                        "ja.json"] // ja.json: SkiPass addition (TRIAGE D13)
     private static let customPatternsFile = "custom-patterns.json"
 
     /// Shared instance; the bundled pattern files are parsed once.
@@ -173,8 +177,11 @@ final class OTPParser: Sendable {
     // MARK: - Candidate validation
 
     /// Collapses a raw match to its alphanumeric characters (drops spaces/dashes/newlines).
+    /// SkiPass addition: full-width characters (common in Japanese mail, e.g. "１２３４５６") become
+    /// their ASCII forms, which is what the user would type.
     private static func normalize(_ raw: Substring) -> String {
-        raw.components(separatedBy: CharacterSet.alphanumerics.inverted).joined()
+        let joined = raw.components(separatedBy: CharacterSet.alphanumerics.inverted).joined()
+        return joined.applyingTransform(.fullwidthToHalfwidth, reverse: false) ?? joined
     }
 
     /// A plausible code is 4-8 digits, or 4-10 characters when mixed with letters.
@@ -306,6 +313,18 @@ private struct NumberGuard {
         #"(?i)\b(?:order|invoice|receipt|tracking|shipment|package|reference|ref|account|acct|customer|member(?:ship)?|ticket|case|booking|reservation|transaction|confirmation|policy|claim)\s*(?:number\b|num\b|no\b\.?|#|id\b)\s*[:#.]?\s*[A-Za-z0-9][A-Za-z0-9-]*"#,
         #"(?i)\b(?:order|invoice)\s*[:#]?\s*\d[\d-]*"#,
         #"(?i)(?:©|\(c\)|copyright)\s*(?:\d{4}\s*[-–]\s*)?\d{4}"#,
+        // TRIAGE D13: promotional codes are not one-time codes. A code labelled as a promo /
+        // coupon / discount / voucher / gift / referral / reward code, a token followed by
+        // "at checkout", the token right after "at checkout:", and a line offering "N% off".
+        #"(?i)\b(?:promo(?:tion(?:al)?)?|coupon|discount|voucher|gift(?:\s*card)?|referral|reward)s?\s*(?:code|card)?\s*(?:is\b|:)?\s*[A-Za-z0-9][A-Za-z0-9-]*"#,
+        #"(?i)\b[A-Za-z0-9][A-Za-z0-9-]*\s+(?:at|during)\s+checkout\b"#,
+        #"(?i)\b(?:at|during)\s+checkout\b[^A-Za-z0-9]{0,20}[A-Za-z0-9][A-Za-z0-9-]*"#,
+        #"(?i)[^\n]*\b\d+\s*%\s*off\b[^\n]*"#,
+        // TRIAGE D13: Japanese order / reservation / member / inquiry numbers, dates and prices.
+        #"(?:注文|予約)(?:確認)?番号[^0-9０-９\n]{0,6}[0-9０-９][0-9０-９-]*"#,
+        #"(?:会員|お客様|顧客|受付|問い?合わ?せ|伝票|追跡|請求|口座)番号[^0-9０-９\n]{0,6}[0-9０-９][0-9０-９-]*"#,
+        #"[0-9０-９]{2,4}\s*年\s*[0-9０-９]{1,2}\s*月(?:\s*[0-9０-９]{1,2}\s*日)?"#,
+        #"[0-9０-９][0-9０-９,，]*\s*円"#,
     ].map { try! NSRegularExpression(pattern: $0) }
 
     private let forbidden: [Range<String.Index>]

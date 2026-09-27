@@ -10,15 +10,17 @@ final class StubURLProtocol: URLProtocol {
     struct Reply {
         let status: Int
         let json: String
+        /// Seconds to wait before answering (simulates a slow server).
+        var delay: TimeInterval = 0
     }
 
     private static let lock = NSLock()
     nonisolated(unsafe) private static var reply = Reply(status: 500, json: "{}")
     nonisolated(unsafe) private static var recorded: [Recorded] = []
 
-    static func respond(status: Int, json: String) {
+    static func respond(status: Int, json: String, delay: TimeInterval = 0) {
         lock.withLock {
-            reply = Reply(status: status, json: json)
+            reply = Reply(status: status, json: json, delay: delay)
             recorded = []
         }
     }
@@ -42,12 +44,21 @@ final class StubURLProtocol: URLProtocol {
         }
         let response = HTTPURLResponse(url: request.url!, statusCode: current.status, httpVersion: "HTTP/1.1",
                                        headerFields: ["Content-Type": "application/json"])!
-        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data(current.json.utf8))
-        client?.urlProtocolDidFinishLoading(self)
+        let delivery = Delivery(stub: self, response: response, data: Data(current.json.utf8))
+        if current.delay > 0 {
+            DispatchQueue.global().asyncAfter(deadline: .now() + current.delay) { delivery.run() }
+        } else {
+            delivery.run()
+        }
     }
 
-    override func stopLoading() {}
+    private let stopLock = NSLock()
+    private var stopped = false
+    fileprivate var isStopped: Bool { stopLock.withLock { stopped } }
+
+    override func stopLoading() {
+        stopLock.withLock { stopped = true }
+    }
 
     private static func readAll(_ stream: InputStream) -> Data {
         stream.open()
@@ -60,5 +71,26 @@ final class StubURLProtocol: URLProtocol {
             data.append(buffer, count: n)
         }
         return data
+    }
+}
+
+/// Hands a canned reply to the URL loading system, possibly later on another queue; nothing is
+/// delivered once the request was stopped (e.g. cancelled by a client-side timeout).
+private final class Delivery: @unchecked Sendable {
+    private let stub: StubURLProtocol
+    private let response: HTTPURLResponse
+    private let data: Data
+
+    init(stub: StubURLProtocol, response: HTTPURLResponse, data: Data) {
+        self.stub = stub
+        self.response = response
+        self.data = data
+    }
+
+    func run() {
+        guard !stub.isStopped else { return }
+        stub.client?.urlProtocol(stub, didReceive: response, cacheStoragePolicy: .notAllowed)
+        stub.client?.urlProtocol(stub, didLoad: data)
+        stub.client?.urlProtocolDidFinishLoading(stub)
     }
 }

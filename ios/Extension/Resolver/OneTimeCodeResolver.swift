@@ -12,6 +12,24 @@ public struct ResolvedCode: Sendable, Hashable {
     }
 }
 
+/// How a failed fill report is retried (TRIAGE D4: up to 3 attempts, in the background).
+public struct FillReportRetry: Sendable {
+    /// Total attempts, including the first.
+    public var attempts: Int
+    /// Pause before the 2nd, 3rd, ... attempt (the last value repeats).
+    public var delays: [Duration]
+    /// False for errors a retry cannot fix (e.g. quota exhausted, no app user ID).
+    public var shouldRetry: @Sendable (any Error) -> Bool
+
+    public init(attempts: Int = 3,
+                delays: [Duration] = [.milliseconds(300), .milliseconds(900)],
+                shouldRetry: @escaping @Sendable (any Error) -> Bool = { _ in true }) {
+        self.attempts = attempts
+        self.delays = delays
+        self.shouldRetry = shouldRetry
+    }
+}
+
 /// UI-free orchestration of the extension flow (CONTRACTS §6, steps 2–4).
 ///
 /// Depends only on the `SkiPassModels` protocols so it can be unit-tested with fakes.
@@ -31,10 +49,12 @@ public struct OneTimeCodeResolver: Sendable {
     private let usage: any UsageReporting
     private let perMailboxBudget: Duration
     private let now: @Sendable () -> Date
-    private let candidateObserver: (@Sendable ([FetchedMessage]) -> Void)?
+    private let fillReportRetry: FillReportRetry
+    private let chosenObserver: (@Sendable (FetchedMessage) -> Void)?
 
-    /// `candidateObserver` receives the messages in which a code was found (before judging);
-    /// the extension records the domains they mention for identity registration.
+    /// `chosenObserver` receives the message whose code is returned (only that one: A2-10, so
+    /// promotions and other sites' mail never register identities); the extension records the
+    /// domains it mentions for identity registration.
     public init(mailboxes: @escaping MailboxSource,
                 fetcher: any MailFetching,
                 extractor: any CodeExtracting,
@@ -42,7 +62,8 @@ public struct OneTimeCodeResolver: Sendable {
                 usage: any UsageReporting,
                 perMailboxBudget: Duration = OneTimeCodeResolver.defaultPerMailboxBudget,
                 now: @escaping @Sendable () -> Date = { Date() },
-                candidateObserver: (@Sendable ([FetchedMessage]) -> Void)? = nil) {
+                fillReportRetry: FillReportRetry = FillReportRetry(),
+                chosenObserver: (@Sendable (FetchedMessage) -> Void)? = nil) {
         self.mailboxes = mailboxes
         self.fetcher = fetcher
         self.extractor = extractor
@@ -50,7 +71,8 @@ public struct OneTimeCodeResolver: Sendable {
         self.usage = usage
         self.perMailboxBudget = perMailboxBudget
         self.now = now
-        self.candidateObserver = candidateObserver
+        self.fillReportRetry = fillReportRetry
+        self.chosenObserver = chosenObserver
     }
 
     /// Finds the code for `service` (nil = no service identifier available).
@@ -65,7 +87,6 @@ public struct OneTimeCodeResolver: Sendable {
             .compactMap { message in extractor.extractCode(from: message).map { CodeCandidate(message: message, code: $0) } }
             .sorted { $0.message.date > $1.message.date }
         guard !candidates.isEmpty else { return nil }
-        candidateObserver?(candidates.map(\.message))
 
         let outcome: JudgeOutcome
         do {
@@ -77,16 +98,32 @@ public struct OneTimeCodeResolver: Sendable {
         switch outcome {
         case .chosen(let messageID, _):
             guard let chosen = candidates.first(where: { $0.message.id == messageID }) else { return nil }
+            chosenObserver?(chosen.message)
             return ResolvedCode(code: chosen.code, messageID: chosen.message.id)
         case .noMatch, .quotaExhausted:
             return nil
         }
     }
 
-    /// Counts one fill. Call only after the system accepted the code. Errors are ignored:
-    /// the code has already been filled and nothing is shown to the user.
-    public func reportFill(messageID: String) async {
-        _ = try? await usage.reportFill(messageID: messageID)
+    /// Counts one fill. Call only after the system accepted the code. A failed report is retried
+    /// per `fillReportRetry` (TRIAGE D4); the final error is ignored: the code has already been
+    /// filled and nothing is shown to the user. Returns the number of attempts made.
+    @discardableResult
+    public func reportFill(messageID: String) async -> Int {
+        let policy = fillReportRetry
+        var attempt = 0
+        while true {
+            attempt += 1
+            do {
+                _ = try await usage.reportFill(messageID: messageID)
+                return attempt
+            } catch {
+                guard attempt < policy.attempts, policy.shouldRetry(error), !Task.isCancelled else { return attempt }
+                if let delay = policy.delays.isEmpty ? nil : policy.delays[min(attempt - 1, policy.delays.count - 1)] {
+                    try? await Task.sleep(for: delay)
+                }
+            }
+        }
     }
 
     // MARK: - Private

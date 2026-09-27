@@ -3,7 +3,8 @@ Source: https://github.com/SoFriendly/2fhey
 Commit: 76a3c02df52ea98bba5263233ec337823310df07 (2026-08-28)
 Used in SkiPassExtraction: the OTP parsing logic of TwoFHey/OTPParser/OTPParser.swift
 (ported to Swift for iOS in OTPParser.swift) and the pattern files
-TwoFHey/OTPKeywords/*.json (copied unmodified into this Resources directory).
+TwoFHey/OTPKeywords/*.json (copied unmodified into this Resources directory; ja.json is
+SkiPass-authored and not part of 2FHey).
 License: CC0-1.0. The LICENSE file of that repository follows verbatim.
 
 ----------------------------------------------------------------------

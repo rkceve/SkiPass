@@ -36,13 +36,6 @@ final class FetchLogicTests: XCTestCase {
         XCTAssertEqual(FetchLogic.searchCalendar.timeZone.secondsFromGMT(), 0)
     }
 
-    func testNewestUIDsKeepsHighest() {
-        let uids = [UID(5), UID(1), UID(9), UID(7)]
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 2), [UID(7), UID(9)])
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 10), [UID(1), UID(5), UID(7), UID(9)])
-        XCTAssertEqual(FetchLogic.newestUIDs(uids, limit: 0), [])
-    }
-
     // MARK: exact recency cut
 
     func testIsRecentUsesInternalDate() {
@@ -81,8 +74,28 @@ final class FetchLogicTests: XCTestCase {
         XCTAssertEqual(message.from, "test@example.com")
         XCTAssertEqual(message.to, "recipient@example.com")
         XCTAssertEqual(message.subject, "Test Email")
-        XCTAssertEqual(message.date, sent)
         XCTAssertEqual(message.bodyText, "Your code is 123456")
+        // A2-09: the server receipt time (INTERNALDATE), not the sender-controlled Date header.
+        XCTAssertEqual(message.date, date("2026-09-23T10:01:02Z"))
+        XCTAssertNotEqual(message.date, sent)
+    }
+
+    func testMessageDateIgnoresFutureDateHeader() {
+        let mailbox = MailboxConfig(address: "a@gmail.com", kind: .google, imapHost: "imap.gmail.com",
+                                    imapPort: 993, username: "a@gmail.com")
+        let received = date("2026-09-23T10:01:02Z")
+        let message = FetchLogic.makeMessage(
+            info: info(uid: 7, internalDate: received, date: date("2026-09-24T10:00:00Z")),
+            uid: UID(7), mailbox: mailbox, bodyText: "Save with code 1234")
+        XCTAssertEqual(message.date, received)
+    }
+
+    func testMessageDateFallsBackToDateHeaderWithoutInternalDate() {
+        let mailbox = MailboxConfig(address: "a@gmail.com", kind: .google, imapHost: "imap.gmail.com",
+                                    imapPort: 993, username: "a@gmail.com")
+        let sent = date("2026-09-23T10:01:00Z")
+        let message = FetchLogic.makeMessage(info: info(uid: 8, date: sent), uid: UID(8), mailbox: mailbox, bodyText: "")
+        XCTAssertEqual(message.date, sent)
     }
 
     // MARK: body part selection

@@ -10,6 +10,10 @@ enum Deadline {
     /// elapse — without waiting for `operation` to notice cancellation. On timeout the operation's
     /// task is cancelled and `onTimeout` runs (used to drop the IMAP connection).
     ///
+    /// The same cleanup runs when the caller's task is cancelled first (it throws
+    /// `CancellationError`), e.g. when the resolver's own per-mailbox budget ends before this one
+    /// (A2-05): the abandoned operation must not keep its connection open.
+    ///
     /// A task group is not used on purpose: a group only returns after every child finishes,
     /// and SwiftMail commands carry their own 5–60 s timeouts that ignore task cancellation.
     static func run<T: Sendable>(
@@ -40,7 +44,9 @@ enum Deadline {
                 gate.onFinish { work.cancel(); timer.cancel() }
             }
         } onCancel: {
-            gate.resume(with: .failure(CancellationError()))
+            if gate.resume(with: .failure(CancellationError())) {
+                Task { await onTimeout() }
+            }
         }
     }
 }

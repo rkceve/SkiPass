@@ -133,6 +133,132 @@ final class ServerClientTests: XCTestCase {
         }
     }
 
+    // MARK: judge reply validation (A2-06, TRIAGE D1/D3)
+
+    func testJudgeAcceptsMockSource() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127":0.9},"remaining":10,"source":"mock"}
+        """)
+        let outcome = try await makeClient().judge(service: "login.acme.co.uk", messages: [acme, globex])
+        XCTAssertEqual(outcome, .chosen(messageID: acme.id, scores: [acme.id: 0.9]))
+    }
+
+    func testJudgeRejectsUnknownSource() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{},"remaining":10,"source":"cache"}
+        """)
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
+        }
+    }
+
+    func testJudgeRejectsChosenIDThatWasNotSent() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:9999","scores":{},"remaining":10,"source":"jev"}
+        """)
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme, self.globex])
+        }
+    }
+
+    func testJudgeRejects402WithoutQuotaBody() async throws {
+        StubURLProtocol.respond(status: 402, json: "<html>Payment Required</html>")
+        await assertThrows(ServerClientError.invalidResponse) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
+        }
+    }
+
+    func testJudgeRateLimitedThrowsSoTheCallerFallsBack() async throws {
+        StubURLProtocol.respond(status: 429, json: #"{"error":"rate_limited"}"#)
+        // Any thrown error makes FallbackJudge use the local rule.
+        await assertThrows(ServerClientError.rateLimited) {
+            _ = try await self.makeClient().judge(service: "login.acme.co.uk", messages: [self.acme])
+        }
+        XCTAssertTrue(ServerClientError.rateLimited.isTransient)
+        XCTAssertFalse(ServerClientError.quotaExhausted.isTransient)
+        XCTAssertFalse(ServerClientError.httpStatus(404).isTransient)
+        XCTAssertTrue(ServerClientError.httpStatus(503).isTransient)
+    }
+
+    /// CONTRACTS §5 (2026-09-27): a user RevenueCat does not know gets 401 unknown_user on every route.
+    /// It is not retried; the extension treats it like an unavailable server (local fallback).
+    func testUnknownUserIsDistinctAndNotTransient() async throws {
+        StubURLProtocol.respond(status: 401, json: #"{"error":"unknown_user"}"#)
+        await assertThrows(ServerClientError.unknownUser) {
+            _ = try await self.makeClient(user: "local:0F2E").judge(service: nil, messages: [self.acme])
+        }
+        await assertThrows(ServerClientError.unknownUser) {
+            _ = try await self.makeClient(user: "local:0F2E").reportFill(messageID: self.acme.id)
+        }
+        XCTAssertFalse(ServerClientError.unknownUser.isTransient)
+    }
+
+    /// CONTRACTS §5 (2026-09-27): `remaining: 0` in a 200 means "not known" while RevenueCat is down,
+    /// not "exhausted"; only 402 is quota exhaustion.
+    func testRemainingZeroInA200IsNotQuotaExhaustion() async throws {
+        StubURLProtocol.respond(status: 200, json: """
+        {"chosenId":"6F9619FF-8B86-D011-B42D-00CF4FC964FF:4127","scores":{},"remaining":0,"source":"jev"}
+        """)
+        let outcome = try await makeClient().judge(service: nil, messages: [acme])
+        XCTAssertEqual(outcome, .chosen(messageID: acme.id, scores: [:]))
+
+        StubURLProtocol.respond(status: 200, json: #"{"remaining":0}"#)
+        let remaining = try await makeClient().reportFill(messageID: acme.id)
+        XCTAssertEqual(remaining, 0)
+
+        StubURLProtocol.respond(status: 200, json: #"{"plan":"unknown","used":3,"limit":0,"resetsAt":"2026-10-01T00:00:00Z"}"#)
+        let usage = try await makeClient().currentUsage()
+        XCTAssertEqual(usage.plan, "unknown")
+        XCTAssertEqual(usage.limit, 0)
+    }
+
+    /// TRIAGE D10: without an app user ID the extension still asks the server to judge.
+    func testJudgeWithoutAppUserIDUsesTheAnonymousJudgeUser() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":10,"source":"jev"}"#)
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { nil },
+                                 anonymousJudgeUserID: "anonymous"),
+            session: StubURLProtocol.session()
+        )
+        _ = try await client.judge(service: nil, messages: [acme])
+        XCTAssertEqual(StubURLProtocol.requests.first?.request.value(forHTTPHeaderField: "X-SkiPass-User"), "anonymous")
+    }
+
+    func testFillsAndUsageNeverUseTheAnonymousJudgeUser() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"remaining":9}"#)
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { nil },
+                                 anonymousJudgeUserID: "anonymous"),
+            session: StubURLProtocol.session()
+        )
+        await assertThrows(ServerClientError.missingAppUserID) {
+            _ = try await client.reportFill(messageID: self.acme.id)
+        }
+        await assertThrows(ServerClientError.missingAppUserID) {
+            _ = try await client.currentUsage()
+        }
+        XCTAssertTrue(StubURLProtocol.requests.isEmpty)
+    }
+
+    /// A2-08: the configured timeout bounds the whole request, not only idle time.
+    func testJudgeTimeoutBoundsTheWholeRequest() async throws {
+        StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":1,"source":"jev"}"#,
+                                delay: 10)
+        let id = user
+        let client = ServerClient(
+            configuration: .init(baseURL: baseURL, appToken: "test-app-token", appUserID: { id }, timeout: 0.3),
+            session: StubURLProtocol.session()
+        )
+        let start = Date()
+        do {
+            _ = try await client.judge(service: nil, messages: [acme])
+            XCTFail("expected a timeout")
+        } catch {}
+        // Only has to separate "gave up at the 0.3 s timeout" from "waited for the 10 s reply", with
+        // room for slow CI simulators.
+        XCTAssertLessThan(Date().timeIntervalSince(start), 5)
+    }
+
     func testMissingAppUserIDMakesNoRequest() async throws {
         StubURLProtocol.respond(status: 200, json: "{}")
         await assertThrows(ServerClientError.missingAppUserID) {

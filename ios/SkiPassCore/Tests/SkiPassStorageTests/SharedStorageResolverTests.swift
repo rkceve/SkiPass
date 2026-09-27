@@ -143,4 +143,20 @@ final class SharedStorageResolverTests: XCTestCase {
         XCTAssertNil(environment.sharedDefaults)
         XCTAssertTrue(environment.defaults === UserDefaults.standard)
     }
+
+    /// Used by the app's log line that checks whether the embedded extension's profile grants the
+    /// keychain group the app chose (TRIAGE "Not fixed": explicit logging of the resolved groups).
+    func testKeychainAccessGroupsAndWildcardCoverage() {
+        let entitlements: [String: Any] = [
+            "keychain-access-groups": ["LCUTH33TX7.*", "group.io.github.rkceve.skipass"],
+            "com.apple.security.application-groups": ["group.io.github.rkceve.skipass.LCUTH33TX7"],
+        ]
+        let groups = SharedStorageResolver.keychainAccessGroups(fromEntitlements: entitlements)
+        XCTAssertEqual(groups, ["LCUTH33TX7.*", "group.io.github.rkceve.skipass"])
+        XCTAssertTrue(SharedStorageResolver.entitlementList(groups, covers: "LCUTH33TX7.io.github.rkceve.skipass.LCUTH33TX7"))
+        XCTAssertTrue(SharedStorageResolver.entitlementList(groups, covers: "group.io.github.rkceve.skipass"))
+        XCTAssertFalse(SharedStorageResolver.entitlementList(groups, covers: "OTHERTEAM1.io.github.rkceve.skipass"))
+        XCTAssertFalse(SharedStorageResolver.entitlementList(groups, covers: "group.io.github.rkceve.skipass.LCUTH33TX7"))
+        XCTAssertEqual(SharedStorageResolver.keychainAccessGroups(fromEntitlements: nil), [])
+    }
 }

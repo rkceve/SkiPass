@@ -10,11 +10,23 @@ private final class CallFlag: @unchecked Sendable {
     var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
 }
 
-/// Sleeps in small steps and ignores cancellation, like a SwiftMail command waiting on its own timeout.
-private func uncancellableSleep(_ seconds: TimeInterval) async {
-    let end = Date().addingTimeInterval(seconds)
-    while Date() < end {
-        try? await Task.sleep(nanoseconds: 10_000_000)
+/// How long a stalled operation hangs in these tests, and the bound for "returned promptly".
+///
+/// The timing assertions only have to tell "returned at the budget or on cancellation" (budgets here
+/// are 0.2–0.5 s) from "waited for the stalled operation". CI simulator runners have shown up to ~2 s of
+/// scheduling delay on top of the budget (first IMAPServer / NIO start-up included), so the bound is
+/// 5 s and the stall 10 s: a regression that waits for the stall still fails by a wide margin.
+let stallSeconds: TimeInterval = 10
+let promptBound: TimeInterval = 5
+
+/// Waits and ignores cancellation, like a SwiftMail command waiting on its own timeout.
+///
+/// Suspends on a dispatch timer instead of looping over `Task.sleep`: once the task is cancelled,
+/// `Task.sleep` throws at once, and such a loop would spin on a cooperative thread until the end,
+/// starving the (small) simulator thread pool and slowing unrelated tests.
+func uncancellableSleep(_ seconds: TimeInterval) async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        DispatchQueue.global().asyncAfter(deadline: .now() + seconds) { continuation.resume() }
     }
 }
 
@@ -41,7 +53,7 @@ final class DeadlineTests: XCTestCase {
             _ = try await Deadline.run(
                 seconds: 0.2,
                 operation: { () async throws -> Int in
-                    await uncancellableSleep(3)
+                    await uncancellableSleep(stallSeconds)
                     return 1
                 },
                 onTimeout: { timedOut.set() }
@@ -50,7 +62,7 @@ final class DeadlineTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? MailFetchError, .timedOut)
         }
-        XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
+        XCTAssertLessThan(Date().timeIntervalSince(start), promptBound)
         // onTimeout runs right after the result is delivered.
         try? await Task.sleep(nanoseconds: 100_000_000)
         XCTAssertTrue(timedOut.isSet)
@@ -65,8 +77,8 @@ final class DeadlineTests: XCTestCase {
 
     func testOuterCancellationEndsWait() async {
         let task = Task {
-            try await Deadline.run(seconds: 5, operation: { () async throws -> Int in
-                await uncancellableSleep(3)
+            try await Deadline.run(seconds: 30, operation: { () async throws -> Int in
+                await uncancellableSleep(stallSeconds)
                 return 1
             })
         }
@@ -74,8 +86,29 @@ final class DeadlineTests: XCTestCase {
         let start = Date()
         task.cancel()
         let result = await task.result
-        XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
+        XCTAssertLessThan(Date().timeIntervalSince(start), promptBound)
         XCTAssertThrowsError(try result.get()) { XCTAssertTrue($0 is CancellationError) }
+    }
+
+    /// A2-05: when the caller gives up first (the resolver's own budget), the IMAP connection must
+    /// still be dropped, so the cleanup that runs on timeout also runs on cancellation.
+    func testOuterCancellationAlsoRunsCleanup() async {
+        let cleaned = CallFlag()
+        let task = Task {
+            try await Deadline.run(
+                seconds: 30,
+                operation: { () async throws -> Int in
+                    await uncancellableSleep(stallSeconds)
+                    return 1
+                },
+                onTimeout: { cleaned.set() }
+            )
+        }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        task.cancel()
+        _ = await task.result
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertTrue(cleaned.isSet)
     }
 }
 
@@ -84,7 +117,7 @@ final class IMAPMailFetcherTimeoutTests: XCTestCase {
     /// No network is touched: the fetch stalls before `connect()`.
     func testCallerTimeoutCoversCredentialLookup() async {
         let stalled = ClosureCredentialProvider { _ in
-            await uncancellableSleep(3)
+            await uncancellableSleep(stallSeconds)
             return .password("unused")
         }
         let fetcher = IMAPMailFetcher(credentials: stalled, timeout: 0.3)
@@ -97,7 +130,7 @@ final class IMAPMailFetcherTimeoutTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? MailFetchError, .timedOut)
         }
-        XCTAssertLessThan(Date().timeIntervalSince(start), 1.5)
+        XCTAssertLessThan(Date().timeIntervalSince(start), promptBound)
     }
 
     func testClosureCredentialProviderForwards() async throws {

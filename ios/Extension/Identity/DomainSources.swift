@@ -75,7 +75,9 @@ final class SeenDomainStore: IdentityDomainSource, @unchecked Sendable {
     /// domains changed.
     @discardableResult
     func record(_ newDomains: [String]) -> Bool {
-        let cleaned = newDomains.map { $0.lowercased() }.filter(EmailDomains.isPlausibleDomain)
+        // Mail-provider and tracking domains are never recorded (TRIAGE D6).
+        let cleaned = newDomains.map { $0.lowercased() }
+            .filter { EmailDomains.isPlausibleDomain($0) && EmailDomains.isServiceDomain($0) }
         guard !cleaned.isEmpty else { return false }
         lock.lock()
         defer { lock.unlock() }

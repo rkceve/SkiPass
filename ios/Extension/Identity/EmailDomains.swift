@@ -5,35 +5,47 @@ import SkiPassModels
 /// local judge fallback.
 enum EmailDomains {
 
-    /// Two-label public suffixes (ICANN section of the Public Suffix List) under which the
-    /// registrable domain has three labels. The server uses the full list through `tldts`
-    /// (`getDomain`, ICANN rules only: server/src/jev.ts `registrableDomain`); this is the subset
-    /// that occurs in common sign-in mail. Hosts under any other suffix use the last two labels.
-    // OPEN(domains): a bundled full Public Suffix List would match the server exactly.
-    static let multiLabelSuffixes: Set<String> = [
-        "co.uk", "org.uk", "ac.uk", "gov.uk", "me.uk", "ltd.uk", "plc.uk",
-        "co.jp", "ne.jp", "or.jp", "ac.jp", "go.jp", "ad.jp", "ed.jp", "gr.jp", "lg.jp",
-        "com.au", "net.au", "org.au", "edu.au", "gov.au",
-        "co.nz", "org.nz", "net.nz",
-        "com.br", "net.br", "org.br",
-        "com.cn", "net.cn", "org.cn",
-        "com.tw", "org.tw", "com.hk", "org.hk",
-        "co.kr", "or.kr", "co.in", "net.in", "org.in",
-        "com.mx", "com.sg", "com.my", "co.za", "co.id", "co.th", "com.tr", "com.ar",
-    ]
-
     /// Registrable domain (eTLD+1) of a service identifier or host, lowercased; nil for an
     /// empty value. Accepts a bare host, a URL, or `host:port`. IP addresses and single-label
     /// hosts are returned as-is (like `tldts` `getHostname`).
+    ///
+    /// Hosts under a two-label public suffix (`PublicSuffixes.twoLabel`: ICANN second-level suffixes
+    /// plus PaaS suffixes of the PSL private section) keep three labels, the rest keep two. The server
+    /// uses `tldts.getDomain` with `allowPrivateDomains: true` (TRIAGE D6), so `skipass-demo.vercel.app`
+    /// stays `skipass-demo.vercel.app` on both sides.
     static func registrableDomain(_ service: String) -> String? {
         guard let host = hostname(service) else { return nil }
         let labels = host.split(separator: ".").map(String.init)
         guard labels.count > 2, !isIPv4(host) else { return host }
         let lastTwo = labels.suffix(2).joined(separator: ".")
-        if multiLabelSuffixes.contains(lastTwo) {
+        if PublicSuffixes.twoLabel.contains(lastTwo) {
             return labels.suffix(3).joined(separator: ".")
         }
         return lastTwo
+    }
+
+    /// Registrable domains of mail senders, mail providers and click-tracking hosts: they appear in
+    /// verification emails but are not the site the code is for, so they never become identities
+    /// (TRIAGE D6, A2-10).
+    static let nonServiceDomains: Set<String> = [
+        // Sending / email service providers.
+        "resend.dev", "resend.com", "sendgrid.net", "sendgrid.com", "mailgun.org", "mailgun.net",
+        "amazonses.com", "mandrillapp.com", "mailchimp.com", "mailchimpapp.net", "mcsv.net",
+        "mcusercontent.com", "list-manage.com", "sparkpostmail.com", "sparkpost.com", "postmarkapp.com",
+        "mailjet.com", "mjt.lu", "sendinblue.com", "brevo.com", "sibmail.com", "exacttarget.com",
+        "createsend.com", "cmail19.com", "cmail20.com", "rs6.net", "constantcontact.com",
+        "hubspotemail.net", "hubspotlinks.com", "hs-analytics.net", "klaviyomail.com", "klclick.com",
+        "customeriomail.com", "mlsend.com", "emltrk.com", "awstrack.me", "sailthru.com",
+        "urldefense.com",
+        // Mailbox providers (a sender or contact address, not the site).
+        "gmail.com", "googlemail.com", "outlook.com", "hotmail.com", "live.com", "msn.com",
+        "icloud.com", "me.com", "mac.com", "yahoo.com", "aol.com", "proton.me",
+        "protonmail.com", "gmx.com", "gmx.net", "zoho.com",
+    ]
+
+    /// False for the provider / tracking domains in `nonServiceDomains`.
+    static func isServiceDomain(_ domain: String) -> Bool {
+        !nonServiceDomains.contains(domain.lowercased())
     }
 
     /// Lowercased host of a bare host or URL, without port, userinfo or trailing dot.
@@ -52,7 +64,8 @@ enum EmailDomains {
     }
 
     /// Registrable domains a verification email points at: the sender's address domain and the
-    /// hosts of `http(s)` links in the body text. Sorted, without duplicates.
+    /// hosts of `http(s)` links in the body text, without mail-provider and tracking domains.
+    /// Sorted, without duplicates.
     static func domains(in message: FetchedMessage) -> [String] {
         var found = Set<String>()
         if let sender = senderDomain(message.from), let domain = registrableDomain(sender) {
@@ -61,7 +74,7 @@ enum EmailDomains {
         for host in linkHosts(in: message.bodyText) {
             if let domain = registrableDomain(host) { found.insert(domain) }
         }
-        return found.filter(isPlausibleDomain).sorted()
+        return found.filter { isPlausibleDomain($0) && isServiceDomain($0) }.sorted()
     }
 
     /// Domain part of a `From` value such as `Acme <no-reply@mail.acme.com>` or `a@b.com`.

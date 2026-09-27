@@ -19,11 +19,6 @@ enum FetchLogic {
         searchCalendar.date(byAdding: .day, value: -1, to: since) ?? since.addingTimeInterval(-86_400)
     }
 
-    /// Keeps at most `limit` of the highest UIDs (UIDs grow with arrival order, RFC 3501 §2.3.1.1).
-    static func newestUIDs(_ uids: [UID], limit: Int) -> [UID] {
-        Array(uids.sorted().suffix(max(0, limit)))
-    }
-
     /// Exact recency cut on the server delivery time (INTERNALDATE), falling back to the
     /// sender's Date header only when the server did not return INTERNALDATE.
     static func isRecent(_ info: MessageInfo, since: Date) -> Bool {
@@ -60,6 +55,9 @@ enum FetchLogic {
         }
     }
 
+    /// `date` is the server receipt time (INTERNALDATE), the clock the recency cut uses; the
+    /// sender-controlled `Date:` header is only a fallback (A2-09: a future `Date:` header must not make
+    /// a message look newest in the local fallback or in the server's tie-break).
     static func makeMessage(info: MessageInfo, uid: UID, mailbox: MailboxConfig, bodyText: String) -> FetchedMessage {
         FetchedMessage(
             id: messageID(mailboxID: mailbox.id, uid: uid),
@@ -67,7 +65,7 @@ enum FetchLogic {
             from: info.from ?? "",
             to: info.to.joined(separator: ", "),
             subject: info.subject ?? "",
-            date: info.date ?? info.internalDate ?? Date(timeIntervalSince1970: 0),
+            date: info.internalDate ?? info.date ?? Date(timeIntervalSince1970: 0),
             bodyText: bodyText
         )
     }

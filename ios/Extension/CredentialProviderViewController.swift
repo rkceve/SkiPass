@@ -5,21 +5,25 @@ import Foundation
 ///
 /// All paths are silent: a code is supplied when one is found, otherwise the request is
 /// cancelled without showing anything (decided: no UI on quota exhaustion / no match / errors).
+///
+/// Every entry point ends in exactly one `complete…` or `cancelRequest` call through
+/// `ExtensionRequestGate` (TRIAGE D11): a request superseded by a newer one never reaches the
+/// context, and the work holds this controller until it finishes, so a released controller cannot
+/// leave a request without an answer.
 final class CredentialProviderViewController: ASCredentialProviderViewController {
 
     /// nil when the mailbox store is unavailable; every request then cancels. Without a server
     /// configuration the resolver still works with the local fallback rule.
     private lazy var resolver: OneTimeCodeResolver? = LiveDependencies.makeResolver()
 
+    private let gate = ExtensionRequestGate()
+
     /// Keeps the one-time-code identities current whenever the extension runs, once per process, in
     /// the background (the app also registers them on launch and after a mailbox is added or removed).
-    /// Every entry point below touches it; the no-UI path does not necessarily load the view.
-    private static let identitySync: Task<Void, Never> = Task.detached {
-        _ = await LiveDependencies.syncIdentities()
-    }
-
+    /// Every entry point touches it; the no-UI path does not necessarily load the view. Runs through
+    /// the same serialized coordinator as the syncs the resolver requests (A2-13).
     private func startIdentitySync() {
-        _ = Self.identitySync
+        LiveDependencies.syncIdentitiesOncePerProcess()
     }
 
     // MARK: - No-UI path (QuickType suggestion tapped)
@@ -27,7 +31,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func provideCredentialWithoutUserInteraction(for credentialRequest: any ASCredentialRequest) {
         startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
-            extensionContext.cancelRequest(withError: ASExtensionError(.credentialIdentityNotFound))
+            cancelNow(.credentialIdentityNotFound)
             return
         }
         let service = request.credentialIdentity.serviceIdentifier.identifier
@@ -48,7 +52,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func prepareInterfaceToProvideCredential(for credentialRequest: any ASCredentialRequest) {
         startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
-            extensionContext.cancelRequest(withError: ASExtensionError(.credentialIdentityNotFound))
+            cancelNow(.credentialIdentityNotFound)
             return
         }
         let service = request.credentialIdentity.serviceIdentifier.identifier
@@ -61,42 +65,42 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func prepareInterfaceForUserChoosingTextToInsert() {
         startIdentitySync()
         guard let resolver else {
-            extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
+            cancelNow(.userCanceled)
             return
         }
-        Task { @MainActor [weak self] in
-            let resolved = await resolver.resolve(service: nil)
-            guard let self else { return }
-            guard let resolved else {
-                self.extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
-                return
-            }
-            self.extensionContext.completeRequest(
-                withTextToInsert: resolved.code,
-                completionHandler: Self.fillReporter(resolver: resolver, messageID: resolved.messageID)
-            )
-        }
+        gate.run(
+            resolve: { await resolver.resolve(service: nil) },
+            complete: { resolved in
+                self.extensionContext.completeRequest(
+                    withTextToInsert: resolved.code,
+                    completionHandler: Self.fillReporter(resolver: resolver, messageID: resolved.messageID)
+                )
+            },
+            cancel: { self.extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled)) }
+        )
     }
 
     // MARK: - Private
 
+    private func cancelNow(_ code: ASExtensionError.Code) {
+        gate.finishNow { extensionContext.cancelRequest(withError: ASExtensionError(code)) }
+    }
+
     private func resolveAndCompleteOneTimeCode(service: String?, failure: ASExtensionError.Code) {
         guard let resolver else {
-            extensionContext.cancelRequest(withError: ASExtensionError(failure))
+            cancelNow(failure)
             return
         }
-        Task { @MainActor [weak self] in
-            let resolved = await resolver.resolve(service: service)
-            guard let self else { return }
-            guard let resolved else {
-                self.extensionContext.cancelRequest(withError: ASExtensionError(failure))
-                return
-            }
-            self.extensionContext.completeOneTimeCodeRequest(
-                using: ASOneTimeCodeCredential(code: resolved.code),
-                completionHandler: Self.fillReporter(resolver: resolver, messageID: resolved.messageID)
-            )
-        }
+        gate.run(
+            resolve: { await resolver.resolve(service: service) },
+            complete: { resolved in
+                self.extensionContext.completeOneTimeCodeRequest(
+                    using: ASOneTimeCodeCredential(code: resolved.code),
+                    completionHandler: Self.fillReporter(resolver: resolver, messageID: resolved.messageID)
+                )
+            },
+            cancel: { self.extensionContext.cancelRequest(withError: ASExtensionError(failure)) }
+        )
     }
 
     /// Completion handler that counts the fill (CONTRACTS §6: fire-and-forget after completion).
@@ -109,11 +113,11 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     /// `ProcessInfo.performExpiringActivity` block instead, which runs on its own concurrent
     /// queue and holds a task assertion while it executes (Apple docs: "Performs the specified
     /// block asynchronously and notifies you if the process is about to be suspended"). That
-    /// block waits at most `reportWait` and stops as soon as the system reports expiry.
-    /// The report result is ignored either way.
+    /// block waits at most `reportWait` (room for the retries of TRIAGE D4) and stops as soon as
+    /// the system reports expiry. The report result is ignored either way.
     private static func fillReporter(resolver: OneTimeCodeResolver,
                                      messageID: String) -> @Sendable (Bool) -> Void {
-        let reportWait: DispatchTimeInterval = .seconds(5)
+        let reportWait: DispatchTimeInterval = .seconds(20)
         return { expired in
             guard !expired else { return }
             let done = DispatchSemaphore(value: 0)

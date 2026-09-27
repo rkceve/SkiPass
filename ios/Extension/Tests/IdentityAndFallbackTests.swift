@@ -13,9 +13,43 @@ final class EmailDomainsTests: XCTestCase {
         XCTAssertEqual(EmailDomains.registrableDomain("login.rakuten.co.jp"), "rakuten.co.jp")
         XCTAssertEqual(EmailDomains.registrableDomain("Example.COM:443"), "example.com")
         XCTAssertEqual(EmailDomains.registrableDomain("github.com"), "github.com")
-        // tldts getDomain (server) uses ICANN rules only, so a vercel.app host maps to vercel.app.
-        XCTAssertEqual(EmailDomains.registrableDomain("skipass-demo.vercel.app"), "vercel.app")
+        // The server uses tldts with allowPrivateDomains (TRIAGE D6), so a vercel.app site keeps its own name.
+        XCTAssertEqual(EmailDomains.registrableDomain("skipass-demo.vercel.app"), "skipass-demo.vercel.app")
+        XCTAssertEqual(EmailDomains.registrableDomain("login.leumi.co.il"), "leumi.co.il")
         XCTAssertNil(EmailDomains.registrableDomain("  "))
+    }
+
+    /// TRIAGE D6 / A2-11: every case in registrable-domain-parity.json was produced by the server's
+    /// rule (tldts, allowPrivateDomains: true) and must come out the same here.
+    func testRegistrableDomainMatchesServerForParityCases() throws {
+        let url = try XCTUnwrap(Bundle(for: EmailDomainsTests.self).url(forResource: "registrable-domain-parity",
+                                                                        withExtension: "json"))
+        let file = try JSONDecoder().decode(ParityFile.self, from: Data(contentsOf: url))
+        XCTAssertGreaterThan(file.cases.count, 200)
+        for testCase in file.cases {
+            XCTAssertEqual(EmailDomains.registrableDomain(testCase.input), testCase.expected, testCase.input)
+        }
+    }
+
+    private struct ParityFile: Decodable {
+        struct Case: Decodable {
+            let input: String
+            let expected: String?
+        }
+        let cases: [Case]
+    }
+
+    func testMailAndTrackingDomainsAreNotServiceDomains() {
+        let message = FetchedMessage(
+            id: "m:3", mailboxAddress: "me@gmail.com",
+            from: "Acme <bounce-123@em1234.sendgrid.net>", to: "me@gmail.com",
+            subject: "Your Acme code", date: Date(timeIntervalSince1970: 1_790_000_000),
+            bodyText: "Your Acme code is 123456.\nSign in at https://login.acme.com/\n"
+                + "Unsubscribe: https://acme.us1.list-manage.com/unsubscribe?u=1\n"
+                + "Tracking: https://u123.ct.sendgrid.net/ls/click?upn=abc\n"
+                + "Questions? Write to acme.support@gmail.com or https://mandrillapp.com/track/click/1"
+        )
+        XCTAssertEqual(EmailDomains.domains(in: message), ["acme.com"])
     }
 
     func testDomainsInVerificationEmailComeFromSenderAndLinks() {
@@ -39,7 +73,8 @@ final class EmailDomainsTests: XCTestCase {
             bodyText: "Your SkiPass Demo verification code is 482913.\n\nIt expires in 10 minutes.\n\n"
                 + "Enter it at https://skipass-demo.vercel.app/"
         )
-        XCTAssertEqual(EmailDomains.domains(in: message), ["resend.dev", "vercel.app"])
+        // resend.dev is the sending provider, not the site (TRIAGE D6 denylist).
+        XCTAssertEqual(EmailDomains.domains(in: message), ["skipass-demo.vercel.app"])
     }
 
     func testPlausibleDomain() {
@@ -96,6 +131,13 @@ final class DomainSourcesTests: XCTestCase {
         XCTAssertFalse(store.record(["not a domain", "localhost"]))
         XCTAssertTrue(store.record(["gamma.org"]))
         XCTAssertEqual(store.stored(), ["gamma.org", "beta.com", "acme.com"])
+    }
+
+    func testSeenStoreSkipsMailProviders() {
+        let store = SeenDomainStore(defaults: freshDefaults())
+        XCTAssertFalse(store.record(["resend.dev", "gmail.com", "SendGrid.net", "amazonses.com"]))
+        XCTAssertTrue(store.record(["acme.com", "outlook.com", "icloud.com"]))
+        XCTAssertEqual(store.stored(), ["acme.com"])
     }
 
     func testSeenStoreIsCapped() {
@@ -185,7 +227,15 @@ final class LocalFallbackJudgeTests: XCTestCase {
         XCTAssertEqual(none, .noMatch(scores: ["1": 0.1]))
     }
 
-    func testResolverFillsFromLocalRuleWhenServerIsDownAndReportsCandidates() async {
+    /// A2-06: a server reply naming a message that was not sent is a bad reply, so the local rule runs.
+    func testFallbackJudgeUsesLocalRuleWhenServerChoosesUnknownMessage() async throws {
+        let m = message("1", body: "skipass-demo.vercel.app 123456", ageSeconds: 60)
+        let judge = FallbackJudge(primary: StubJudge(result: .success(.chosen(messageID: "other:9", scores: [:]))))
+        let outcome = try await judge.judge(service: "skipass-demo.vercel.app", messages: [m])
+        XCTAssertEqual(outcome, .chosen(messageID: "1", scores: [:]))
+    }
+
+    func testResolverFillsFromLocalRuleWhenServerIsDownAndReportsChosenMessage() async {
         let box = MailboxConfig(address: "me@gmail.com", kind: .google, imapHost: "imap.gmail.com",
                                 imapPort: 993, username: "me@gmail.com")
         let demo = message("\(box.id):1", body: "CODE:482913 https://skipass-demo.vercel.app/", ageSeconds: 120)
@@ -198,13 +248,14 @@ final class LocalFallbackJudgeTests: XCTestCase {
             judge: FallbackJudge(primary: StubJudge(result: .failure(URLError(.timedOut)))),
             usage: StubUsage(),
             now: { LocalFallbackJudgeTests.now },
-            candidateObserver: { observed.set($0.map(\.id)) }
+            chosenObserver: { observed.set([$0.id]) }
         )
 
         let resolved = await resolver.resolve(service: "skipass-demo.vercel.app")
 
         XCTAssertEqual(resolved, ResolvedCode(code: "482913", messageID: demo.id))
-        XCTAssertEqual(Set(observed.get()), [demo.id, newerOther.id])
+        // A2-10: only the message that was actually used records its domains.
+        XCTAssertEqual(observed.get(), [demo.id])
     }
 }
 

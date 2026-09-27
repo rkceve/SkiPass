@@ -13,7 +13,7 @@ final class OTPCodeExtractorTests: XCTestCase {
 
     func testHTMLEmailFixtures() throws {
         let manifest = try JSONDecoder().decode(EmailCases.self, from: FixtureLoader.data("emails.json"))
-        XCTAssertEqual(manifest.cases.count, 7)
+        XCTAssertEqual(manifest.cases.count, 9)
         for testCase in manifest.cases {
             let html = try FixtureLoader.string(testCase.file)
             let body = HTMLText.plainText(fromHTML: html)
