@@ -133,7 +133,7 @@ final class ServerClientTests: XCTestCase {
         }
     }
 
-    // MARK: judge reply validation (A2-06, TRIAGE D1/D3)
+    // MARK: judge reply validation
 
     func testJudgeAcceptsMockSource() async throws {
         StubURLProtocol.respond(status: 200, json: """
@@ -212,7 +212,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertEqual(usage.limit, 0)
     }
 
-    /// TRIAGE D10: without an app user ID the extension still asks the server to judge.
+    /// Without an app user ID the extension still asks the server to judge.
     func testJudgeWithoutAppUserIDUsesTheAnonymousJudgeUser() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":10,"source":"jev"}"#)
         let client = ServerClient(
@@ -240,7 +240,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertTrue(StubURLProtocol.requests.isEmpty)
     }
 
-    /// A2-08: the configured timeout bounds the whole request, not only idle time.
+    /// The configured timeout bounds the whole request, not only idle time.
     func testJudgeTimeoutBoundsTheWholeRequest() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":1,"source":"jev"}"#,
                                 delay: 10)

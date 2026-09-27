@@ -10,7 +10,7 @@ import os
 
 // All concrete construction lives in this file.
 //
-// Symbols used from packages written in parallel (read from origin/wip/i2 b76d60d and origin/wip/i5 7a8a6bc):
+// Symbols used from the SkiPassCore packages:
 //   SkiPassStorage: MailboxStore(defaults:) list / add / update / remove(id:); KeychainStore.delete(account:)
 //                   CredentialStore() setIMAPPassword / imapPassword / setOAuthStateData / removeAll(for:)
 //                   AppGroupState(defaults:) revenueCatAppUserID / usageSnapshot() / setUsageSnapshot(_:) throws

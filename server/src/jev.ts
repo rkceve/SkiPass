@@ -24,7 +24,7 @@ export interface JudgeMessage {
 export interface JudgeResult {
   chosenId: string | null
   scores: Record<string, number>
-  /** `mock` only when JEV_MODE=mock (CONTRACTS §5 change log 2026-09-27, TRIAGE D3). */
+  /** `mock` only when JEV_MODE=mock (CONTRACTS §5 change log 2026-09-27). */
   source: 'jev' | 'fallback' | 'mock'
 }
 
@@ -71,7 +71,7 @@ export function buildRequestBody(service: string | null, text: string) {
 /**
  * Public Suffix List including its PRIVATE section, so hosting suffixes such as `vercel.app` and
  * `github.io` count as suffixes: `skipass-demo.vercel.app` -> `skipass-demo.vercel.app`, not
- * `vercel.app` (TRIAGE D6). tldts option `allowPrivateDomains` (default false):
+ * `vercel.app`. tldts option `allowPrivateDomains` (default false):
  * https://github.com/remusao/tldts#readme ("allowPrivateDomains").
  */
 const TLD_OPTIONS = { allowPrivateDomains: true } as const
@@ -230,7 +230,7 @@ export async function judgeMessages(
     messages.forEach((m, i) => (scores[m.id] = values[i]))
     return { chosenId: selectByScores(messages, scores), scores, source: 'jev' }
   } catch {
-    // Deliberately no logging: error objects could carry request content (SPEC: no email logging).
+    // Deliberately no logging: error objects could carry request content (SYSTEM §4: never log email text).
     return fallbackResult(service, messages)
   }
 }

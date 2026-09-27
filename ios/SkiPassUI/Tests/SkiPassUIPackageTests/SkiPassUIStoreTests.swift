@@ -16,7 +16,7 @@ private final class StubActions: SkiPassUIActions {
 
 @MainActor
 final class SkiPassUIStoreTests: XCTestCase {
-    /// A1-10: saving an account (new password) must hide a revealed password on the expanded card.
+    /// Saving an account (new password) must hide a revealed password on the expanded card.
     func testSavingAnAccountChangesItsPasswordRevision() async throws {
         let store = SkiPassUIStore(accounts: [PreviewData.infoAccount], plans: [], usage: nil, actions: StubActions())
         let before = store.passwordRevision(for: PreviewData.infoAccountID)
@@ -36,12 +36,12 @@ final class SkiPassUIStoreTests: XCTestCase {
 }
 
 final class CopyErrorMessageTests: XCTestCase {
-    /// A1-04: a cancelled provider sign-in shows nothing.
+    /// A cancelled provider sign-in shows nothing.
     func testCancellationShowsNothing() {
         XCTAssertNil(Copy.errorMessage(for: CancellationError()))
     }
 
-    /// A1-12: messages come from Copy, never from a raw `localizedDescription`.
+    /// Messages come from Copy, never from a raw `localizedDescription`.
     func testErrorsMapToCopyStrings() {
         XCTAssertEqual(Copy.errorMessage(for: SkiPassUIError.googleSignInNotConfigured),
                        "Google sign-in is not configured in this build.")

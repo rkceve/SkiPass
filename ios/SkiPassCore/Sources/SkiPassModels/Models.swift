@@ -1,6 +1,6 @@
 import Foundation
 
-// Fixed shared contract (docs/CONTRACTS.md §3). Owned by the orchestrator.
+// Shared model types used by the app and the extension (docs/CONTRACTS.md §3).
 
 public enum ProviderKind: String, Codable, Sendable, Hashable {
     case google

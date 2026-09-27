@@ -90,7 +90,7 @@ final class DeadlineTests: XCTestCase {
         XCTAssertThrowsError(try result.get()) { XCTAssertTrue($0 is CancellationError) }
     }
 
-    /// A2-05: when the caller gives up first (the resolver's own budget), the IMAP connection must
+    /// When the caller gives up first (the resolver's own budget), the IMAP connection must
     /// still be dropped, so the cleanup that runs on timeout also runs on cancellation.
     func testOuterCancellationAlsoRunsCleanup() async {
         let cleaned = CallFlag()

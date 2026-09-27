@@ -2,7 +2,7 @@ import Foundation
 
 /// Server settings baked into a build's Info.plist (CONTRACTS §2: `SkiPassServerURL`,
 /// `SkiPassAppToken`), with unset values and the placeholders of `ios/Config/Secrets.example.xcconfig`
-/// meaning "not configured" (same rule as the app's `AppConfiguration`, A1-09).
+/// meaning "not configured" (same rule as the app's `AppConfiguration`).
 public struct ServerBuildConfiguration: Sendable, Equatable {
     public static let serverURLKey = "SkiPassServerURL"
     public static let appTokenKey = "SkiPassAppToken"

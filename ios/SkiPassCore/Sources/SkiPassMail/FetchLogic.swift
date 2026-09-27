@@ -56,7 +56,7 @@ enum FetchLogic {
     }
 
     /// `date` is the server receipt time (INTERNALDATE), the clock the recency cut uses; the
-    /// sender-controlled `Date:` header is only a fallback (A2-09: a future `Date:` header must not make
+    /// sender-controlled `Date:` header is only a fallback (a future `Date:` header must not make
     /// a message look newest in the local fallback or in the server's tie-break).
     static func makeMessage(info: MessageInfo, uid: UID, mailbox: MailboxConfig, bodyText: String) -> FetchedMessage {
         FetchedMessage(

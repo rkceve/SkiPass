@@ -2,7 +2,7 @@
 import AuthenticationServices
 
 enum ProbeIdentity {
-    /// Host of the probe page deployed from probe-site/ by .github/workflows/pages.yml.
+    /// Host of the probe page deployed from tools/probe/site/ by .github/workflows/pages.yml.
     static let domain = "rkceve.github.io"
     static let label = "From probe@example.com"
     static let recordIdentifier = "probe-otp-1"

@@ -1,11 +1,9 @@
 name: probe
 
-# Experiment: OTP AutoFill from a third-party credential provider in the iOS Simulator.
-# Produces a screen recording, per-step screenshots and accessibility dumps as artifacts.
+# Feasibility probe (tools/probe/): OTP AutoFill from a third-party credential provider in the
+# iOS Simulator. Produces a screen recording, per-step screenshots and accessibility dumps as artifacts.
 on:
   workflow_dispatch:
-  push:
-    branches: [wip/i1]
 
 concurrency:
   group: probe-${{ github.ref }}

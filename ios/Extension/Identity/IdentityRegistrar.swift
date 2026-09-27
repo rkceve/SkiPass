@@ -9,7 +9,7 @@ protocol IdentityDomainSource: Sendable {
 }
 
 /// Registers `ASOneTimeCodeCredentialIdentity` entries so that iOS offers SkiPass in
-/// one-time-code fields of matching sites (spec §6a: background, no UI).
+/// one-time-code fields of matching sites (SYSTEM §3.6: background, no UI).
 /// Compiled into both the app (launch, mailbox added/removed) and the extension (each run).
 struct IdentityRegistrar: Sendable {
     let domainSource: any IdentityDomainSource
@@ -54,8 +54,8 @@ struct IdentityRegistrar: Sendable {
     }
 
     /// The QuickType label for an identity (CONTRACTS §6: `From <mailbox address>`).
-    // OPEN(label): labelling with several registered mailboxes is undecided (spec §11.3:
-    // one suggestion per mailbox, or one per site). Until decided, the first address is used.
+    // Note: with several registered mailboxes the label names the first address only (one
+    // identity per domain); a suggestion per mailbox would need one identity per domain and mailbox.
     static func label(mailboxAddresses: [String]) -> String? {
         guard let first = mailboxAddresses.first else { return nil }
         return "From \(first)"

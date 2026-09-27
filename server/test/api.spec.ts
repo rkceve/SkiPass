@@ -209,7 +209,7 @@ describe('POST /v1/judge — Jev mock mode', () => {
   })
 })
 
-describe('POST /v1/judge — Jev not configured (A3-04, D3)', () => {
+describe('POST /v1/judge — Jev not configured', () => {
   it('uses the fallback rule with source "fallback" when JEV_MODE is live but no key is set', async () => {
     const f = fakeFetch(() => json({}, 500))
     const log = vi.fn()
@@ -541,7 +541,7 @@ describe('invalid bodies', () => {
   }
 })
 
-describe('known-user check (D1a)', () => {
+describe('known-user check', () => {
   const live = {
     REVENUECAT_MODE: 'live',
     REVENUECAT_SECRET_KEY: 'sk_test_secret',
@@ -585,7 +585,7 @@ describe('known-user check (D1a)', () => {
   })
 })
 
-describe('judge rate limit (D1b)', () => {
+describe('judge rate limit', () => {
   it('defaults to 60 per user and 300 per IP per hour', () => {
     expect(JUDGE_LIMIT_PER_USER_PER_HOUR).toBe(60)
     expect(JUDGE_LIMIT_PER_IP_PER_HOUR).toBe(300)
@@ -626,7 +626,7 @@ describe('judge rate limit (D1b)', () => {
   })
 })
 
-describe('RevenueCat outage (A3-02, A3-05, D2)', () => {
+describe('RevenueCat outage', () => {
   const live = { REVENUECAT_MODE: 'live', REVENUECAT_SECRET_KEY: 'sk_test_secret' }
   const pro = PAID_PLANS.find((p) => p.id === 'pro')!
 
@@ -717,7 +717,7 @@ describe('RevenueCat outage (A3-02, A3-05, D2)', () => {
   })
 })
 
-describe('registrable domain with private suffixes (A3-03, D6)', () => {
+describe('registrable domain with private suffixes', () => {
   it('keeps the owner label of private suffixes (vercel.app, github.io)', () => {
     expect(registrableDomain('skipass-demo.vercel.app')).toBe('skipass-demo.vercel.app')
     expect(registrableDomain('https://rkceve.github.io/probe/')).toBe('rkceve.github.io')

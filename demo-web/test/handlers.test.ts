@@ -152,7 +152,7 @@ describe('POST /api/send-code', () => {
     expect(d.fetch).toHaveBeenCalledTimes(2)
   })
 
-  it('rate-limits per recipient address without any cookie (A3-07)', async () => {
+  it('rate-limits per recipient address without any cookie', async () => {
     const d = deps()
     expect((await handleSendCode(post('/api/send-code', { email: 'reader@example.com' }), ENV, d)).status).toBe(200)
     // No cookie, other IP, different letter case: still the same recipient.
@@ -162,7 +162,7 @@ describe('POST /api/send-code', () => {
     expect(d.fetch).toHaveBeenCalledOnce()
   })
 
-  it('rate-limits sends per IP: 5 per 10 minutes (A3-07)', async () => {
+  it('rate-limits sends per IP: 5 per 10 minutes', async () => {
     let now = T0
     const d = deps({ now: () => now })
     expect(SEND_LIMIT_PER_IP).toBe(5)
@@ -235,7 +235,7 @@ describe('POST /api/verify-code', () => {
     expect(res.headers.get('set-cookie')).toContain('Max-Age=0')
   })
 
-  it('does not verify twice with a replayed cookie (single use, A3-06)', async () => {
+  it('does not verify twice with a replayed cookie (single use)', async () => {
     const cookie = await session()
     expect(await (await handleVerifyCode(post('/api/verify-code', { code: '042917' }, cookie), ENV, deps())).json()).toMatchObject({
       result: 'verified',
@@ -256,7 +256,7 @@ describe('POST /api/verify-code', () => {
     expect(await right.json()).toEqual({ result: 'locked' })
   })
 
-  it('locks at 5 even when every guess replays the first cookie (A3-06)', async () => {
+  it('locks at 5 even when every guess replays the first cookie', async () => {
     const first = await session()
     const results: string[] = []
     for (let i = 0; i < 20; i++) {

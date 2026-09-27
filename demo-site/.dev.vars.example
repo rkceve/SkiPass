@@ -1,5 +1,0 @@
-# Copy to .dev.vars (git-ignored) for `npm run dev`. dotenv syntax.
-MAILER=log
-DEMO_TO=demo@example.com
-SESSION_SECRET=dev-session-secret
-RESEND_API_KEY=

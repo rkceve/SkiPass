@@ -1,4 +1,4 @@
-// CI probe app (not shipped). Driven by ios/UITests/ProbeAutoFillTests.swift.
+// CI probe app (not shipped). Driven by tools/probe/UITests/ProbeAutoFillTests.swift.
 import AuthenticationServices
 import SwiftUI
 

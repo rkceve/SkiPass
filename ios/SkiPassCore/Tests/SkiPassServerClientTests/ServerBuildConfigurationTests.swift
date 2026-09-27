@@ -2,8 +2,8 @@ import Foundation
 import SkiPassServerClient
 import XCTest
 
-/// The extension must not treat the Secrets.example placeholders as a real server (A1-09 on the
-/// app side; same rule for the extension through this type).
+/// The extension must not treat the Secrets.example placeholders as a real server (the same rule
+/// as the app's `AppConfiguration`, applied to the extension through this type).
 final class ServerBuildConfigurationTests: XCTestCase {
     func testRealValuesAreUsed() throws {
         let config = try XCTUnwrap(ServerBuildConfiguration(info: [

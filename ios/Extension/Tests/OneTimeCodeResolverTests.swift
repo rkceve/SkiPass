@@ -231,7 +231,7 @@ final class OneTimeCodeResolverTests: XCTestCase {
         XCTAssertEqual(reported, ["box:42"])
     }
 
-    /// TRIAGE D4: a failed fill report is retried, up to 3 attempts in total, and never surfaces.
+    /// A failed fill report is retried, up to 3 attempts in total, and never surfaces.
     func testReportFillRetriesThreeTimesThenGivesUp() async {
         let usage = FakeUsage(fails: true)
         let resolver = makeResolver(mailboxes: [], fetcher: FakeFetcher(results: [:]),

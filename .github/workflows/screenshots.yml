@@ -1,0 +1,147 @@
+name: screenshots
+
+# Store screenshots of the SkiPass app (iPhone 16 simulator, 1179x2556, status bar 9:41) driven by
+# ios/UITests/ScreenshotTests.swift with the DEBUG-only in-memory fixtures (fictional addresses,
+# no network). Output artifact `screenshots`: 01-home.png, 02-imap-expanded.png, 03-plan.png.
+on:
+  workflow_dispatch:
+  push:
+    branches: [wip/p3]
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Select Xcode and simulator
+        run: bash .github/workflows/scripts/select-sim.sh
+
+      # Same Xcode + iOS runtime pair as the tour recording, on an iPhone 16.
+      - name: Pin Xcode, runtime and iPhone 16
+        env:
+          PIN_XCODE: /Applications/Xcode_26.3.0.app
+          PIN_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-26-2
+        run: |
+          test -d "$PIN_XCODE" || { echo "::error::pinned Xcode $PIN_XCODE is not installed"; exit 1; }
+          sudo xcode-select -s "$PIN_XCODE/Contents/Developer"
+          xcrun simctl list runtimes available | grep -q "$PIN_RUNTIME" \
+            || { echo "::error::pinned runtime $PIN_RUNTIME is not available"; exit 1; }
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"].get(sys.argv[1], [])
+          match = [d for d in devices if d["name"] == "iPhone 16"]
+          print(match[0]["udid"] if match else "")' "$PIN_RUNTIME")
+          [ -n "$udid" ] || udid=$(xcrun simctl create "iPhone 16" com.apple.CoreSimulator.SimDeviceType.iPhone-16 "$PIN_RUNTIME")
+          {
+            echo "XCODE_APP=$PIN_XCODE"
+            echo "SIM_RUNTIME=$PIN_RUNTIME"
+            echo "SIM_UDID=$udid"
+          } >> "$GITHUB_ENV"
+          xcodebuild -version
+
+      - name: Install XcodeGen and generate
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Boot simulator and override status bar
+        run: |
+          xcrun simctl boot "$SIM_UDID" || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          open -a Simulator --args -CurrentDeviceUDID "$SIM_UDID"
+          sleep 10
+          xcrun simctl ui "$SIM_UDID" appearance light
+          xcrun simctl status_bar "$SIM_UDID" override --time 9:41 \
+            --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            --batteryState charged --batteryLevel 100
+
+      - name: Build for testing
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -skipMacroValidation -skipPackagePluginValidation \
+            | tee build-screenshots.log | tail -30
+
+      - name: App icon in the built app
+        run: |
+          app=build/dd/Build/Products/Debug-iphonesimulator/SkiPass.app
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIcons" "$app/Info.plist"
+          ls -la "$app" | grep -E "AppIcon|Assets.car"
+
+      - name: Take screenshots
+        run: |
+          mkdir -p out
+          set +e
+          TEST_RUNNER_SKIPASS_SCREENSHOTS=1 xcodebuild test-without-building \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -only-testing:SkiPassUITests/ScreenshotTests \
+            -resultBundlePath out/screenshots.xcresult \
+            > out/test.log 2>&1
+          status=$?
+          set -e
+          grep -E "error:|Test Case|passed|failed|skipped" out/test.log | head -50 || true
+          if grep -q "Test skipped" out/test.log; then echo "screenshot test was skipped"; exit 1; fi
+          exit $status
+
+      - name: Export and check screenshots
+        run: |
+          mkdir -p out/attachments screenshots
+          xcrun xcresulttool export attachments --path out/screenshots.xcresult --output-path out/attachments
+          python3 - <<'EOF'
+          import json, shutil, subprocess, sys
+          names = ["01-home", "02-imap-expanded", "03-plan"]
+          manifest = json.load(open("out/attachments/manifest.json"))
+          found = {}
+          for test in manifest:
+              for a in test.get("attachments", []):
+                  human = a.get("suggestedHumanReadableName", "")
+                  for n in names:
+                      if human.startswith(n):
+                          found[n] = a["exportedFileName"]
+          missing = [n for n in names if n not in found]
+          if missing:
+              sys.exit(f"missing screenshots: {missing}; manifest: {manifest}")
+          bad = False
+          for n in names:
+              src = f"out/attachments/{found[n]}"
+              dst = f"screenshots/{n}.png"
+              # Normalise to PNG whatever the attachment encoding was.
+              subprocess.run(["sips", "-s", "format", "png", src, "--out", dst], check=True, capture_output=True)
+              info = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", dst],
+                                    check=True, capture_output=True, text=True).stdout
+              w = int(info.split("pixelWidth:")[1].split()[0])
+              h = int(info.split("pixelHeight:")[1].split()[0])
+              print(f"{dst}: {w}x{h}")
+              if (w, h) != (1179, 2556):
+                  print(f"::error::{dst} is {w}x{h}, expected 1179x2556")
+                  bad = True
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots
+          path: screenshots
+
+      - name: Upload diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-diagnostics
+          path: |
+            out
+            build-screenshots.log

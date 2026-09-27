@@ -12,7 +12,7 @@ public struct ResolvedCode: Sendable, Hashable {
     }
 }
 
-/// How a failed fill report is retried (TRIAGE D4: up to 3 attempts, in the background).
+/// How a failed fill report is retried (up to 3 attempts, in the background).
 public struct FillReportRetry: Sendable {
     /// Total attempts, including the first.
     public var attempts: Int
@@ -52,7 +52,7 @@ public struct OneTimeCodeResolver: Sendable {
     private let fillReportRetry: FillReportRetry
     private let chosenObserver: (@Sendable (FetchedMessage) -> Void)?
 
-    /// `chosenObserver` receives the message whose code is returned (only that one: A2-10, so
+    /// `chosenObserver` receives the message whose code is returned (only that one, so
     /// promotions and other sites' mail never register identities); the extension records the
     /// domains it mentions for identity registration.
     public init(mailboxes: @escaping MailboxSource,
@@ -106,7 +106,7 @@ public struct OneTimeCodeResolver: Sendable {
     }
 
     /// Counts one fill. Call only after the system accepted the code. A failed report is retried
-    /// per `fillReportRetry` (TRIAGE D4); the final error is ignored: the code has already been
+    /// per `fillReportRetry`; the final error is ignored: the code has already been
     /// filled and nothing is shown to the user. Returns the number of attempts made.
     @discardableResult
     public func reportFill(messageID: String) async -> Int {

@@ -6,7 +6,7 @@ import Foundation
 //   2. the demo site,
 //   3. registrable domains seen in verification emails (sender + links), recorded by the extension.
 
-/// The demo site (demo-site/, deployed on Vercel).
+/// The demo site (demo-web/, deployed on Vercel).
 enum DemoSite {
     static let domain = "skipass-demo.vercel.app"
 }
@@ -75,7 +75,7 @@ final class SeenDomainStore: IdentityDomainSource, @unchecked Sendable {
     /// domains changed.
     @discardableResult
     func record(_ newDomains: [String]) -> Bool {
-        // Mail-provider and tracking domains are never recorded (TRIAGE D6).
+        // Mail-provider and tracking domains are never recorded.
         let cleaned = newDomains.map { $0.lowercased() }
             .filter { EmailDomains.isPlausibleDomain($0) && EmailDomains.isServiceDomain($0) }
         guard !cleaned.isEmpty else { return false }

@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Leading icon for an account card.
-/// OPEN(ui): brand logos. No third-party logo artwork is bundled; google and
-/// microsoft use neutral SF Symbols until logo usage is cleared.
+/// Leading icon for an account card. No third-party logo artwork is bundled: Google and
+/// Microsoft accounts use neutral SF Symbols.
 struct ProviderIcon: View {
     let kind: AccountKind
 

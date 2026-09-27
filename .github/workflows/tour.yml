@@ -5,8 +5,6 @@ name: tour
 # duplication), the original simulator tour.mov, and the .xcresult.
 on:
   workflow_dispatch:
-  push:
-    branches: [wip/i10]
 
 concurrency:
   group: tour-${{ github.ref }}

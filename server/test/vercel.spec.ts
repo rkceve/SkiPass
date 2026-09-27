@@ -151,7 +151,7 @@ for (const [name, make] of stores) {
 }
 
 describe('RedisUsageCounter wire format', () => {
-  it('checks and counts in one EVAL under usage:<appUserID>:<YYYY-MM> (A3-10, D5)', async () => {
+  it('checks and counts in one EVAL under usage:<appUserID>:<YYYY-MM>', async () => {
     const up = fakeUpstash()
     const c = new RedisUsageCounter({ url: REDIS_URL, token: REDIS_TOKEN }, up.fetchFn)
     await c.tryConsume('user-1', SEPT, 10)
@@ -200,7 +200,7 @@ describe('RedisUsageCounter wire format', () => {
     expect(await c.getPlan('user-2')).toBeNull()
   })
 
-  it('gives up on a slow Upstash after its timeout (A3-11, D5)', async () => {
+  it('gives up on a slow Upstash after its timeout', async () => {
     const hanging = (() => new Promise<Response>(() => {})) as typeof fetch
     const c = new RedisUsageCounter({ url: REDIS_URL, token: REDIS_TOKEN }, hanging, 30)
     const t0 = Date.now()

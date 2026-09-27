@@ -5,8 +5,6 @@ an email address, gets a 6-digit code by email within seconds, and types (or Aut
 whose field is `<input autocomplete="one-time-code" inputmode="numeric">`, which is where the SkiPass
 iOS AutoFill extension offers the code. Production: https://skipass-demo.vercel.app
 
-The older single-mailbox Cloudflare version in `../demo-site/` is legacy (not deployed).
-
 ## Flow
 
 | Route | What it does |

@@ -33,7 +33,7 @@ struct LocalFallbackJudge: CandidateJudging {
 
 /// Asks `primary` (the server) and falls back to `LocalFallbackJudge` when it throws
 /// (unreachable, timeout, 5xx, 401, 429 rate limit, malformed reply), when it chooses a message that
-/// was not sent (a bad reply, A2-06), or when there is no server in this build.
+/// was not sent (a bad reply), or when there is no server in this build.
 /// A valid server answer — including `.noMatch` and `.quotaExhausted` — is final.
 struct FallbackJudge: CandidateJudging {
     let primary: (any CandidateJudging)?

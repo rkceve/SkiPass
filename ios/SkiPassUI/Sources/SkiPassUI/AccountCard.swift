@@ -79,7 +79,7 @@ struct AccountCard: View {
         } message: {
             Text(account.address)
         }
-        // OPEN(ui): error presentation style not specified; a plain alert is used.
+        // Errors from delete are shown in a plain alert.
         .alert(Copy.errorTitle, isPresented: $isShowingError) {
             Button(Copy.ok, role: .cancel) {}
         } message: {

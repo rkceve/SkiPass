@@ -5,7 +5,6 @@ import UIKit
 enum Theme {
     static let accent = Color(red: 0.42, green: 0.36, blue: 0.96)
     static let accentBlue = Color(red: 0.40, green: 0.60, blue: 0.98)
-    static let accentPink = Color(red: 0.93, green: 0.62, blue: 0.86)
 
     static var accentGradient: LinearGradient {
         LinearGradient(

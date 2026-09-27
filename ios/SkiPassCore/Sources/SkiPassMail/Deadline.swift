@@ -11,8 +11,8 @@ enum Deadline {
     /// task is cancelled and `onTimeout` runs (used to drop the IMAP connection).
     ///
     /// The same cleanup runs when the caller's task is cancelled first (it throws
-    /// `CancellationError`), e.g. when the resolver's own per-mailbox budget ends before this one
-    /// (A2-05): the abandoned operation must not keep its connection open.
+    /// `CancellationError`), e.g. when the resolver's own per-mailbox budget ends before this one:
+    /// the abandoned operation must not keep its connection open.
     ///
     /// A task group is not used on purpose: a group only returns after every child finishes,
     /// and SwiftMail commands carry their own 5–60 s timeouts that ignore task cancellation.

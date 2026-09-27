@@ -2,8 +2,8 @@ import XCTest
 import SkiPassModels
 import SkiPassExtraction
 
-/// TRIAGE D13: coupon / promo codes are not one-time codes (A2-03), and Japanese verification
-/// emails are recognised (A2-04). Texts follow the layout of real mails; service names are placeholders.
+/// Coupon / promo codes are not one-time codes, and Japanese verification
+/// emails are recognised. Texts follow the layout of real mails; service names are placeholders.
 final class PromoCodeTests: XCTestCase {
     private let extractor = OTPCodeExtractor()
 

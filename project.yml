@@ -1,4 +1,4 @@
-# XcodeGen spec (owner: I1 Scaffold & CI). Generate with `xcodegen generate`; SkiPass.xcodeproj is git-ignored.
+# XcodeGen spec. Generate with `xcodegen generate`; SkiPass.xcodeproj is git-ignored.
 name: SkiPass
 
 options:
@@ -45,6 +45,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass
         PRODUCT_NAME: SkiPass
         INFOPLIST_FILE: ios/Config/SkiPass-Info.plist
+        # ios/App/Assets.xcassets/AppIcon.appiconset: single-size 1024x1024 icon; Xcode generates
+        # the other sizes ("Primary App Icon Set Name",
+        # https://developer.apple.com/documentation/xcode/configuring-your-app-icon).
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: ios/Config/SkiPass.entitlements
     dependencies:
       - package: SkiPassCore
@@ -130,22 +134,22 @@ targets:
       - package: SkiPassCore
         product: SkiPassModels
 
-  # CI probe (not shipped): verifies OTP AutoFill from a third-party provider in the Simulator.
+  # Feasibility probe (not shipped, tools/probe/): OTP AutoFill from a third-party provider in the Simulator.
   SkiPassProbe:
     type: application
     platform: iOS
     sources:
-      - path: ios/Probe/App
+      - path: tools/probe/ios/App
         excludes:
           - Info.plist
           - "*.entitlements"
-      - path: ios/Probe/Shared
+      - path: tools/probe/ios/Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass.probe
         PRODUCT_NAME: SkiPassProbe
-        INFOPLIST_FILE: ios/Probe/App/Info.plist
-        CODE_SIGN_ENTITLEMENTS: ios/Probe/App/SkiPassProbe.entitlements
+        INFOPLIST_FILE: tools/probe/ios/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: tools/probe/ios/App/SkiPassProbe.entitlements
     dependencies:
       - target: SkiPassProbeAutoFill
         embed: true
@@ -154,20 +158,21 @@ targets:
     type: app-extension
     platform: iOS
     sources:
-      - path: ios/Probe/AutoFill
+      - path: tools/probe/ios/AutoFill
         excludes:
           - Info.plist
           - "*.entitlements"
-      - path: ios/Probe/Shared
+      - path: tools/probe/ios/Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass.probe.autofill
         PRODUCT_NAME: SkiPassProbeAutoFill
-        INFOPLIST_FILE: ios/Probe/AutoFill/Info.plist
-        CODE_SIGN_ENTITLEMENTS: ios/Probe/AutoFill/SkiPassProbeAutoFill.entitlements
+        INFOPLIST_FILE: tools/probe/ios/AutoFill/Info.plist
+        CODE_SIGN_ENTITLEMENTS: tools/probe/ios/AutoFill/SkiPassProbeAutoFill.entitlements
     dependencies:
       - sdk: AuthenticationServices.framework
 
+  # UI tour and store screenshots of the SkiPass app (DEBUG fixtures, no network).
   SkiPassUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -176,6 +181,19 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: SkiPass
+    dependencies:
+      - target: SkiPass
+
+  SkiPassProbeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: tools/probe/UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.rkceve.skipass.probe.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: SkiPassProbe
     dependencies:
@@ -197,8 +215,8 @@ schemes:
     test:
       targets:
         - SkiPassExtensionTests
-  # UI tour recording (.github/workflows/tour.yml): builds the SkiPass app (installed onto the
-  # simulator by the workflow) and SkiPassUITests, whose UITourTests drives the SkiPass app.
+  # UI tour recording (.github/workflows/tour.yml) and store screenshots
+  # (.github/workflows/screenshots.yml): SkiPassUITests drives the SkiPass app.
   SkiPassTour:
     build:
       targets:
@@ -213,6 +231,7 @@ schemes:
       targets:
         SkiPassProbe: all
         SkiPassProbeAutoFill: all
+        SkiPassProbeUITests: [test]
     test:
       targets:
-        - SkiPassUITests
+        - SkiPassProbeUITests

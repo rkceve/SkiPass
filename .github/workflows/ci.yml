@@ -181,19 +181,3 @@ jobs:
           npm ci
           npm test
           npm run typecheck
-
-  demo-site:
-    name: demo-site (legacy; npm test + typecheck)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-      - name: npm ci && npm test && npm run typecheck
-        working-directory: demo-site
-        run: |
-          npm ci
-          npm test
-          npm run typecheck

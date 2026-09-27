@@ -2,7 +2,7 @@
 
 Implements `docs/CONTRACTS.md` §5: `POST /v1/judge`, `POST /v1/fills`, `GET /v1/usage`.
 
-Abuse and outage rules (docs/SYSTEM.md, TRIAGE D1-D3, D5):
+Abuse and outage rules (docs/SYSTEM.md):
 
 - The app token is public (it ships in every IPA). Every `/v1/*` request therefore also needs an
   `X-SkiPass-User` that RevenueCat knows: a 404 from `active_entitlements` (while the project's

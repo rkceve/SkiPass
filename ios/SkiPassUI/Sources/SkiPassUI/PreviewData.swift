@@ -1,7 +1,7 @@
 import Foundation
 
-/// Mock data identical to design/screen1-accounts.png and design/screen2-plan.png.
-/// Previews only; no live services.
+/// Mock data matching the original Home and Plan screen designs (fictional `.example` addresses
+/// for custom domains). Previews only; no live services.
 enum PreviewData {
     // MARK: Accounts (screen 1)
 
@@ -13,25 +13,25 @@ enum PreviewData {
 
     static let infoAccount = MailAccount(
         id: infoAccountID,
-        address: "info@myshop.jp",
+        address: "info@myshop.example",
         kind: .imap,
         status: .connected,
         server: ServerSettings(
-            incomingHost: "mail.myshop.jp",
+            incomingHost: "mail.myshop.example",
             incomingPort: 993,
-            username: "info@myshop.jp"
+            username: "info@myshop.example"
         )
     )
 
     static let supportAccount = MailAccount(
         id: supportAccountID,
-        address: "support@myshop.jp",
+        address: "support@myshop.example",
         kind: .imap,
         status: .connected,
         server: ServerSettings(
-            incomingHost: "mail.myshop.jp",
+            incomingHost: "mail.myshop.example",
             incomingPort: 993,
-            username: "support@myshop.jp"
+            username: "support@myshop.example"
         )
     )
 
@@ -51,13 +51,13 @@ enum PreviewData {
 
     static let salesAccount = MailAccount(
         id: salesAccountID,
-        address: "sales@studio.co",
+        address: "sales@studio.example",
         kind: .imap,
         status: .connected,
         server: ServerSettings(
-            incomingHost: "imap.studio.co",
+            incomingHost: "imap.studio.example",
             incomingPort: 993,
-            username: "sales@studio.co"
+            username: "sales@studio.example"
         )
     )
 

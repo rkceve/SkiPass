@@ -1,7 +1,6 @@
 // swift-tools-version: 6.0
 import PackageDescription
 
-// Owned by the orchestrator (see docs/CONTRACTS.md §1). Agents request changes instead of editing.
 let package = Package(
     name: "SkiPassCore",
     platforms: [.iOS(.v18), .macOS(.v15)],

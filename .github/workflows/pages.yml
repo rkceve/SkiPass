@@ -2,9 +2,10 @@ name: probe-site
 
 on:
   push:
-    # Only main deploys the public probe page that probe.yml depends on (A3-14); other branches use workflow_dispatch.
+    # Only main deploys the public probe page that probe.yml depends on, so a branch cannot replace
+    # it; other branches use workflow_dispatch.
     branches: [main]
-    paths: ["probe-site/**", ".github/workflows/pages.yml"]
+    paths: ["tools/probe/site/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -27,6 +28,6 @@ jobs:
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: probe-site
+          path: tools/probe/site
       - id: deployment
         uses: actions/deploy-pages@v5
