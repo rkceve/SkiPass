@@ -1,0 +1,2335 @@
+{
+  "generatedBy": "eval/generate.ts",
+  "note": "Synthetic, author-written scenarios with fictional brands/domains (plus the demo site skipass-demo.vercel.app). Not real user mail.",
+  "count": 64,
+  "scenarios": [
+    {
+      "id": "older_target-01",
+      "category": "older_target",
+      "description": "Lumora code 2 min before an Orbitly code",
+      "service": "lumora.example",
+      "emails": [
+        {
+          "id": "older_target-01-m1",
+          "from": "Lumora <security@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Lumora sign-in code",
+          "date": "2026-09-20T09:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    513211\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <security@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Lumora sign-in code\nDate: 2026-09-20T09:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    513211\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "513211",
+          "kind": "otp",
+          "owner": "lumora.example"
+        },
+        {
+          "id": "older_target-01-m2",
+          "from": "Orbitly <accounts@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "376491 is your Orbitly login code",
+          "date": "2026-09-20T09:02:00Z",
+          "body": "Enter 376491 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <accounts@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 376491 is your Orbitly login code\nDate: 2026-09-20T09:02:00Z\n\nEnter 376491 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "376491",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        }
+      ],
+      "correct": "older_target-01-m1"
+    },
+    {
+      "id": "older_target-02",
+      "category": "older_target",
+      "description": "Quillfeather code, then Veloxa and Zentrik codes",
+      "service": "quillfeather.example",
+      "emails": [
+        {
+          "id": "older_target-02-m1",
+          "from": "Quillfeather <no-reply@quillfeather.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Quillfeather verification code is 703404",
+          "date": "2026-09-20T10:00:00Z",
+          "body": "Your Quillfeather verification code is 703404.\n\nIt expires in 10 minutes.\n\nEnter it at https://quillfeather.example/\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "text": "From: Quillfeather <no-reply@quillfeather.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Quillfeather verification code is 703404\nDate: 2026-09-20T10:00:00Z\n\nYour Quillfeather verification code is 703404.\n\nIt expires in 10 minutes.\n\nEnter it at https://quillfeather.example/\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "code": "703404",
+          "kind": "otp",
+          "owner": "quillfeather.example"
+        },
+        {
+          "id": "older_target-02-m2",
+          "from": "Veloxa <security@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Veloxa sign-in code",
+          "date": "2026-09-20T10:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    885758\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "text": "From: Veloxa <security@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Veloxa sign-in code\nDate: 2026-09-20T10:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    885758\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "code": "885758",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        },
+        {
+          "id": "older_target-02-m3",
+          "from": "Zentrik <no-reply@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-20T10:03:00Z",
+          "body": "Zentrik one-time passcode: 47854260\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <no-reply@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-20T10:03:00Z\n\nZentrik one-time passcode: 47854260\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "47854260",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        }
+      ],
+      "correct": "older_target-02-m1"
+    },
+    {
+      "id": "older_target-03",
+      "category": "older_target",
+      "description": "Brightpine confirmation code, then Marrowby login code",
+      "service": "brightpine.example",
+      "emails": [
+        {
+          "id": "older_target-03-m1",
+          "from": "Brightpine <verify@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-20T11:00:00Z",
+          "body": "Welcome to Brightpine!\n\nYour confirmation code:\n494571\n\nPaste it into the sign-up form to activate your account.\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <verify@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-20T11:00:00Z\n\nWelcome to Brightpine!\n\nYour confirmation code:\n494571\n\nPaste it into the sign-up form to activate your account.\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "494571",
+          "kind": "otp",
+          "owner": "brightpine.example"
+        },
+        {
+          "id": "older_target-03-m2",
+          "from": "Marrowby <accounts@marrowby.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "800454 is your Marrowby login code",
+          "date": "2026-09-20T11:04:00Z",
+          "body": "Enter 800454 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "text": "From: Marrowby <accounts@marrowby.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 800454 is your Marrowby login code\nDate: 2026-09-20T11:04:00Z\n\nEnter 800454 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "code": "800454",
+          "kind": "otp",
+          "owner": "marrowby.example"
+        }
+      ],
+      "correct": "older_target-03-m1"
+    },
+    {
+      "id": "older_target-04",
+      "category": "older_target",
+      "description": "Kestrel Notes code, then Cobaltix code 30 s later",
+      "service": "kestrelnotes.example",
+      "emails": [
+        {
+          "id": "older_target-04-m1",
+          "from": "Kestrel Notes <accounts@kestrelnotes.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "705957 is your Kestrel Notes login code",
+          "date": "2026-09-20T12:00:00Z",
+          "body": "Enter 705957 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "text": "From: Kestrel Notes <accounts@kestrelnotes.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 705957 is your Kestrel Notes login code\nDate: 2026-09-20T12:00:00Z\n\nEnter 705957 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "code": "705957",
+          "kind": "otp",
+          "owner": "kestrelnotes.example"
+        },
+        {
+          "id": "older_target-04-m2",
+          "from": "Cobaltix <security@cobaltix.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Cobaltix sign-in code",
+          "date": "2026-09-20T12:00:30Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Cobaltix account:\n\n    128241\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Cobaltix team\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "text": "From: Cobaltix <security@cobaltix.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Cobaltix sign-in code\nDate: 2026-09-20T12:00:30Z\n\nHi Alex,\n\nUse the code below to sign in to your Cobaltix account:\n\n    128241\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Cobaltix team\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "code": "128241",
+          "kind": "otp",
+          "owner": "cobaltix.example"
+        }
+      ],
+      "correct": "older_target-04-m1"
+    },
+    {
+      "id": "older_target-05",
+      "category": "older_target",
+      "description": "Sableworks 8-digit passcode, then three other sites",
+      "service": "sableworks.example",
+      "emails": [
+        {
+          "id": "older_target-05-m1",
+          "from": "Sableworks <no-reply@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-20T13:00:00Z",
+          "body": "Sableworks one-time passcode: 92915023\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <no-reply@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-20T13:00:00Z\n\nSableworks one-time passcode: 92915023\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "92915023",
+          "kind": "otp",
+          "owner": "sableworks.example"
+        },
+        {
+          "id": "older_target-05-m2",
+          "from": "Juniperly <no-reply@juniperly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Juniperly verification code is 410274",
+          "date": "2026-09-20T13:01:00Z",
+          "body": "Your Juniperly verification code is 410274.\n\nIt expires in 10 minutes.\n\nEnter it at https://juniperly.example/\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "text": "From: Juniperly <no-reply@juniperly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Juniperly verification code is 410274\nDate: 2026-09-20T13:01:00Z\n\nYour Juniperly verification code is 410274.\n\nIt expires in 10 minutes.\n\nEnter it at https://juniperly.example/\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "code": "410274",
+          "kind": "otp",
+          "owner": "juniperly.example"
+        },
+        {
+          "id": "older_target-05-m3",
+          "from": "Trellium <verify@trellium.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-20T13:02:00Z",
+          "body": "Welcome to Trellium!\n\nYour confirmation code:\n302403\n\nPaste it into the sign-up form to activate your account.\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "text": "From: Trellium <verify@trellium.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-20T13:02:00Z\n\nWelcome to Trellium!\n\nYour confirmation code:\n302403\n\nPaste it into the sign-up form to activate your account.\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "code": "302403",
+          "kind": "otp",
+          "owner": "trellium.example"
+        },
+        {
+          "id": "older_target-05-m4",
+          "from": "Nimbusly <security@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Nimbusly sign-in code",
+          "date": "2026-09-20T13:05:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Nimbusly account:\n\n    755157\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Nimbusly team\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "text": "From: Nimbusly <security@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Nimbusly sign-in code\nDate: 2026-09-20T13:05:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Nimbusly account:\n\n    755157\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Nimbusly team\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "code": "755157",
+          "kind": "otp",
+          "owner": "nimbusly.example"
+        }
+      ],
+      "correct": "older_target-05-m1"
+    },
+    {
+      "id": "older_target-06",
+      "category": "older_target",
+      "description": "Rookwise code, then Glimmerly code (same template)",
+      "service": "rookwise.example",
+      "emails": [
+        {
+          "id": "older_target-06-m1",
+          "from": "Rookwise <security@rookwise.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Rookwise sign-in code",
+          "date": "2026-09-20T14:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    909971\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "text": "From: Rookwise <security@rookwise.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Rookwise sign-in code\nDate: 2026-09-20T14:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    909971\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "code": "909971",
+          "kind": "otp",
+          "owner": "rookwise.example"
+        },
+        {
+          "id": "older_target-06-m2",
+          "from": "Glimmerly <security@glimmerly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Glimmerly sign-in code",
+          "date": "2026-09-20T14:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Glimmerly account:\n\n    963963\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Glimmerly team\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "text": "From: Glimmerly <security@glimmerly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Glimmerly sign-in code\nDate: 2026-09-20T14:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Glimmerly account:\n\n    963963\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Glimmerly team\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "code": "963963",
+          "kind": "otp",
+          "owner": "glimmerly.example"
+        }
+      ],
+      "correct": "older_target-06-m1"
+    },
+    {
+      "id": "older_target-07",
+      "category": "older_target",
+      "description": "Zentrik code, then Lumora and Pebblecart codes",
+      "service": "zentrik.example",
+      "emails": [
+        {
+          "id": "older_target-07-m1",
+          "from": "Zentrik <no-reply@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Zentrik verification code is 972206",
+          "date": "2026-09-20T15:00:00Z",
+          "body": "Your Zentrik verification code is 972206.\n\nIt expires in 10 minutes.\n\nEnter it at https://zentrik.example/\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <no-reply@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Zentrik verification code is 972206\nDate: 2026-09-20T15:00:00Z\n\nYour Zentrik verification code is 972206.\n\nIt expires in 10 minutes.\n\nEnter it at https://zentrik.example/\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "972206",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        },
+        {
+          "id": "older_target-07-m2",
+          "from": "Lumora <verify@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-20T15:02:00Z",
+          "body": "Welcome to Lumora!\n\nYour confirmation code:\n608198\n\nPaste it into the sign-up form to activate your account.\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <verify@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-20T15:02:00Z\n\nWelcome to Lumora!\n\nYour confirmation code:\n608198\n\nPaste it into the sign-up form to activate your account.\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "608198",
+          "kind": "otp",
+          "owner": "lumora.example"
+        },
+        {
+          "id": "older_target-07-m3",
+          "from": "Pebblecart <accounts@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "561503 is your Pebblecart login code",
+          "date": "2026-09-20T15:03:00Z",
+          "body": "Enter 561503 to finish signing in.\n\nDon't share this code with anyone. Pebblecart will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <accounts@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 561503 is your Pebblecart login code\nDate: 2026-09-20T15:03:00Z\n\nEnter 561503 to finish signing in.\n\nDon't share this code with anyone. Pebblecart will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "561503",
+          "kind": "otp",
+          "owner": "pebblecart.example"
+        }
+      ],
+      "correct": "older_target-07-m1"
+    },
+    {
+      "id": "brand_via_provider-01",
+      "category": "brand_via_provider",
+      "description": "Veloxa via provider, then Orbitly direct",
+      "service": "veloxa.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-01-m1",
+          "from": "Veloxa <security@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Veloxa sign-in code",
+          "date": "2026-09-20T16:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    283071\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nSent by Veloxa. You received this email because of activity on your account.",
+          "text": "From: Veloxa <security@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Veloxa sign-in code\nDate: 2026-09-20T16:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    283071\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nSent by Veloxa. You received this email because of activity on your account.",
+          "code": "283071",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        },
+        {
+          "id": "brand_via_provider-01-m2",
+          "from": "Orbitly <no-reply@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Orbitly verification code is 228025",
+          "date": "2026-09-20T16:02:00Z",
+          "body": "Your Orbitly verification code is 228025.\n\nIt expires in 10 minutes.\n\nEnter it at https://orbitly.example/\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <no-reply@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Orbitly verification code is 228025\nDate: 2026-09-20T16:02:00Z\n\nYour Orbitly verification code is 228025.\n\nIt expires in 10 minutes.\n\nEnter it at https://orbitly.example/\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "228025",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        }
+      ],
+      "correct": "brand_via_provider-01-m1"
+    },
+    {
+      "id": "brand_via_provider-02",
+      "category": "brand_via_provider",
+      "description": "Marrowby via provider, then Quillfeather via the same kind of provider",
+      "service": "marrowby.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-02-m1",
+          "from": "Marrowby <accounts@mg.postrelay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "971050 is your Marrowby login code",
+          "date": "2026-09-20T17:00:00Z",
+          "body": "Enter 971050 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Marrowby. You received this email because of activity on your account.",
+          "text": "From: Marrowby <accounts@mg.postrelay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 971050 is your Marrowby login code\nDate: 2026-09-20T17:00:00Z\n\nEnter 971050 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Marrowby. You received this email because of activity on your account.",
+          "code": "971050",
+          "kind": "otp",
+          "owner": "marrowby.example"
+        },
+        {
+          "id": "brand_via_provider-02-m2",
+          "from": "Quillfeather <security@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Quillfeather sign-in code",
+          "date": "2026-09-20T17:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Quillfeather account:\n\n    822297\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Quillfeather team\n\n--\nSent by Quillfeather. You received this email because of activity on your account.",
+          "text": "From: Quillfeather <security@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Quillfeather sign-in code\nDate: 2026-09-20T17:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Quillfeather account:\n\n    822297\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Quillfeather team\n\n--\nSent by Quillfeather. You received this email because of activity on your account.",
+          "code": "822297",
+          "kind": "otp",
+          "owner": "quillfeather.example"
+        }
+      ],
+      "correct": "brand_via_provider-02-m1"
+    },
+    {
+      "id": "brand_via_provider-03",
+      "category": "brand_via_provider",
+      "description": "Juniperly via provider is newest; older Brightpine code",
+      "service": "juniperly.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-03-m1",
+          "from": "Brightpine <accounts@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "731132 is your Brightpine login code",
+          "date": "2026-09-20T18:00:00Z",
+          "body": "Enter 731132 to finish signing in.\n\nDon't share this code with anyone. Brightpine will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <accounts@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 731132 is your Brightpine login code\nDate: 2026-09-20T18:00:00Z\n\nEnter 731132 to finish signing in.\n\nDon't share this code with anyone. Brightpine will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "731132",
+          "kind": "otp",
+          "owner": "brightpine.example"
+        },
+        {
+          "id": "brand_via_provider-03-m2",
+          "from": "Juniperly <no-reply@mg.postrelay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Juniperly verification code is 907318",
+          "date": "2026-09-20T18:02:00Z",
+          "body": "Your Juniperly verification code is 907318.\n\nIt expires in 10 minutes.",
+          "text": "From: Juniperly <no-reply@mg.postrelay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Juniperly verification code is 907318\nDate: 2026-09-20T18:02:00Z\n\nYour Juniperly verification code is 907318.\n\nIt expires in 10 minutes.",
+          "code": "907318",
+          "kind": "otp",
+          "owner": "juniperly.example"
+        }
+      ],
+      "correct": "brand_via_provider-03-m2"
+    },
+    {
+      "id": "brand_via_provider-04",
+      "category": "brand_via_provider",
+      "description": "Trellium via provider, then Kestrel Notes and Sableworks",
+      "service": "trellium.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-04-m1",
+          "from": "Trellium <no-reply@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-20T19:00:00Z",
+          "body": "Trellium one-time passcode: 56306869\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nSent by Trellium. You received this email because of activity on your account.",
+          "text": "From: Trellium <no-reply@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-20T19:00:00Z\n\nTrellium one-time passcode: 56306869\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nSent by Trellium. You received this email because of activity on your account.",
+          "code": "56306869",
+          "kind": "otp",
+          "owner": "trellium.example"
+        },
+        {
+          "id": "brand_via_provider-04-m2",
+          "from": "Kestrel Notes <verify@kestrelnotes.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-20T19:01:00Z",
+          "body": "Welcome to Kestrel Notes!\n\nYour confirmation code:\n371034\n\nPaste it into the sign-up form to activate your account.\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "text": "From: Kestrel Notes <verify@kestrelnotes.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-20T19:01:00Z\n\nWelcome to Kestrel Notes!\n\nYour confirmation code:\n371034\n\nPaste it into the sign-up form to activate your account.\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "code": "371034",
+          "kind": "otp",
+          "owner": "kestrelnotes.example"
+        },
+        {
+          "id": "brand_via_provider-04-m3",
+          "from": "Sableworks <security@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Sableworks sign-in code",
+          "date": "2026-09-20T19:02:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Sableworks account:\n\n    687957\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Sableworks team\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <security@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Sableworks sign-in code\nDate: 2026-09-20T19:02:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Sableworks account:\n\n    687957\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Sableworks team\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "687957",
+          "kind": "otp",
+          "owner": "sableworks.example"
+        }
+      ],
+      "correct": "brand_via_provider-04-m1"
+    },
+    {
+      "id": "brand_via_provider-05",
+      "category": "brand_via_provider",
+      "description": "Nimbusly via provider between two other codes",
+      "service": "nimbusly.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-05-m1",
+          "from": "Cobaltix <security@cobaltix.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Cobaltix sign-in code",
+          "date": "2026-09-20T20:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Cobaltix account:\n\n    407341\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Cobaltix team\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "text": "From: Cobaltix <security@cobaltix.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Cobaltix sign-in code\nDate: 2026-09-20T20:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Cobaltix account:\n\n    407341\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Cobaltix team\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "code": "407341",
+          "kind": "otp",
+          "owner": "cobaltix.example"
+        },
+        {
+          "id": "brand_via_provider-05-m2",
+          "from": "Nimbusly <accounts@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "521498 is your Nimbusly login code",
+          "date": "2026-09-20T20:01:00Z",
+          "body": "Enter 521498 to finish signing in.\n\nDon't share this code with anyone. Nimbusly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Nimbusly. You received this email because of activity on your account.",
+          "text": "From: Nimbusly <accounts@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 521498 is your Nimbusly login code\nDate: 2026-09-20T20:01:00Z\n\nEnter 521498 to finish signing in.\n\nDon't share this code with anyone. Nimbusly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Nimbusly. You received this email because of activity on your account.",
+          "code": "521498",
+          "kind": "otp",
+          "owner": "nimbusly.example"
+        },
+        {
+          "id": "brand_via_provider-05-m3",
+          "from": "Glimmerly <no-reply@notify.relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Glimmerly verification code is 802855",
+          "date": "2026-09-20T20:03:00Z",
+          "body": "Your Glimmerly verification code is 802855.\n\nIt expires in 10 minutes.",
+          "text": "From: Glimmerly <no-reply@notify.relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Glimmerly verification code is 802855\nDate: 2026-09-20T20:03:00Z\n\nYour Glimmerly verification code is 802855.\n\nIt expires in 10 minutes.",
+          "code": "802855",
+          "kind": "otp",
+          "owner": "glimmerly.example"
+        }
+      ],
+      "correct": "brand_via_provider-05-m2"
+    },
+    {
+      "id": "brand_via_provider-06",
+      "category": "brand_via_provider",
+      "description": "Pebblecart via provider, newest of three",
+      "service": "pebblecart.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-06-m1",
+          "from": "Rookwise <no-reply@rookwise.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Rookwise verification code is 727447",
+          "date": "2026-09-20T21:00:00Z",
+          "body": "Your Rookwise verification code is 727447.\n\nIt expires in 10 minutes.\n\nEnter it at https://rookwise.example/\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "text": "From: Rookwise <no-reply@rookwise.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Rookwise verification code is 727447\nDate: 2026-09-20T21:00:00Z\n\nYour Rookwise verification code is 727447.\n\nIt expires in 10 minutes.\n\nEnter it at https://rookwise.example/\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "code": "727447",
+          "kind": "otp",
+          "owner": "rookwise.example"
+        },
+        {
+          "id": "brand_via_provider-06-m2",
+          "from": "Lumora <security@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Lumora sign-in code",
+          "date": "2026-09-20T21:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    793572\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nSent by Lumora. You received this email because of activity on your account.",
+          "text": "From: Lumora <security@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Lumora sign-in code\nDate: 2026-09-20T21:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    793572\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nSent by Lumora. You received this email because of activity on your account.",
+          "code": "793572",
+          "kind": "otp",
+          "owner": "lumora.example"
+        },
+        {
+          "id": "brand_via_provider-06-m3",
+          "from": "Pebblecart <verify@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-20T21:02:00Z",
+          "body": "Welcome to Pebblecart!\n\nYour confirmation code:\n185411\n\nPaste it into the sign-up form to activate your account.\n\n--\nSent by Pebblecart. You received this email because of activity on your account.",
+          "text": "From: Pebblecart <verify@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-20T21:02:00Z\n\nWelcome to Pebblecart!\n\nYour confirmation code:\n185411\n\nPaste it into the sign-up form to activate your account.\n\n--\nSent by Pebblecart. You received this email because of activity on your account.",
+          "code": "185411",
+          "kind": "otp",
+          "owner": "pebblecart.example"
+        }
+      ],
+      "correct": "brand_via_provider-06-m3"
+    },
+    {
+      "id": "brand_via_provider-07",
+      "category": "brand_via_provider",
+      "description": "Cobaltix via provider, then Zentrik promo",
+      "service": "cobaltix.example",
+      "emails": [
+        {
+          "id": "brand_via_provider-07-m1",
+          "from": "Cobaltix <no-reply@notify.relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Cobaltix verification code is 629897",
+          "date": "2026-09-20T22:00:00Z",
+          "body": "Your Cobaltix verification code is 629897.\n\nIt expires in 10 minutes.",
+          "text": "From: Cobaltix <no-reply@notify.relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Cobaltix verification code is 629897\nDate: 2026-09-20T22:00:00Z\n\nYour Cobaltix verification code is 629897.\n\nIt expires in 10 minutes.",
+          "code": "629897",
+          "kind": "otp",
+          "owner": "cobaltix.example"
+        },
+        {
+          "id": "brand_via_provider-07-m2",
+          "from": "Zentrik <news@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Zentrik",
+          "date": "2026-09-20T22:01:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 487193\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://zentrik.example/offers\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy\nUnsubscribe: https://zentrik.example/unsubscribe",
+          "text": "From: Zentrik <news@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Zentrik\nDate: 2026-09-20T22:01:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 487193\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://zentrik.example/offers\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy\nUnsubscribe: https://zentrik.example/unsubscribe",
+          "code": "487193",
+          "kind": "promo",
+          "owner": "zentrik.example"
+        }
+      ],
+      "correct": "brand_via_provider-07-m1"
+    },
+    {
+      "id": "domain_in_link_only-01",
+      "category": "domain_in_link_only",
+      "description": "Sent as \"Northwind Media Group\", link to glimmerly.example; newer Veloxa code",
+      "service": "glimmerly.example",
+      "emails": [
+        {
+          "id": "domain_in_link_only-01-m1",
+          "from": "Northwind Media Group <security@notify.relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Glimmerly sign-in code",
+          "date": "2026-09-20T23:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Glimmerly account:\n\n    329220\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://glimmerly.example/login\n\n— The Glimmerly team\n\n--\nSent by Northwind Media Group. You received this email because of activity on your account.",
+          "text": "From: Northwind Media Group <security@notify.relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Glimmerly sign-in code\nDate: 2026-09-20T23:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Glimmerly account:\n\n    329220\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://glimmerly.example/login\n\n— The Glimmerly team\n\n--\nSent by Northwind Media Group. You received this email because of activity on your account.",
+          "code": "329220",
+          "kind": "otp",
+          "owner": "glimmerly.example"
+        },
+        {
+          "id": "domain_in_link_only-01-m2",
+          "from": "Veloxa <accounts@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "740032 is your Veloxa login code",
+          "date": "2026-09-20T23:02:00Z",
+          "body": "Enter 740032 to finish signing in.\n\nDon't share this code with anyone. Veloxa will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "text": "From: Veloxa <accounts@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 740032 is your Veloxa login code\nDate: 2026-09-20T23:02:00Z\n\nEnter 740032 to finish signing in.\n\nDon't share this code with anyone. Veloxa will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "code": "740032",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        }
+      ],
+      "correct": "domain_in_link_only-01-m1"
+    },
+    {
+      "id": "domain_in_link_only-02",
+      "category": "domain_in_link_only",
+      "description": "Demo site (brand Acme) with link only; newer Juniperly code",
+      "service": "skipass-demo.vercel.app",
+      "emails": [
+        {
+          "id": "domain_in_link_only-02-m1",
+          "from": "Acme <no-reply@mailer-relay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Acme verification code is 784588",
+          "date": "2026-09-21T00:00:00Z",
+          "body": "Your Acme verification code is 784588.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "text": "From: Acme <no-reply@mailer-relay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Acme verification code is 784588\nDate: 2026-09-21T00:00:00Z\n\nYour Acme verification code is 784588.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "code": "784588",
+          "kind": "otp",
+          "owner": "skipass-demo.vercel.app"
+        },
+        {
+          "id": "domain_in_link_only-02-m2",
+          "from": "Juniperly <security@juniperly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Juniperly sign-in code",
+          "date": "2026-09-21T00:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Juniperly account:\n\n    850022\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Juniperly team\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "text": "From: Juniperly <security@juniperly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Juniperly sign-in code\nDate: 2026-09-21T00:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Juniperly account:\n\n    850022\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Juniperly team\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "code": "850022",
+          "kind": "otp",
+          "owner": "juniperly.example"
+        }
+      ],
+      "correct": "domain_in_link_only-02-m1"
+    },
+    {
+      "id": "domain_in_link_only-03",
+      "category": "domain_in_link_only",
+      "description": "Sent as \"Orbitly Accounts\" via provider, link only; newer Trellium code",
+      "service": "orbitly.example",
+      "emails": [
+        {
+          "id": "domain_in_link_only-03-m1",
+          "from": "Orbitly Accounts <accounts@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "508083 is your Orbitly login code",
+          "date": "2026-09-21T01:00:00Z",
+          "body": "Enter 508083 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\nNot you? Secure your account: https://orbitly.example/security\n\n--\nSent by Orbitly Accounts. You received this email because of activity on your account.",
+          "text": "From: Orbitly Accounts <accounts@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 508083 is your Orbitly login code\nDate: 2026-09-21T01:00:00Z\n\nEnter 508083 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\nNot you? Secure your account: https://orbitly.example/security\n\n--\nSent by Orbitly Accounts. You received this email because of activity on your account.",
+          "code": "508083",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        },
+        {
+          "id": "domain_in_link_only-03-m2",
+          "from": "Trellium <no-reply@trellium.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Trellium verification code is 405934",
+          "date": "2026-09-21T01:01:00Z",
+          "body": "Your Trellium verification code is 405934.\n\nIt expires in 10 minutes.\n\nEnter it at https://trellium.example/\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "text": "From: Trellium <no-reply@trellium.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Trellium verification code is 405934\nDate: 2026-09-21T01:01:00Z\n\nYour Trellium verification code is 405934.\n\nIt expires in 10 minutes.\n\nEnter it at https://trellium.example/\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "code": "405934",
+          "kind": "otp",
+          "owner": "trellium.example"
+        }
+      ],
+      "correct": "domain_in_link_only-03-m1"
+    },
+    {
+      "id": "domain_in_link_only-04",
+      "category": "domain_in_link_only",
+      "description": "Sent as \"HV Loyalty Club\", link only; newer Marrowby code and older Rookwise code",
+      "service": "halvardair.example",
+      "emails": [
+        {
+          "id": "domain_in_link_only-04-m1",
+          "from": "Rookwise <security@rookwise.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Rookwise sign-in code",
+          "date": "2026-09-21T02:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    443233\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "text": "From: Rookwise <security@rookwise.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Rookwise sign-in code\nDate: 2026-09-21T02:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    443233\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "code": "443233",
+          "kind": "otp",
+          "owner": "rookwise.example"
+        },
+        {
+          "id": "domain_in_link_only-04-m2",
+          "from": "HV Loyalty Club <verify@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-21T02:01:00Z",
+          "body": "Welcome to Halvard Air!\n\nYour confirmation code:\n603440\n\nPaste it into the sign-up form to activate your account.\nOr open https://halvardair.example/confirm?session=thqzsvkjhq\n\n--\nSent by HV Loyalty Club. You received this email because of activity on your account.",
+          "text": "From: HV Loyalty Club <verify@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-21T02:01:00Z\n\nWelcome to Halvard Air!\n\nYour confirmation code:\n603440\n\nPaste it into the sign-up form to activate your account.\nOr open https://halvardair.example/confirm?session=thqzsvkjhq\n\n--\nSent by HV Loyalty Club. You received this email because of activity on your account.",
+          "code": "603440",
+          "kind": "otp",
+          "owner": "halvardair.example"
+        },
+        {
+          "id": "domain_in_link_only-04-m3",
+          "from": "Marrowby <accounts@marrowby.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "296064 is your Marrowby login code",
+          "date": "2026-09-21T02:03:00Z",
+          "body": "Enter 296064 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "text": "From: Marrowby <accounts@marrowby.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 296064 is your Marrowby login code\nDate: 2026-09-21T02:03:00Z\n\nEnter 296064 to finish signing in.\n\nDon't share this code with anyone. Marrowby will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "code": "296064",
+          "kind": "otp",
+          "owner": "marrowby.example"
+        }
+      ],
+      "correct": "domain_in_link_only-04-m2"
+    },
+    {
+      "id": "domain_in_link_only-05",
+      "category": "domain_in_link_only",
+      "description": "Sent as \"SW Studio\", link only, newest",
+      "service": "sableworks.example",
+      "emails": [
+        {
+          "id": "domain_in_link_only-05-m1",
+          "from": "Nimbusly <no-reply@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Nimbusly verification code is 916407",
+          "date": "2026-09-21T03:00:00Z",
+          "body": "Your Nimbusly verification code is 916407.\n\nIt expires in 10 minutes.\n\nEnter it at https://nimbusly.example/\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "text": "From: Nimbusly <no-reply@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Nimbusly verification code is 916407\nDate: 2026-09-21T03:00:00Z\n\nYour Nimbusly verification code is 916407.\n\nIt expires in 10 minutes.\n\nEnter it at https://nimbusly.example/\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "code": "916407",
+          "kind": "otp",
+          "owner": "nimbusly.example"
+        },
+        {
+          "id": "domain_in_link_only-05-m2",
+          "from": "SW Studio <no-reply@mg.postrelay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-21T03:02:00Z",
+          "body": "Sableworks one-time passcode: 27059472\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\nContinue at https://sableworks.example/mfa\n\n--\nSent by SW Studio. You received this email because of activity on your account.",
+          "text": "From: SW Studio <no-reply@mg.postrelay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-21T03:02:00Z\n\nSableworks one-time passcode: 27059472\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\nContinue at https://sableworks.example/mfa\n\n--\nSent by SW Studio. You received this email because of activity on your account.",
+          "code": "27059472",
+          "kind": "otp",
+          "owner": "sableworks.example"
+        }
+      ],
+      "correct": "domain_in_link_only-05-m2"
+    },
+    {
+      "id": "domain_in_link_only-06",
+      "category": "domain_in_link_only",
+      "description": "Demo site link only; newer other code also sent via a relay",
+      "service": "skipass-demo.vercel.app",
+      "emails": [
+        {
+          "id": "domain_in_link_only-06-m1",
+          "from": "Acme <no-reply@mailer-relay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Acme verification code is 142252",
+          "date": "2026-09-21T04:00:00Z",
+          "body": "Your Acme verification code is 142252.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "text": "From: Acme <no-reply@mailer-relay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Acme verification code is 142252\nDate: 2026-09-21T04:00:00Z\n\nYour Acme verification code is 142252.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "code": "142252",
+          "kind": "otp",
+          "owner": "skipass-demo.vercel.app"
+        },
+        {
+          "id": "domain_in_link_only-06-m2",
+          "from": "Cobaltix <no-reply@notify.relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Cobaltix verification code is 122752",
+          "date": "2026-09-21T04:01:00Z",
+          "body": "Your Cobaltix verification code is 122752.\n\nIt expires in 10 minutes.",
+          "text": "From: Cobaltix <no-reply@notify.relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Cobaltix verification code is 122752\nDate: 2026-09-21T04:01:00Z\n\nYour Cobaltix verification code is 122752.\n\nIt expires in 10 minutes.",
+          "code": "122752",
+          "kind": "otp",
+          "owner": "cobaltix.example"
+        }
+      ],
+      "correct": "domain_in_link_only-06-m1"
+    },
+    {
+      "id": "domain_in_link_only-07",
+      "category": "domain_in_link_only",
+      "description": "Sent as \"Trell Inc.\", link only; newer Glimmerly code via link",
+      "service": "trellium.example",
+      "emails": [
+        {
+          "id": "domain_in_link_only-07-m1",
+          "from": "Trell Inc. <security@send.mailcrane.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Trellium sign-in code",
+          "date": "2026-09-21T05:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Trellium account:\n\n    896871\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://trellium.example/login\n\n— The Trellium team\n\n--\nSent by Trell Inc.. You received this email because of activity on your account.",
+          "text": "From: Trell Inc. <security@send.mailcrane.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Trellium sign-in code\nDate: 2026-09-21T05:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Trellium account:\n\n    896871\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://trellium.example/login\n\n— The Trellium team\n\n--\nSent by Trell Inc.. You received this email because of activity on your account.",
+          "code": "896871",
+          "kind": "otp",
+          "owner": "trellium.example"
+        },
+        {
+          "id": "domain_in_link_only-07-m2",
+          "from": "Glimmerly <verify@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-21T05:02:00Z",
+          "body": "Welcome to Glimmerly!\n\nYour confirmation code:\n843601\n\nPaste it into the sign-up form to activate your account.\nOr open https://glimmerly.example/confirm?session=zb7ca2f7lk\n\n--\nSent by Glimmerly. You received this email because of activity on your account.",
+          "text": "From: Glimmerly <verify@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-21T05:02:00Z\n\nWelcome to Glimmerly!\n\nYour confirmation code:\n843601\n\nPaste it into the sign-up form to activate your account.\nOr open https://glimmerly.example/confirm?session=zb7ca2f7lk\n\n--\nSent by Glimmerly. You received this email because of activity on your account.",
+          "code": "843601",
+          "kind": "otp",
+          "owner": "glimmerly.example"
+        }
+      ],
+      "correct": "domain_in_link_only-07-m1"
+    },
+    {
+      "id": "same_site_two_codes-01",
+      "category": "same_site_two_codes",
+      "description": "Two Lumora codes (resend 1 min apart)",
+      "service": "lumora.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-01-m1",
+          "from": "Lumora <security@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Lumora sign-in code",
+          "date": "2026-09-21T06:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    383496\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <security@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Lumora sign-in code\nDate: 2026-09-21T06:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    383496\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "383496",
+          "kind": "otp",
+          "owner": "lumora.example"
+        },
+        {
+          "id": "same_site_two_codes-01-m2",
+          "from": "Lumora <security@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Lumora sign-in code",
+          "date": "2026-09-21T06:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    114125\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <security@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Lumora sign-in code\nDate: 2026-09-21T06:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    114125\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "114125",
+          "kind": "otp",
+          "owner": "lumora.example"
+        }
+      ],
+      "correct": "same_site_two_codes-01-m2"
+    },
+    {
+      "id": "same_site_two_codes-02",
+      "category": "same_site_two_codes",
+      "description": "Two Orbitly codes, then a newer Veloxa code",
+      "service": "orbitly.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-02-m1",
+          "from": "Orbitly <accounts@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "968824 is your Orbitly login code",
+          "date": "2026-09-21T07:00:00Z",
+          "body": "Enter 968824 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <accounts@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 968824 is your Orbitly login code\nDate: 2026-09-21T07:00:00Z\n\nEnter 968824 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "968824",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        },
+        {
+          "id": "same_site_two_codes-02-m2",
+          "from": "Orbitly <accounts@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "566560 is your Orbitly login code",
+          "date": "2026-09-21T07:02:00Z",
+          "body": "Enter 566560 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <accounts@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 566560 is your Orbitly login code\nDate: 2026-09-21T07:02:00Z\n\nEnter 566560 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "566560",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        },
+        {
+          "id": "same_site_two_codes-02-m3",
+          "from": "Veloxa <security@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Veloxa sign-in code",
+          "date": "2026-09-21T07:03:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    804183\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "text": "From: Veloxa <security@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Veloxa sign-in code\nDate: 2026-09-21T07:03:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Veloxa account:\n\n    804183\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Veloxa team\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "code": "804183",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        }
+      ],
+      "correct": "same_site_two_codes-02-m2"
+    },
+    {
+      "id": "same_site_two_codes-03",
+      "category": "same_site_two_codes",
+      "description": "Two demo-site codes (resend 30 s apart)",
+      "service": "skipass-demo.vercel.app",
+      "emails": [
+        {
+          "id": "same_site_two_codes-03-m1",
+          "from": "Acme <no-reply@mailer-relay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Acme verification code is 174796",
+          "date": "2026-09-21T08:00:00Z",
+          "body": "Your Acme verification code is 174796.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "text": "From: Acme <no-reply@mailer-relay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Acme verification code is 174796\nDate: 2026-09-21T08:00:00Z\n\nYour Acme verification code is 174796.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "code": "174796",
+          "kind": "otp",
+          "owner": "skipass-demo.vercel.app"
+        },
+        {
+          "id": "same_site_two_codes-03-m2",
+          "from": "Acme <no-reply@mailer-relay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Acme verification code is 763188",
+          "date": "2026-09-21T08:00:30Z",
+          "body": "Your Acme verification code is 763188.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "text": "From: Acme <no-reply@mailer-relay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Acme verification code is 763188\nDate: 2026-09-21T08:00:30Z\n\nYour Acme verification code is 763188.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "code": "763188",
+          "kind": "otp",
+          "owner": "skipass-demo.vercel.app"
+        }
+      ],
+      "correct": "same_site_two_codes-03-m2"
+    },
+    {
+      "id": "same_site_two_codes-04",
+      "category": "same_site_two_codes",
+      "description": "Two Zentrik codes with different templates, newer Quillfeather code",
+      "service": "zentrik.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-04-m1",
+          "from": "Zentrik <verify@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-21T09:00:00Z",
+          "body": "Welcome to Zentrik!\n\nYour confirmation code:\n463866\n\nPaste it into the sign-up form to activate your account.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <verify@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-21T09:00:00Z\n\nWelcome to Zentrik!\n\nYour confirmation code:\n463866\n\nPaste it into the sign-up form to activate your account.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "463866",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        },
+        {
+          "id": "same_site_two_codes-04-m2",
+          "from": "Zentrik <no-reply@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Zentrik verification code is 142800",
+          "date": "2026-09-21T09:03:00Z",
+          "body": "Your Zentrik verification code is 142800.\n\nIt expires in 10 minutes.\n\nEnter it at https://zentrik.example/\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <no-reply@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Zentrik verification code is 142800\nDate: 2026-09-21T09:03:00Z\n\nYour Zentrik verification code is 142800.\n\nIt expires in 10 minutes.\n\nEnter it at https://zentrik.example/\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "142800",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        },
+        {
+          "id": "same_site_two_codes-04-m3",
+          "from": "Quillfeather <accounts@quillfeather.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "306219 is your Quillfeather login code",
+          "date": "2026-09-21T09:04:00Z",
+          "body": "Enter 306219 to finish signing in.\n\nDon't share this code with anyone. Quillfeather will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "text": "From: Quillfeather <accounts@quillfeather.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 306219 is your Quillfeather login code\nDate: 2026-09-21T09:04:00Z\n\nEnter 306219 to finish signing in.\n\nDon't share this code with anyone. Quillfeather will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "code": "306219",
+          "kind": "otp",
+          "owner": "quillfeather.example"
+        }
+      ],
+      "correct": "same_site_two_codes-04-m2"
+    },
+    {
+      "id": "same_site_two_codes-05",
+      "category": "same_site_two_codes",
+      "description": "Three Brightpine codes (two resends)",
+      "service": "brightpine.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-05-m1",
+          "from": "Brightpine <security@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Brightpine sign-in code",
+          "date": "2026-09-21T10:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    125173\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <security@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Brightpine sign-in code\nDate: 2026-09-21T10:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    125173\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "125173",
+          "kind": "otp",
+          "owner": "brightpine.example"
+        },
+        {
+          "id": "same_site_two_codes-05-m2",
+          "from": "Brightpine <security@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Brightpine sign-in code",
+          "date": "2026-09-21T10:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    474995\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <security@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Brightpine sign-in code\nDate: 2026-09-21T10:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    474995\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "474995",
+          "kind": "otp",
+          "owner": "brightpine.example"
+        },
+        {
+          "id": "same_site_two_codes-05-m3",
+          "from": "Brightpine <security@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Brightpine sign-in code",
+          "date": "2026-09-21T10:02:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    898007\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <security@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Brightpine sign-in code\nDate: 2026-09-21T10:02:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Brightpine account:\n\n    898007\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Brightpine team\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "898007",
+          "kind": "otp",
+          "owner": "brightpine.example"
+        }
+      ],
+      "correct": "same_site_two_codes-05-m3"
+    },
+    {
+      "id": "same_site_two_codes-06",
+      "category": "same_site_two_codes",
+      "description": "Two Kestrel Notes codes via provider, other site in between",
+      "service": "kestrelnotes.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-06-m1",
+          "from": "Kestrel Notes <accounts@mg.postrelay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "638291 is your Kestrel Notes login code",
+          "date": "2026-09-21T11:00:00Z",
+          "body": "Enter 638291 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Kestrel Notes. You received this email because of activity on your account.",
+          "text": "From: Kestrel Notes <accounts@mg.postrelay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 638291 is your Kestrel Notes login code\nDate: 2026-09-21T11:00:00Z\n\nEnter 638291 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Kestrel Notes. You received this email because of activity on your account.",
+          "code": "638291",
+          "kind": "otp",
+          "owner": "kestrelnotes.example"
+        },
+        {
+          "id": "same_site_two_codes-06-m2",
+          "from": "Marrowby <no-reply@marrowby.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Marrowby verification code is 360293",
+          "date": "2026-09-21T11:01:00Z",
+          "body": "Your Marrowby verification code is 360293.\n\nIt expires in 10 minutes.\n\nEnter it at https://marrowby.example/\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "text": "From: Marrowby <no-reply@marrowby.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Marrowby verification code is 360293\nDate: 2026-09-21T11:01:00Z\n\nYour Marrowby verification code is 360293.\n\nIt expires in 10 minutes.\n\nEnter it at https://marrowby.example/\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "code": "360293",
+          "kind": "otp",
+          "owner": "marrowby.example"
+        },
+        {
+          "id": "same_site_two_codes-06-m3",
+          "from": "Kestrel Notes <accounts@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "543360 is your Kestrel Notes login code",
+          "date": "2026-09-21T11:02:00Z",
+          "body": "Enter 543360 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Kestrel Notes. You received this email because of activity on your account.",
+          "text": "From: Kestrel Notes <accounts@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 543360 is your Kestrel Notes login code\nDate: 2026-09-21T11:02:00Z\n\nEnter 543360 to finish signing in.\n\nDon't share this code with anyone. Kestrel Notes will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Kestrel Notes. You received this email because of activity on your account.",
+          "code": "543360",
+          "kind": "otp",
+          "owner": "kestrelnotes.example"
+        }
+      ],
+      "correct": "same_site_two_codes-06-m3"
+    },
+    {
+      "id": "same_site_two_codes-07",
+      "category": "same_site_two_codes",
+      "description": "Two Pebblecart codes, newer Pebblecart promo",
+      "service": "pebblecart.example",
+      "emails": [
+        {
+          "id": "same_site_two_codes-07-m1",
+          "from": "Pebblecart <no-reply@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-21T12:00:00Z",
+          "body": "Pebblecart one-time passcode: 66793448\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <no-reply@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-21T12:00:00Z\n\nPebblecart one-time passcode: 66793448\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "66793448",
+          "kind": "otp",
+          "owner": "pebblecart.example"
+        },
+        {
+          "id": "same_site_two_codes-07-m2",
+          "from": "Pebblecart <no-reply@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-21T12:01:00Z",
+          "body": "Pebblecart one-time passcode: 18901720\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <no-reply@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-21T12:01:00Z\n\nPebblecart one-time passcode: 18901720\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "18901720",
+          "kind": "otp",
+          "owner": "pebblecart.example"
+        },
+        {
+          "id": "same_site_two_codes-07-m3",
+          "from": "Pebblecart <news@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Pebblecart",
+          "date": "2026-09-21T12:02:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 432672\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://pebblecart.example/offers\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy\nUnsubscribe: https://pebblecart.example/unsubscribe",
+          "text": "From: Pebblecart <news@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Pebblecart\nDate: 2026-09-21T12:02:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 432672\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://pebblecart.example/offers\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy\nUnsubscribe: https://pebblecart.example/unsubscribe",
+          "code": "432672",
+          "kind": "promo",
+          "owner": "pebblecart.example"
+        }
+      ],
+      "correct": "same_site_two_codes-07-m2"
+    },
+    {
+      "id": "promo_codes-01",
+      "category": "promo_codes",
+      "description": "Quillfeather code, then its own 20%-off promo code",
+      "service": "quillfeather.example",
+      "emails": [
+        {
+          "id": "promo_codes-01-m1",
+          "from": "Quillfeather <security@quillfeather.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Quillfeather sign-in code",
+          "date": "2026-09-21T13:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Quillfeather account:\n\n    151993\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Quillfeather team\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "text": "From: Quillfeather <security@quillfeather.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Quillfeather sign-in code\nDate: 2026-09-21T13:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Quillfeather account:\n\n    151993\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Quillfeather team\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy",
+          "code": "151993",
+          "kind": "otp",
+          "owner": "quillfeather.example"
+        },
+        {
+          "id": "promo_codes-01-m2",
+          "from": "Quillfeather <news@quillfeather.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Quillfeather: 20% off ends tonight",
+          "date": "2026-09-21T13:02:00Z",
+          "body": "Last chance! Use code FALL13 at checkout for 20% off your next order.\n\nShop the sale: https://quillfeather.example/sale\n\nYou are receiving this because you subscribed to Quillfeather news.\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy\nUnsubscribe: https://quillfeather.example/unsubscribe",
+          "text": "From: Quillfeather <news@quillfeather.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Quillfeather: 20% off ends tonight\nDate: 2026-09-21T13:02:00Z\n\nLast chance! Use code FALL13 at checkout for 20% off your next order.\n\nShop the sale: https://quillfeather.example/sale\n\nYou are receiving this because you subscribed to Quillfeather news.\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy\nUnsubscribe: https://quillfeather.example/unsubscribe",
+          "code": "FALL13",
+          "kind": "promo",
+          "owner": "quillfeather.example"
+        }
+      ],
+      "correct": "promo_codes-01-m1"
+    },
+    {
+      "id": "promo_codes-02",
+      "category": "promo_codes",
+      "description": "Veloxa code, then its own 6-digit \"one-time discount code\"",
+      "service": "veloxa.example",
+      "emails": [
+        {
+          "id": "promo_codes-02-m1",
+          "from": "Veloxa <accounts@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "967501 is your Veloxa login code",
+          "date": "2026-09-21T14:00:00Z",
+          "body": "Enter 967501 to finish signing in.\n\nDon't share this code with anyone. Veloxa will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "text": "From: Veloxa <accounts@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 967501 is your Veloxa login code\nDate: 2026-09-21T14:00:00Z\n\nEnter 967501 to finish signing in.\n\nDon't share this code with anyone. Veloxa will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "code": "967501",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        },
+        {
+          "id": "promo_codes-02-m2",
+          "from": "Veloxa <news@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Veloxa",
+          "date": "2026-09-21T14:01:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 924190\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://veloxa.example/offers\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy\nUnsubscribe: https://veloxa.example/unsubscribe",
+          "text": "From: Veloxa <news@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Veloxa\nDate: 2026-09-21T14:01:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 924190\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://veloxa.example/offers\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy\nUnsubscribe: https://veloxa.example/unsubscribe",
+          "code": "924190",
+          "kind": "promo",
+          "owner": "veloxa.example"
+        }
+      ],
+      "correct": "promo_codes-02-m1"
+    },
+    {
+      "id": "promo_codes-03",
+      "category": "promo_codes",
+      "description": "Juniperly code, then a referral code from Juniperly",
+      "service": "juniperly.example",
+      "emails": [
+        {
+          "id": "promo_codes-03-m1",
+          "from": "Juniperly <no-reply@juniperly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Juniperly verification code is 784912",
+          "date": "2026-09-21T15:00:00Z",
+          "body": "Your Juniperly verification code is 784912.\n\nIt expires in 10 minutes.\n\nEnter it at https://juniperly.example/\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "text": "From: Juniperly <no-reply@juniperly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Juniperly verification code is 784912\nDate: 2026-09-21T15:00:00Z\n\nYour Juniperly verification code is 784912.\n\nIt expires in 10 minutes.\n\nEnter it at https://juniperly.example/\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "code": "784912",
+          "kind": "otp",
+          "owner": "juniperly.example"
+        },
+        {
+          "id": "promo_codes-03-m2",
+          "from": "Juniperly <news@juniperly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Juniperly referral reward is waiting",
+          "date": "2026-09-21T15:03:00Z",
+          "body": "Share your code SQ9-582 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://juniperly.example/invite\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "text": "From: Juniperly <news@juniperly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Juniperly referral reward is waiting\nDate: 2026-09-21T15:03:00Z\n\nShare your code SQ9-582 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://juniperly.example/invite\n\n--\nJuniperly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://juniperly.example/help · Privacy: https://juniperly.example/privacy",
+          "code": "SQ9-582",
+          "kind": "promo",
+          "owner": "juniperly.example"
+        }
+      ],
+      "correct": "promo_codes-03-m1"
+    },
+    {
+      "id": "promo_codes-04",
+      "category": "promo_codes",
+      "description": "Marrowby code, then a Nimbusly 6-digit discount code",
+      "service": "marrowby.example",
+      "emails": [
+        {
+          "id": "promo_codes-04-m1",
+          "from": "Marrowby <verify@marrowby.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-21T16:00:00Z",
+          "body": "Welcome to Marrowby!\n\nYour confirmation code:\n247039\n\nPaste it into the sign-up form to activate your account.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "text": "From: Marrowby <verify@marrowby.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-21T16:00:00Z\n\nWelcome to Marrowby!\n\nYour confirmation code:\n247039\n\nPaste it into the sign-up form to activate your account.\n\n--\nMarrowby · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://marrowby.example/help · Privacy: https://marrowby.example/privacy",
+          "code": "247039",
+          "kind": "otp",
+          "owner": "marrowby.example"
+        },
+        {
+          "id": "promo_codes-04-m2",
+          "from": "Nimbusly <news@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Nimbusly",
+          "date": "2026-09-21T16:01:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 912063\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://nimbusly.example/offers\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy\nUnsubscribe: https://nimbusly.example/unsubscribe",
+          "text": "From: Nimbusly <news@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Nimbusly\nDate: 2026-09-21T16:01:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 912063\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://nimbusly.example/offers\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy\nUnsubscribe: https://nimbusly.example/unsubscribe",
+          "code": "912063",
+          "kind": "promo",
+          "owner": "nimbusly.example"
+        }
+      ],
+      "correct": "promo_codes-04-m1"
+    },
+    {
+      "id": "promo_codes-05",
+      "category": "promo_codes",
+      "description": "Rookwise code via provider, then Rookwise promo mentioning the domain",
+      "service": "rookwise.example",
+      "emails": [
+        {
+          "id": "promo_codes-05-m1",
+          "from": "Rookwise <security@notify.relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Rookwise sign-in code",
+          "date": "2026-09-21T17:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    152494\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nSent by Rookwise. You received this email because of activity on your account.",
+          "text": "From: Rookwise <security@notify.relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Rookwise sign-in code\nDate: 2026-09-21T17:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Rookwise account:\n\n    152494\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Rookwise team\n\n--\nSent by Rookwise. You received this email because of activity on your account.",
+          "code": "152494",
+          "kind": "otp",
+          "owner": "rookwise.example"
+        },
+        {
+          "id": "promo_codes-05-m2",
+          "from": "Rookwise <news@rookwise.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Rookwise",
+          "date": "2026-09-21T17:02:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 976921\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://rookwise.example/offers\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy\nUnsubscribe: https://rookwise.example/unsubscribe",
+          "text": "From: Rookwise <news@rookwise.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Rookwise\nDate: 2026-09-21T17:02:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 976921\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://rookwise.example/offers\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy\nUnsubscribe: https://rookwise.example/unsubscribe",
+          "code": "976921",
+          "kind": "promo",
+          "owner": "rookwise.example"
+        }
+      ],
+      "correct": "promo_codes-05-m1"
+    },
+    {
+      "id": "promo_codes-06",
+      "category": "promo_codes",
+      "description": "Older Cobaltix promo, then Cobaltix code",
+      "service": "cobaltix.example",
+      "emails": [
+        {
+          "id": "promo_codes-06-m1",
+          "from": "Cobaltix <news@cobaltix.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Cobaltix: 20% off ends tonight",
+          "date": "2026-09-21T18:00:00Z",
+          "body": "Last chance! Use code FALL77 at checkout for 20% off your next order.\n\nShop the sale: https://cobaltix.example/sale\n\nYou are receiving this because you subscribed to Cobaltix news.\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy\nUnsubscribe: https://cobaltix.example/unsubscribe",
+          "text": "From: Cobaltix <news@cobaltix.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Cobaltix: 20% off ends tonight\nDate: 2026-09-21T18:00:00Z\n\nLast chance! Use code FALL77 at checkout for 20% off your next order.\n\nShop the sale: https://cobaltix.example/sale\n\nYou are receiving this because you subscribed to Cobaltix news.\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy\nUnsubscribe: https://cobaltix.example/unsubscribe",
+          "code": "FALL77",
+          "kind": "promo",
+          "owner": "cobaltix.example"
+        },
+        {
+          "id": "promo_codes-06-m2",
+          "from": "Cobaltix <accounts@cobaltix.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "234228 is your Cobaltix login code",
+          "date": "2026-09-21T18:05:00Z",
+          "body": "Enter 234228 to finish signing in.\n\nDon't share this code with anyone. Cobaltix will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "text": "From: Cobaltix <accounts@cobaltix.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 234228 is your Cobaltix login code\nDate: 2026-09-21T18:05:00Z\n\nEnter 234228 to finish signing in.\n\nDon't share this code with anyone. Cobaltix will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nCobaltix · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://cobaltix.example/help · Privacy: https://cobaltix.example/privacy",
+          "code": "234228",
+          "kind": "otp",
+          "owner": "cobaltix.example"
+        }
+      ],
+      "correct": "promo_codes-06-m2"
+    },
+    {
+      "id": "promo_codes-07",
+      "category": "promo_codes",
+      "description": "Nimbusly code, other-site promo, then Nimbusly promo",
+      "service": "nimbusly.example",
+      "emails": [
+        {
+          "id": "promo_codes-07-m1",
+          "from": "Nimbusly <no-reply@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Nimbusly verification code is 616957",
+          "date": "2026-09-21T19:00:00Z",
+          "body": "Your Nimbusly verification code is 616957.\n\nIt expires in 10 minutes.\n\nEnter it at https://nimbusly.example/\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "text": "From: Nimbusly <no-reply@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Nimbusly verification code is 616957\nDate: 2026-09-21T19:00:00Z\n\nYour Nimbusly verification code is 616957.\n\nIt expires in 10 minutes.\n\nEnter it at https://nimbusly.example/\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "code": "616957",
+          "kind": "otp",
+          "owner": "nimbusly.example"
+        },
+        {
+          "id": "promo_codes-07-m2",
+          "from": "Glimmerly <news@glimmerly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Glimmerly referral reward is waiting",
+          "date": "2026-09-21T19:01:00Z",
+          "body": "Share your code 789-448 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://glimmerly.example/invite\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "text": "From: Glimmerly <news@glimmerly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Glimmerly referral reward is waiting\nDate: 2026-09-21T19:01:00Z\n\nShare your code 789-448 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://glimmerly.example/invite\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "code": "789-448",
+          "kind": "promo",
+          "owner": "glimmerly.example"
+        },
+        {
+          "id": "promo_codes-07-m3",
+          "from": "Nimbusly <news@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Nimbusly",
+          "date": "2026-09-21T19:02:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 124859\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://nimbusly.example/offers\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy\nUnsubscribe: https://nimbusly.example/unsubscribe",
+          "text": "From: Nimbusly <news@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Nimbusly\nDate: 2026-09-21T19:02:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 124859\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://nimbusly.example/offers\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy\nUnsubscribe: https://nimbusly.example/unsubscribe",
+          "code": "124859",
+          "kind": "promo",
+          "owner": "nimbusly.example"
+        }
+      ],
+      "correct": "promo_codes-07-m1"
+    },
+    {
+      "id": "order_invoice_numbers-01",
+      "category": "order_invoice_numbers",
+      "description": "Pebblecart code, then its own order confirmation",
+      "service": "pebblecart.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-01-m1",
+          "from": "Pebblecart <security@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Pebblecart sign-in code",
+          "date": "2026-09-21T20:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Pebblecart account:\n\n    152578\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Pebblecart team\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <security@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Pebblecart sign-in code\nDate: 2026-09-21T20:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Pebblecart account:\n\n    152578\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Pebblecart team\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "152578",
+          "kind": "otp",
+          "owner": "pebblecart.example"
+        },
+        {
+          "id": "order_invoice_numbers-01-m2",
+          "from": "Pebblecart <orders@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Order #53741586 confirmed",
+          "date": "2026-09-21T20:02:00Z",
+          "body": "Thanks for your order, Alex!\n\nOrder number: 53741586\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://pebblecart.example/orders/53741586\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <orders@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Order #53741586 confirmed\nDate: 2026-09-21T20:02:00Z\n\nThanks for your order, Alex!\n\nOrder number: 53741586\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://pebblecart.example/orders/53741586\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "53741586",
+          "kind": "order",
+          "owner": "pebblecart.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-01-m1"
+    },
+    {
+      "id": "order_invoice_numbers-02",
+      "category": "order_invoice_numbers",
+      "description": "Sableworks code, then a Sableworks invoice",
+      "service": "sableworks.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-02-m1",
+          "from": "Sableworks <accounts@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "764095 is your Sableworks login code",
+          "date": "2026-09-21T21:00:00Z",
+          "body": "Enter 764095 to finish signing in.\n\nDon't share this code with anyone. Sableworks will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <accounts@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 764095 is your Sableworks login code\nDate: 2026-09-21T21:00:00Z\n\nEnter 764095 to finish signing in.\n\nDon't share this code with anyone. Sableworks will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "764095",
+          "kind": "otp",
+          "owner": "sableworks.example"
+        },
+        {
+          "id": "order_invoice_numbers-02-m2",
+          "from": "Sableworks <orders@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Invoice INV-539089 from Sableworks",
+          "date": "2026-09-21T21:01:00Z",
+          "body": "Hello Alex,\n\nYour invoice INV-539089 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://sableworks.example/billing/invoices\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <orders@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Invoice INV-539089 from Sableworks\nDate: 2026-09-21T21:01:00Z\n\nHello Alex,\n\nYour invoice INV-539089 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://sableworks.example/billing/invoices\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "539089",
+          "kind": "order",
+          "owner": "sableworks.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-02-m1"
+    },
+    {
+      "id": "order_invoice_numbers-03",
+      "category": "order_invoice_numbers",
+      "description": "Halvard Air code, then its booking reference (6 alphanumerics)",
+      "service": "halvardair.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-03-m1",
+          "from": "Halvard Air <no-reply@halvardair.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Halvard Air verification code is 218612",
+          "date": "2026-09-21T22:00:00Z",
+          "body": "Your Halvard Air verification code is 218612.\n\nIt expires in 10 minutes.\n\nEnter it at https://halvardair.example/\n\n--\nHalvard Air · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://halvardair.example/help · Privacy: https://halvardair.example/privacy",
+          "text": "From: Halvard Air <no-reply@halvardair.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Halvard Air verification code is 218612\nDate: 2026-09-21T22:00:00Z\n\nYour Halvard Air verification code is 218612.\n\nIt expires in 10 minutes.\n\nEnter it at https://halvardair.example/\n\n--\nHalvard Air · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://halvardair.example/help · Privacy: https://halvardair.example/privacy",
+          "code": "218612",
+          "kind": "otp",
+          "owner": "halvardair.example"
+        },
+        {
+          "id": "order_invoice_numbers-03-m2",
+          "from": "Halvard Air <orders@halvardair.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your booking is confirmed",
+          "date": "2026-09-21T22:03:00Z",
+          "body": "Booking reference: NXZ54E\n\nPassenger: MORGAN/ALEX\nFlight HV 218  Toronto (YYZ) 14:05 → Montreal (YUL) 15:20\nSeat 14C\n\nManage booking: https://halvardair.example/manage\n\n--\nHalvard Air · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://halvardair.example/help · Privacy: https://halvardair.example/privacy",
+          "text": "From: Halvard Air <orders@halvardair.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your booking is confirmed\nDate: 2026-09-21T22:03:00Z\n\nBooking reference: NXZ54E\n\nPassenger: MORGAN/ALEX\nFlight HV 218  Toronto (YYZ) 14:05 → Montreal (YUL) 15:20\nSeat 14C\n\nManage booking: https://halvardair.example/manage\n\n--\nHalvard Air · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://halvardair.example/help · Privacy: https://halvardair.example/privacy",
+          "code": "NXZ54E",
+          "kind": "order",
+          "owner": "halvardair.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-03-m1"
+    },
+    {
+      "id": "order_invoice_numbers-04",
+      "category": "order_invoice_numbers",
+      "description": "Glimmerly code, then a Zentrik payment receipt",
+      "service": "glimmerly.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-04-m1",
+          "from": "Glimmerly <verify@glimmerly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-21T23:00:00Z",
+          "body": "Welcome to Glimmerly!\n\nYour confirmation code:\n629530\n\nPaste it into the sign-up form to activate your account.\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "text": "From: Glimmerly <verify@glimmerly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-21T23:00:00Z\n\nWelcome to Glimmerly!\n\nYour confirmation code:\n629530\n\nPaste it into the sign-up form to activate your account.\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy",
+          "code": "629530",
+          "kind": "otp",
+          "owner": "glimmerly.example"
+        },
+        {
+          "id": "order_invoice_numbers-04-m2",
+          "from": "Zentrik <orders@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Payment received",
+          "date": "2026-09-21T23:01:00Z",
+          "body": "We received your payment of $24.90.\n\nTransaction ID: 706572\nCard ending 4417\n\nReceipt: https://zentrik.example/receipts\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <orders@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Payment received\nDate: 2026-09-21T23:01:00Z\n\nWe received your payment of $24.90.\n\nTransaction ID: 706572\nCard ending 4417\n\nReceipt: https://zentrik.example/receipts\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "706572",
+          "kind": "order",
+          "owner": "zentrik.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-04-m1"
+    },
+    {
+      "id": "order_invoice_numbers-05",
+      "category": "order_invoice_numbers",
+      "description": "Lumora code via provider, then Lumora payment receipt",
+      "service": "lumora.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-05-m1",
+          "from": "Lumora <accounts@bounce.sendwave.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "579076 is your Lumora login code",
+          "date": "2026-09-22T00:00:00Z",
+          "body": "Enter 579076 to finish signing in.\n\nDon't share this code with anyone. Lumora will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Lumora. You received this email because of activity on your account.",
+          "text": "From: Lumora <accounts@bounce.sendwave.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 579076 is your Lumora login code\nDate: 2026-09-22T00:00:00Z\n\nEnter 579076 to finish signing in.\n\nDon't share this code with anyone. Lumora will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nSent by Lumora. You received this email because of activity on your account.",
+          "code": "579076",
+          "kind": "otp",
+          "owner": "lumora.example"
+        },
+        {
+          "id": "order_invoice_numbers-05-m2",
+          "from": "Lumora <orders@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Payment received",
+          "date": "2026-09-22T00:01:00Z",
+          "body": "We received your payment of $24.90.\n\nTransaction ID: 998902\nCard ending 4417\n\nReceipt: https://lumora.example/receipts\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <orders@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Payment received\nDate: 2026-09-22T00:01:00Z\n\nWe received your payment of $24.90.\n\nTransaction ID: 998902\nCard ending 4417\n\nReceipt: https://lumora.example/receipts\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "998902",
+          "kind": "order",
+          "owner": "lumora.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-05-m1"
+    },
+    {
+      "id": "order_invoice_numbers-06",
+      "category": "order_invoice_numbers",
+      "description": "Older Trellium order, Trellium code, newer Brightpine invoice",
+      "service": "trellium.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-06-m1",
+          "from": "Trellium <orders@trellium.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Order #31859682 confirmed",
+          "date": "2026-09-22T01:00:00Z",
+          "body": "Thanks for your order, Alex!\n\nOrder number: 31859682\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://trellium.example/orders/31859682\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "text": "From: Trellium <orders@trellium.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Order #31859682 confirmed\nDate: 2026-09-22T01:00:00Z\n\nThanks for your order, Alex!\n\nOrder number: 31859682\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://trellium.example/orders/31859682\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "code": "31859682",
+          "kind": "order",
+          "owner": "trellium.example"
+        },
+        {
+          "id": "order_invoice_numbers-06-m2",
+          "from": "Trellium <security@trellium.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Trellium sign-in code",
+          "date": "2026-09-22T01:02:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Trellium account:\n\n    508433\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Trellium team\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "text": "From: Trellium <security@trellium.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Trellium sign-in code\nDate: 2026-09-22T01:02:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Trellium account:\n\n    508433\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Trellium team\n\n--\nTrellium · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://trellium.example/help · Privacy: https://trellium.example/privacy",
+          "code": "508433",
+          "kind": "otp",
+          "owner": "trellium.example"
+        },
+        {
+          "id": "order_invoice_numbers-06-m3",
+          "from": "Brightpine <orders@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Invoice INV-812997 from Brightpine",
+          "date": "2026-09-22T01:03:00Z",
+          "body": "Hello Alex,\n\nYour invoice INV-812997 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://brightpine.example/billing/invoices\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <orders@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Invoice INV-812997 from Brightpine\nDate: 2026-09-22T01:03:00Z\n\nHello Alex,\n\nYour invoice INV-812997 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://brightpine.example/billing/invoices\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "812997",
+          "kind": "order",
+          "owner": "brightpine.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-06-m2"
+    },
+    {
+      "id": "order_invoice_numbers-07",
+      "category": "order_invoice_numbers",
+      "description": "Zentrik code, then Zentrik sign-in alert with a reference number",
+      "service": "zentrik.example",
+      "emails": [
+        {
+          "id": "order_invoice_numbers-07-m1",
+          "from": "Zentrik <no-reply@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-22T02:00:00Z",
+          "body": "Zentrik one-time passcode: 18667361\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <no-reply@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-22T02:00:00Z\n\nZentrik one-time passcode: 18667361\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "18667361",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        },
+        {
+          "id": "order_invoice_numbers-07-m2",
+          "from": "Zentrik <alerts@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "New sign-in to your Zentrik account",
+          "date": "2026-09-22T02:01:00Z",
+          "body": "We noticed a new sign-in to your Zentrik account from Safari on iPhone (Toronto, ON).\n\nReference: 851288\n\nIf this was you, no action is needed. If not, reset your password: https://zentrik.example/security\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <alerts@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: New sign-in to your Zentrik account\nDate: 2026-09-22T02:01:00Z\n\nWe noticed a new sign-in to your Zentrik account from Safari on iPhone (Toronto, ON).\n\nReference: 851288\n\nIf this was you, no action is needed. If not, reset your password: https://zentrik.example/security\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "851288",
+          "kind": "notice",
+          "owner": "zentrik.example"
+        }
+      ],
+      "correct": "order_invoice_numbers-07-m1"
+    },
+    {
+      "id": "japanese-01",
+      "category": "japanese",
+      "description": "こもれびID code, then ひばりチケット code",
+      "service": "komorebi-id.example",
+      "emails": [
+        {
+          "id": "japanese-01-m1",
+          "from": "こもれびID <no-reply@komorebi-id.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【こもれびID】認証コードのお知らせ",
+          "date": "2026-09-22T03:00:00Z",
+          "body": "こもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：165611\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "text": "From: こもれびID <no-reply@komorebi-id.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【こもれびID】認証コードのお知らせ\nDate: 2026-09-22T03:00:00Z\n\nこもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：165611\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "code": "165611",
+          "kind": "otp",
+          "owner": "komorebi-id.example"
+        },
+        {
+          "id": "japanese-01-m2",
+          "from": "ひばりチケット <no-reply@hibari-ticket.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ワンタイムパスワードのご案内",
+          "date": "2026-09-22T03:02:00Z",
+          "body": "佐藤 由衣 様\n\nひばりチケットのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：677591\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nひばりチケット サポートセンター\nhttps://hibari-ticket.example/help\n※このメールは送信専用です。",
+          "text": "From: ひばりチケット <no-reply@hibari-ticket.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ワンタイムパスワードのご案内\nDate: 2026-09-22T03:02:00Z\n\n佐藤 由衣 様\n\nひばりチケットのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：677591\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nひばりチケット サポートセンター\nhttps://hibari-ticket.example/help\n※このメールは送信専用です。",
+          "code": "677591",
+          "kind": "otp",
+          "owner": "hibari-ticket.example"
+        }
+      ],
+      "correct": "japanese-01-m1"
+    },
+    {
+      "id": "japanese-02",
+      "category": "japanese",
+      "description": "しずくクラウド confirmation code is newest; older つむぎ証券 one-time password",
+      "service": "shizuku-cloud.example",
+      "emails": [
+        {
+          "id": "japanese-02-m1",
+          "from": "つむぎ証券 <no-reply@tsumugi-sec.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ワンタイムパスワードのご案内",
+          "date": "2026-09-22T04:00:00Z",
+          "body": "佐藤 由衣 様\n\nつむぎ証券のワンタイムパスワードをお送りします。\n\nワンタイムパスワード：137592\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nつむぎ証券 サポートセンター\nhttps://tsumugi-sec.example/help\n※このメールは送信専用です。",
+          "text": "From: つむぎ証券 <no-reply@tsumugi-sec.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ワンタイムパスワードのご案内\nDate: 2026-09-22T04:00:00Z\n\n佐藤 由衣 様\n\nつむぎ証券のワンタイムパスワードをお送りします。\n\nワンタイムパスワード：137592\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nつむぎ証券 サポートセンター\nhttps://tsumugi-sec.example/help\n※このメールは送信専用です。",
+          "code": "137592",
+          "kind": "otp",
+          "owner": "tsumugi-sec.example"
+        },
+        {
+          "id": "japanese-02-m2",
+          "from": "しずくクラウド <no-reply@shizuku-cloud.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "しずくクラウド 確認コード: 444760",
+          "date": "2026-09-22T04:01:00Z",
+          "body": "確認コード 444760 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\n\n――――――――――\nしずくクラウド サポートセンター\nhttps://shizuku-cloud.example/help\n※このメールは送信専用です。",
+          "text": "From: しずくクラウド <no-reply@shizuku-cloud.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: しずくクラウド 確認コード: 444760\nDate: 2026-09-22T04:01:00Z\n\n確認コード 444760 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\n\n――――――――――\nしずくクラウド サポートセンター\nhttps://shizuku-cloud.example/help\n※このメールは送信専用です。",
+          "code": "444760",
+          "kind": "otp",
+          "owner": "shizuku-cloud.example"
+        }
+      ],
+      "correct": "japanese-02-m2"
+    },
+    {
+      "id": "japanese-03",
+      "category": "japanese",
+      "description": "ことのは書店 code, then its own coupon code",
+      "service": "kotonoha-books.example",
+      "emails": [
+        {
+          "id": "japanese-03-m1",
+          "from": "ことのは書店 <no-reply@kotonoha-books.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ことのは書店】認証コードのお知らせ",
+          "date": "2026-09-22T05:00:00Z",
+          "body": "ことのは書店をご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：793790\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。",
+          "text": "From: ことのは書店 <no-reply@kotonoha-books.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ことのは書店】認証コードのお知らせ\nDate: 2026-09-22T05:00:00Z\n\nことのは書店をご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：793790\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。",
+          "code": "793790",
+          "kind": "otp",
+          "owner": "kotonoha-books.example"
+        },
+        {
+          "id": "japanese-03-m2",
+          "from": "ことのは書店 <news@kotonoha-books.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ことのは書店】週末限定クーポンのお届け",
+          "date": "2026-09-22T05:01:00Z",
+          "body": "いつもことのは書店をご利用いただきありがとうございます。\n\n週末限定で使える500円OFFクーポンをお届けします。\n\nクーポンコード：AKI8992\n\nご注文手続きの画面で入力してください（10月5日まで）。\nhttps://kotonoha-books.example/campaign\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。\n配信停止：https://kotonoha-books.example/mail-settings",
+          "text": "From: ことのは書店 <news@kotonoha-books.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ことのは書店】週末限定クーポンのお届け\nDate: 2026-09-22T05:01:00Z\n\nいつもことのは書店をご利用いただきありがとうございます。\n\n週末限定で使える500円OFFクーポンをお届けします。\n\nクーポンコード：AKI8992\n\nご注文手続きの画面で入力してください（10月5日まで）。\nhttps://kotonoha-books.example/campaign\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。\n配信停止：https://kotonoha-books.example/mail-settings",
+          "code": "AKI8992",
+          "kind": "promo",
+          "owner": "kotonoha-books.example"
+        }
+      ],
+      "correct": "japanese-03-m1"
+    },
+    {
+      "id": "japanese-04",
+      "category": "japanese",
+      "description": "ほたるモバイル one-time password via provider, then its own order",
+      "service": "hotaru-mobile.example",
+      "emails": [
+        {
+          "id": "japanese-04-m1",
+          "from": "ほたるモバイル <no-reply@send.mailcrane.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ワンタイムパスワードのご案内",
+          "date": "2026-09-22T06:00:00Z",
+          "body": "佐藤 由衣 様\n\nほたるモバイルのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：622974\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nほたるモバイル\n※このメールは送信専用アドレスから配信しています。",
+          "text": "From: ほたるモバイル <no-reply@send.mailcrane.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ワンタイムパスワードのご案内\nDate: 2026-09-22T06:00:00Z\n\n佐藤 由衣 様\n\nほたるモバイルのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：622974\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nほたるモバイル\n※このメールは送信専用アドレスから配信しています。",
+          "code": "622974",
+          "kind": "otp",
+          "owner": "hotaru-mobile.example"
+        },
+        {
+          "id": "japanese-04-m2",
+          "from": "ほたるモバイル <orders@hotaru-mobile.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ほたるモバイル】ご注文ありがとうございます（注文番号：949841-531185）",
+          "date": "2026-09-22T06:02:00Z",
+          "body": "佐藤 由衣 様\n\nこのたびはほたるモバイルをご利用いただき、誠にありがとうございます。\n以下の内容でご注文を承りました。\n\n注文番号：949841-531185\nご注文日：2026年9月20日\n合計金額：2,860円（税込）\n\nご注文履歴：https://hotaru-mobile.example/orders\n\n――――――――――\nほたるモバイル サポートセンター\nhttps://hotaru-mobile.example/help\n※このメールは送信専用です。",
+          "text": "From: ほたるモバイル <orders@hotaru-mobile.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ほたるモバイル】ご注文ありがとうございます（注文番号：949841-531185）\nDate: 2026-09-22T06:02:00Z\n\n佐藤 由衣 様\n\nこのたびはほたるモバイルをご利用いただき、誠にありがとうございます。\n以下の内容でご注文を承りました。\n\n注文番号：949841-531185\nご注文日：2026年9月20日\n合計金額：2,860円（税込）\n\nご注文履歴：https://hotaru-mobile.example/orders\n\n――――――――――\nほたるモバイル サポートセンター\nhttps://hotaru-mobile.example/help\n※このメールは送信専用です。",
+          "code": "949841-531185",
+          "kind": "order",
+          "owner": "hotaru-mobile.example"
+        }
+      ],
+      "correct": "japanese-04-m1"
+    },
+    {
+      "id": "japanese-05",
+      "category": "japanese",
+      "description": "つむぎ証券 code, then English Orbitly code",
+      "service": "tsumugi-sec.example",
+      "emails": [
+        {
+          "id": "japanese-05-m1",
+          "from": "つむぎ証券 <no-reply@tsumugi-sec.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ワンタイムパスワードのご案内",
+          "date": "2026-09-22T07:00:00Z",
+          "body": "佐藤 由衣 様\n\nつむぎ証券のワンタイムパスワードをお送りします。\n\nワンタイムパスワード：468401\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nつむぎ証券 サポートセンター\nhttps://tsumugi-sec.example/help\n※このメールは送信専用です。",
+          "text": "From: つむぎ証券 <no-reply@tsumugi-sec.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ワンタイムパスワードのご案内\nDate: 2026-09-22T07:00:00Z\n\n佐藤 由衣 様\n\nつむぎ証券のワンタイムパスワードをお送りします。\n\nワンタイムパスワード：468401\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nつむぎ証券 サポートセンター\nhttps://tsumugi-sec.example/help\n※このメールは送信専用です。",
+          "code": "468401",
+          "kind": "otp",
+          "owner": "tsumugi-sec.example"
+        },
+        {
+          "id": "japanese-05-m2",
+          "from": "Orbitly <accounts@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "579042 is your Orbitly login code",
+          "date": "2026-09-22T07:01:00Z",
+          "body": "Enter 579042 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <accounts@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 579042 is your Orbitly login code\nDate: 2026-09-22T07:01:00Z\n\nEnter 579042 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "579042",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        }
+      ],
+      "correct": "japanese-05-m1"
+    },
+    {
+      "id": "japanese-06",
+      "category": "japanese",
+      "description": "ひばりチケット code (link only via provider), then こもれびID code and ひばり sign-in alert",
+      "service": "hibari-ticket.example",
+      "emails": [
+        {
+          "id": "japanese-06-m1",
+          "from": "ひばりチケット <no-reply@notify.relaykit.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ひばりチケット 確認コード: 812953",
+          "date": "2026-09-22T08:00:00Z",
+          "body": "確認コード 812953 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\nhttps://hibari-ticket.example/confirm\n\n――――――――――\nひばりチケット\n※このメールは送信専用アドレスから配信しています。",
+          "text": "From: ひばりチケット <no-reply@notify.relaykit.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ひばりチケット 確認コード: 812953\nDate: 2026-09-22T08:00:00Z\n\n確認コード 812953 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\nhttps://hibari-ticket.example/confirm\n\n――――――――――\nひばりチケット\n※このメールは送信専用アドレスから配信しています。",
+          "code": "812953",
+          "kind": "otp",
+          "owner": "hibari-ticket.example"
+        },
+        {
+          "id": "japanese-06-m2",
+          "from": "こもれびID <no-reply@komorebi-id.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【こもれびID】認証コードのお知らせ",
+          "date": "2026-09-22T08:01:00Z",
+          "body": "こもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：574803\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "text": "From: こもれびID <no-reply@komorebi-id.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【こもれびID】認証コードのお知らせ\nDate: 2026-09-22T08:01:00Z\n\nこもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：574803\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "code": "574803",
+          "kind": "otp",
+          "owner": "komorebi-id.example"
+        },
+        {
+          "id": "japanese-06-m3",
+          "from": "ひばりチケット <alerts@hibari-ticket.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ひばりチケット】新しい端末からのログインがありました",
+          "date": "2026-09-22T08:02:00Z",
+          "body": "新しい端末からひばりチケットへのログインがありました。\n\n日時：2026年9月20日 18:04\n端末：iPhone（Safari）\n受付番号：476926\n\nお心当たりがない場合はパスワードを変更してください。\nhttps://hibari-ticket.example/security\n\n――――――――――\nひばりチケット サポートセンター\nhttps://hibari-ticket.example/help\n※このメールは送信専用です。",
+          "text": "From: ひばりチケット <alerts@hibari-ticket.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ひばりチケット】新しい端末からのログインがありました\nDate: 2026-09-22T08:02:00Z\n\n新しい端末からひばりチケットへのログインがありました。\n\n日時：2026年9月20日 18:04\n端末：iPhone（Safari）\n受付番号：476926\n\nお心当たりがない場合はパスワードを変更してください。\nhttps://hibari-ticket.example/security\n\n――――――――――\nひばりチケット サポートセンター\nhttps://hibari-ticket.example/help\n※このメールは送信専用です。",
+          "code": "476926",
+          "kind": "notice",
+          "owner": "hibari-ticket.example"
+        }
+      ],
+      "correct": "japanese-06-m1"
+    },
+    {
+      "id": "japanese-07",
+      "category": "japanese",
+      "description": "Two こもれびID codes (resend), then しずくクラウド code",
+      "service": "komorebi-id.example",
+      "emails": [
+        {
+          "id": "japanese-07-m1",
+          "from": "こもれびID <no-reply@komorebi-id.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【こもれびID】認証コードのお知らせ",
+          "date": "2026-09-22T09:00:00Z",
+          "body": "こもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：756256\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "text": "From: こもれびID <no-reply@komorebi-id.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【こもれびID】認証コードのお知らせ\nDate: 2026-09-22T09:00:00Z\n\nこもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：756256\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "code": "756256",
+          "kind": "otp",
+          "owner": "komorebi-id.example"
+        },
+        {
+          "id": "japanese-07-m2",
+          "from": "こもれびID <no-reply@komorebi-id.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【こもれびID】認証コードのお知らせ",
+          "date": "2026-09-22T09:01:00Z",
+          "body": "こもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：452136\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "text": "From: こもれびID <no-reply@komorebi-id.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【こもれびID】認証コードのお知らせ\nDate: 2026-09-22T09:01:00Z\n\nこもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：452136\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "code": "452136",
+          "kind": "otp",
+          "owner": "komorebi-id.example"
+        },
+        {
+          "id": "japanese-07-m3",
+          "from": "しずくクラウド <no-reply@shizuku-cloud.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ワンタイムパスワードのご案内",
+          "date": "2026-09-22T09:02:00Z",
+          "body": "佐藤 由衣 様\n\nしずくクラウドのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：282215\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nしずくクラウド サポートセンター\nhttps://shizuku-cloud.example/help\n※このメールは送信専用です。",
+          "text": "From: しずくクラウド <no-reply@shizuku-cloud.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ワンタイムパスワードのご案内\nDate: 2026-09-22T09:02:00Z\n\n佐藤 由衣 様\n\nしずくクラウドのワンタイムパスワードをお送りします。\n\nワンタイムパスワード：282215\n\n画面に入力して手続きを完了してください（有効期限：5分）。\n第三者にこのパスワードを教えないでください。\n\n――――――――――\nしずくクラウド サポートセンター\nhttps://shizuku-cloud.example/help\n※このメールは送信専用です。",
+          "code": "282215",
+          "kind": "otp",
+          "owner": "shizuku-cloud.example"
+        }
+      ],
+      "correct": "japanese-07-m2"
+    },
+    {
+      "id": "subdomain_site-01",
+      "category": "subdomain_site",
+      "description": "login.<bank>.co.uk; bank code, then another .co.uk bank code",
+      "service": "login.wyndmoorbank.co.uk",
+      "emails": [
+        {
+          "id": "subdomain_site-01-m1",
+          "from": "Wyndmoor Bank <security@wyndmoorbank.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Wyndmoor Bank sign-in code",
+          "date": "2026-09-22T10:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Wyndmoor Bank account:\n\n    153307\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Wyndmoor Bank team\n\n--\nWyndmoor Bank · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://login.wyndmoorbank.co.uk/help · Privacy: https://login.wyndmoorbank.co.uk/privacy",
+          "text": "From: Wyndmoor Bank <security@wyndmoorbank.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Wyndmoor Bank sign-in code\nDate: 2026-09-22T10:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Wyndmoor Bank account:\n\n    153307\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Wyndmoor Bank team\n\n--\nWyndmoor Bank · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://login.wyndmoorbank.co.uk/help · Privacy: https://login.wyndmoorbank.co.uk/privacy",
+          "code": "153307",
+          "kind": "otp",
+          "owner": "wyndmoorbank.co.uk"
+        },
+        {
+          "id": "subdomain_site-01-m2",
+          "from": "Halsey Savings <accounts@halseysavings.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "670394 is your Halsey Savings login code",
+          "date": "2026-09-22T10:02:00Z",
+          "body": "Enter 670394 to finish signing in.\n\nDon't share this code with anyone. Halsey Savings will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "text": "From: Halsey Savings <accounts@halseysavings.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 670394 is your Halsey Savings login code\nDate: 2026-09-22T10:02:00Z\n\nEnter 670394 to finish signing in.\n\nDon't share this code with anyone. Halsey Savings will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "code": "670394",
+          "kind": "otp",
+          "owner": "halseysavings.co.uk"
+        }
+      ],
+      "correct": "subdomain_site-01-m1"
+    },
+    {
+      "id": "subdomain_site-02",
+      "category": "subdomain_site",
+      "description": "online.<bank>.co.uk; bank passcode is newest, older other bank code",
+      "service": "online.halseysavings.co.uk",
+      "emails": [
+        {
+          "id": "subdomain_site-02-m1",
+          "from": "Wyndmoor Bank <no-reply@wyndmoorbank.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-22T11:00:00Z",
+          "body": "Wyndmoor Bank one-time passcode: 37112307\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nWyndmoor Bank · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://login.wyndmoorbank.co.uk/help · Privacy: https://login.wyndmoorbank.co.uk/privacy",
+          "text": "From: Wyndmoor Bank <no-reply@wyndmoorbank.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-22T11:00:00Z\n\nWyndmoor Bank one-time passcode: 37112307\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nWyndmoor Bank · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://login.wyndmoorbank.co.uk/help · Privacy: https://login.wyndmoorbank.co.uk/privacy",
+          "code": "37112307",
+          "kind": "otp",
+          "owner": "wyndmoorbank.co.uk"
+        },
+        {
+          "id": "subdomain_site-02-m2",
+          "from": "Halsey Savings <no-reply@halseysavings.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-22T11:01:00Z",
+          "body": "Halsey Savings one-time passcode: 60051190\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "text": "From: Halsey Savings <no-reply@halseysavings.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-22T11:01:00Z\n\nHalsey Savings one-time passcode: 60051190\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "code": "60051190",
+          "kind": "otp",
+          "owner": "halseysavings.co.uk"
+        }
+      ],
+      "correct": "subdomain_site-02-m2"
+    },
+    {
+      "id": "subdomain_site-03",
+      "category": "subdomain_site",
+      "description": "accounts.orbitly.example; Orbitly code, then Lumora code",
+      "service": "accounts.orbitly.example",
+      "emails": [
+        {
+          "id": "subdomain_site-03-m1",
+          "from": "Orbitly <accounts@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "669724 is your Orbitly login code",
+          "date": "2026-09-22T12:00:00Z",
+          "body": "Enter 669724 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://accounts.orbitly.example/help · Privacy: https://accounts.orbitly.example/privacy",
+          "text": "From: Orbitly <accounts@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 669724 is your Orbitly login code\nDate: 2026-09-22T12:00:00Z\n\nEnter 669724 to finish signing in.\n\nDon't share this code with anyone. Orbitly will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://accounts.orbitly.example/help · Privacy: https://accounts.orbitly.example/privacy",
+          "code": "669724",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        },
+        {
+          "id": "subdomain_site-03-m2",
+          "from": "Lumora <security@lumora.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Lumora sign-in code",
+          "date": "2026-09-22T12:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    151127\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "text": "From: Lumora <security@lumora.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Lumora sign-in code\nDate: 2026-09-22T12:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Lumora account:\n\n    151127\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Lumora team\n\n--\nLumora · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://lumora.example/help · Privacy: https://lumora.example/privacy",
+          "code": "151127",
+          "kind": "otp",
+          "owner": "lumora.example"
+        }
+      ],
+      "correct": "subdomain_site-03-m1"
+    },
+    {
+      "id": "subdomain_site-04",
+      "category": "subdomain_site",
+      "description": "id.ferroline.example; code from mail.ferroline.example, then Kestrel code",
+      "service": "id.ferroline.example",
+      "emails": [
+        {
+          "id": "subdomain_site-04-m1",
+          "from": "Ferroline <no-reply@mail.ferroline.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Ferroline verification code is 539735",
+          "date": "2026-09-22T13:00:00Z",
+          "body": "Your Ferroline verification code is 539735.\n\nIt expires in 10 minutes.\n\nEnter it at https://id.ferroline.example/\n\n--\nFerroline · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://id.ferroline.example/help · Privacy: https://id.ferroline.example/privacy",
+          "text": "From: Ferroline <no-reply@mail.ferroline.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Ferroline verification code is 539735\nDate: 2026-09-22T13:00:00Z\n\nYour Ferroline verification code is 539735.\n\nIt expires in 10 minutes.\n\nEnter it at https://id.ferroline.example/\n\n--\nFerroline · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://id.ferroline.example/help · Privacy: https://id.ferroline.example/privacy",
+          "code": "539735",
+          "kind": "otp",
+          "owner": "ferroline.example"
+        },
+        {
+          "id": "subdomain_site-04-m2",
+          "from": "Kestrel Notes <no-reply@kestrelnotes.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Kestrel Notes verification code is 568256",
+          "date": "2026-09-22T13:03:00Z",
+          "body": "Your Kestrel Notes verification code is 568256.\n\nIt expires in 10 minutes.\n\nEnter it at https://kestrelnotes.example/\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "text": "From: Kestrel Notes <no-reply@kestrelnotes.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Kestrel Notes verification code is 568256\nDate: 2026-09-22T13:03:00Z\n\nYour Kestrel Notes verification code is 568256.\n\nIt expires in 10 minutes.\n\nEnter it at https://kestrelnotes.example/\n\n--\nKestrel Notes · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://kestrelnotes.example/help · Privacy: https://kestrelnotes.example/privacy",
+          "code": "568256",
+          "kind": "otp",
+          "owner": "kestrelnotes.example"
+        }
+      ],
+      "correct": "subdomain_site-04-m1"
+    },
+    {
+      "id": "subdomain_site-05",
+      "category": "subdomain_site",
+      "description": "*.vercel.app: Tallyfin link-only code, newer Pebbledash (another vercel.app app) code",
+      "service": "tallyfin-app.vercel.app",
+      "emails": [
+        {
+          "id": "subdomain_site-05-m1",
+          "from": "Tallyfin <security@relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Tallyfin sign-in code",
+          "date": "2026-09-22T14:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Tallyfin account:\n\n    446291\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://tallyfin-app.vercel.app/login\n\n— The Tallyfin team\n\n--\nSent by Tallyfin. You received this email because of activity on your account.",
+          "text": "From: Tallyfin <security@relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Tallyfin sign-in code\nDate: 2026-09-22T14:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Tallyfin account:\n\n    446291\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://tallyfin-app.vercel.app/login\n\n— The Tallyfin team\n\n--\nSent by Tallyfin. You received this email because of activity on your account.",
+          "code": "446291",
+          "kind": "otp",
+          "owner": "tallyfin-app.vercel.app"
+        },
+        {
+          "id": "subdomain_site-05-m2",
+          "from": "Pebbledash <security@relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Pebbledash sign-in code",
+          "date": "2026-09-22T14:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Pebbledash account:\n\n    867335\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://pebbledash.vercel.app/login\n\n— The Pebbledash team\n\n--\nSent by Pebbledash. You received this email because of activity on your account.",
+          "text": "From: Pebbledash <security@relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Pebbledash sign-in code\nDate: 2026-09-22T14:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Pebbledash account:\n\n    867335\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\nSign in: https://pebbledash.vercel.app/login\n\n— The Pebbledash team\n\n--\nSent by Pebbledash. You received this email because of activity on your account.",
+          "code": "867335",
+          "kind": "otp",
+          "owner": "pebbledash.vercel.app"
+        }
+      ],
+      "correct": "subdomain_site-05-m1"
+    },
+    {
+      "id": "subdomain_site-06",
+      "category": "subdomain_site",
+      "description": "Demo site vercel.app code, newer Tallyfin vercel.app code",
+      "service": "skipass-demo.vercel.app",
+      "emails": [
+        {
+          "id": "subdomain_site-06-m1",
+          "from": "Acme <no-reply@mailer-relay.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Acme verification code is 437370",
+          "date": "2026-09-22T15:00:00Z",
+          "body": "Your Acme verification code is 437370.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "text": "From: Acme <no-reply@mailer-relay.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Acme verification code is 437370\nDate: 2026-09-22T15:00:00Z\n\nYour Acme verification code is 437370.\n\nIt expires in 10 minutes.\n\nEnter it at https://skipass-demo.vercel.app/",
+          "code": "437370",
+          "kind": "otp",
+          "owner": "skipass-demo.vercel.app"
+        },
+        {
+          "id": "subdomain_site-06-m2",
+          "from": "Tallyfin <accounts@relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "247441 is your Tallyfin login code",
+          "date": "2026-09-22T15:01:00Z",
+          "body": "Enter 247441 to finish signing in.\n\nDon't share this code with anyone. Tallyfin will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\nNot you? Secure your account: https://tallyfin-app.vercel.app/security\n\n--\nSent by Tallyfin. You received this email because of activity on your account.",
+          "text": "From: Tallyfin <accounts@relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 247441 is your Tallyfin login code\nDate: 2026-09-22T15:01:00Z\n\nEnter 247441 to finish signing in.\n\nDon't share this code with anyone. Tallyfin will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\nNot you? Secure your account: https://tallyfin-app.vercel.app/security\n\n--\nSent by Tallyfin. You received this email because of activity on your account.",
+          "code": "247441",
+          "kind": "otp",
+          "owner": "tallyfin-app.vercel.app"
+        }
+      ],
+      "correct": "subdomain_site-06-m1"
+    },
+    {
+      "id": "subdomain_site-07",
+      "category": "subdomain_site",
+      "description": "login.<x>.co.jp Japanese code, then ほたるモバイル code",
+      "service": "login.kotonoha-books.co.jp",
+      "emails": [
+        {
+          "id": "subdomain_site-07-m1",
+          "from": "ことのは書店 <no-reply@kotonoha-books.co.jp>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ことのは書店】認証コードのお知らせ",
+          "date": "2026-09-22T16:00:00Z",
+          "body": "ことのは書店をご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：292638\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nことのは書店 サポートセンター\nhttps://login.kotonoha-books.co.jp/help\n※このメールは送信専用です。",
+          "text": "From: ことのは書店 <no-reply@kotonoha-books.co.jp>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ことのは書店】認証コードのお知らせ\nDate: 2026-09-22T16:00:00Z\n\nことのは書店をご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：292638\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nことのは書店 サポートセンター\nhttps://login.kotonoha-books.co.jp/help\n※このメールは送信専用です。",
+          "code": "292638",
+          "kind": "otp",
+          "owner": "kotonoha-books.co.jp"
+        },
+        {
+          "id": "subdomain_site-07-m2",
+          "from": "ほたるモバイル <no-reply@hotaru-mobile.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "ほたるモバイル 確認コード: 603224",
+          "date": "2026-09-22T16:01:00Z",
+          "body": "確認コード 603224 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\n\n――――――――――\nほたるモバイル サポートセンター\nhttps://hotaru-mobile.example/help\n※このメールは送信専用です。",
+          "text": "From: ほたるモバイル <no-reply@hotaru-mobile.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: ほたるモバイル 確認コード: 603224\nDate: 2026-09-22T16:01:00Z\n\n確認コード 603224 を入力して、メールアドレスの確認を完了してください。\n\nこのコードの有効期限は15分です。\n\n――――――――――\nほたるモバイル サポートセンター\nhttps://hotaru-mobile.example/help\n※このメールは送信専用です。",
+          "code": "603224",
+          "kind": "otp",
+          "owner": "hotaru-mobile.example"
+        }
+      ],
+      "correct": "subdomain_site-07-m1"
+    },
+    {
+      "id": "no_correct-01",
+      "category": "no_correct",
+      "description": "Only other sites' codes (Orbitly, Veloxa)",
+      "service": "lumora.example",
+      "emails": [
+        {
+          "id": "no_correct-01-m1",
+          "from": "Orbitly <security@orbitly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Orbitly sign-in code",
+          "date": "2026-09-22T17:00:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Orbitly account:\n\n    699525\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Orbitly team\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "text": "From: Orbitly <security@orbitly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Orbitly sign-in code\nDate: 2026-09-22T17:00:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Orbitly account:\n\n    699525\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Orbitly team\n\n--\nOrbitly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://orbitly.example/help · Privacy: https://orbitly.example/privacy",
+          "code": "699525",
+          "kind": "otp",
+          "owner": "orbitly.example"
+        },
+        {
+          "id": "no_correct-01-m2",
+          "from": "Veloxa <no-reply@veloxa.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Veloxa verification code is 932050",
+          "date": "2026-09-22T17:02:00Z",
+          "body": "Your Veloxa verification code is 932050.\n\nIt expires in 10 minutes.\n\nEnter it at https://veloxa.example/\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "text": "From: Veloxa <no-reply@veloxa.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Veloxa verification code is 932050\nDate: 2026-09-22T17:02:00Z\n\nYour Veloxa verification code is 932050.\n\nIt expires in 10 minutes.\n\nEnter it at https://veloxa.example/\n\n--\nVeloxa · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://veloxa.example/help · Privacy: https://veloxa.example/privacy",
+          "code": "932050",
+          "kind": "otp",
+          "owner": "veloxa.example"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-02",
+      "category": "no_correct",
+      "description": "Quillfeather promo code and a Zentrik code",
+      "service": "quillfeather.example",
+      "emails": [
+        {
+          "id": "no_correct-02-m1",
+          "from": "Quillfeather <news@quillfeather.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "A gift for you from Quillfeather",
+          "date": "2026-09-22T18:00:00Z",
+          "body": "Thanks for being with us, Alex.\n\nHere is your one-time discount code: 492548\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://quillfeather.example/offers\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy\nUnsubscribe: https://quillfeather.example/unsubscribe",
+          "text": "From: Quillfeather <news@quillfeather.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: A gift for you from Quillfeather\nDate: 2026-09-22T18:00:00Z\n\nThanks for being with us, Alex.\n\nHere is your one-time discount code: 492548\n\nValid for 7 days on orders over $30. One use per customer.\nhttps://quillfeather.example/offers\n\n--\nQuillfeather · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://quillfeather.example/help · Privacy: https://quillfeather.example/privacy\nUnsubscribe: https://quillfeather.example/unsubscribe",
+          "code": "492548",
+          "kind": "promo",
+          "owner": "quillfeather.example"
+        },
+        {
+          "id": "no_correct-02-m2",
+          "from": "Zentrik <accounts@zentrik.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "703067 is your Zentrik login code",
+          "date": "2026-09-22T18:01:00Z",
+          "body": "Enter 703067 to finish signing in.\n\nDon't share this code with anyone. Zentrik will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "text": "From: Zentrik <accounts@zentrik.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: 703067 is your Zentrik login code\nDate: 2026-09-22T18:01:00Z\n\nEnter 703067 to finish signing in.\n\nDon't share this code with anyone. Zentrik will never ask you for it.\n\nRequested from Chrome on Windows near Toronto, ON.\n\n--\nZentrik · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://zentrik.example/help · Privacy: https://zentrik.example/privacy",
+          "code": "703067",
+          "kind": "otp",
+          "owner": "zentrik.example"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-03",
+      "category": "no_correct",
+      "description": "Pebblecart order number and a Rookwise code",
+      "service": "pebblecart.example",
+      "emails": [
+        {
+          "id": "no_correct-03-m1",
+          "from": "Rookwise <verify@rookwise.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-22T19:00:00Z",
+          "body": "Welcome to Rookwise!\n\nYour confirmation code:\n392102\n\nPaste it into the sign-up form to activate your account.\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "text": "From: Rookwise <verify@rookwise.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-22T19:00:00Z\n\nWelcome to Rookwise!\n\nYour confirmation code:\n392102\n\nPaste it into the sign-up form to activate your account.\n\n--\nRookwise · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://rookwise.example/help · Privacy: https://rookwise.example/privacy",
+          "code": "392102",
+          "kind": "otp",
+          "owner": "rookwise.example"
+        },
+        {
+          "id": "no_correct-03-m2",
+          "from": "Pebblecart <orders@pebblecart.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Order #70659912 confirmed",
+          "date": "2026-09-22T19:01:00Z",
+          "body": "Thanks for your order, Alex!\n\nOrder number: 70659912\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://pebblecart.example/orders/70659912\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "text": "From: Pebblecart <orders@pebblecart.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Order #70659912 confirmed\nDate: 2026-09-22T19:01:00Z\n\nThanks for your order, Alex!\n\nOrder number: 70659912\n1 x Merino socks (grey, M)   $14.00\nShipping                    $4.20\nTotal                       $18.20\n\nTrack your order: https://pebblecart.example/orders/70659912\n\n--\nPebblecart · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://pebblecart.example/help · Privacy: https://pebblecart.example/privacy",
+          "code": "70659912",
+          "kind": "order",
+          "owner": "pebblecart.example"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-04",
+      "category": "no_correct",
+      "description": "Brightpine sign-in alert (reference number) and a Glimmerly promo",
+      "service": "brightpine.example",
+      "emails": [
+        {
+          "id": "no_correct-04-m1",
+          "from": "Glimmerly <news@glimmerly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Glimmerly: 20% off ends tonight",
+          "date": "2026-09-22T20:00:00Z",
+          "body": "Last chance! Use code FALL67 at checkout for 20% off your next order.\n\nShop the sale: https://glimmerly.example/sale\n\nYou are receiving this because you subscribed to Glimmerly news.\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy\nUnsubscribe: https://glimmerly.example/unsubscribe",
+          "text": "From: Glimmerly <news@glimmerly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Glimmerly: 20% off ends tonight\nDate: 2026-09-22T20:00:00Z\n\nLast chance! Use code FALL67 at checkout for 20% off your next order.\n\nShop the sale: https://glimmerly.example/sale\n\nYou are receiving this because you subscribed to Glimmerly news.\n\n--\nGlimmerly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://glimmerly.example/help · Privacy: https://glimmerly.example/privacy\nUnsubscribe: https://glimmerly.example/unsubscribe",
+          "code": "FALL67",
+          "kind": "promo",
+          "owner": "glimmerly.example"
+        },
+        {
+          "id": "no_correct-04-m2",
+          "from": "Brightpine <alerts@brightpine.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "New sign-in to your Brightpine account",
+          "date": "2026-09-22T20:01:00Z",
+          "body": "We noticed a new sign-in to your Brightpine account from Safari on iPhone (Toronto, ON).\n\nReference: 807361\n\nIf this was you, no action is needed. If not, reset your password: https://brightpine.example/security\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "text": "From: Brightpine <alerts@brightpine.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: New sign-in to your Brightpine account\nDate: 2026-09-22T20:01:00Z\n\nWe noticed a new sign-in to your Brightpine account from Safari on iPhone (Toronto, ON).\n\nReference: 807361\n\nIf this was you, no action is needed. If not, reset your password: https://brightpine.example/security\n\n--\nBrightpine · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://brightpine.example/help · Privacy: https://brightpine.example/privacy",
+          "code": "807361",
+          "kind": "notice",
+          "owner": "brightpine.example"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-05",
+      "category": "no_correct",
+      "description": "ことのは書店 coupon and こもれびID code",
+      "service": "kotonoha-books.example",
+      "emails": [
+        {
+          "id": "no_correct-05-m1",
+          "from": "こもれびID <no-reply@komorebi-id.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【こもれびID】認証コードのお知らせ",
+          "date": "2026-09-22T21:00:00Z",
+          "body": "こもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：136165\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "text": "From: こもれびID <no-reply@komorebi-id.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【こもれびID】認証コードのお知らせ\nDate: 2026-09-22T21:00:00Z\n\nこもれびIDをご利用いただきありがとうございます。\n\nログイン用の認証コードは以下のとおりです。\n\n認証コード：136165\n\n有効期限は発行から10分間です。\nこのメールに心当たりがない場合は、破棄してください。\n\n――――――――――\nこもれびID サポートセンター\nhttps://komorebi-id.example/help\n※このメールは送信専用です。",
+          "code": "136165",
+          "kind": "otp",
+          "owner": "komorebi-id.example"
+        },
+        {
+          "id": "no_correct-05-m2",
+          "from": "ことのは書店 <news@kotonoha-books.example>",
+          "to": "佐藤 由衣 <sato.yui@mailbox.example>",
+          "subject": "【ことのは書店】週末限定クーポンのお届け",
+          "date": "2026-09-22T21:01:00Z",
+          "body": "いつもことのは書店をご利用いただきありがとうございます。\n\n週末限定で使える500円OFFクーポンをお届けします。\n\nクーポンコード：AKI8796\n\nご注文手続きの画面で入力してください（10月5日まで）。\nhttps://kotonoha-books.example/campaign\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。\n配信停止：https://kotonoha-books.example/mail-settings",
+          "text": "From: ことのは書店 <news@kotonoha-books.example>\nTo: 佐藤 由衣 <sato.yui@mailbox.example>\nSubject: 【ことのは書店】週末限定クーポンのお届け\nDate: 2026-09-22T21:01:00Z\n\nいつもことのは書店をご利用いただきありがとうございます。\n\n週末限定で使える500円OFFクーポンをお届けします。\n\nクーポンコード：AKI8796\n\nご注文手続きの画面で入力してください（10月5日まで）。\nhttps://kotonoha-books.example/campaign\n\n――――――――――\nことのは書店 サポートセンター\nhttps://kotonoha-books.example/help\n※このメールは送信専用です。\n配信停止：https://kotonoha-books.example/mail-settings",
+          "code": "AKI8796",
+          "kind": "promo",
+          "owner": "kotonoha-books.example"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-06",
+      "category": "no_correct",
+      "description": "Only other vercel.app apps' codes (Tallyfin, Pebbledash)",
+      "service": "skipass-demo.vercel.app",
+      "emails": [
+        {
+          "id": "no_correct-06-m1",
+          "from": "Tallyfin <no-reply@relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Tallyfin verification code is 168242",
+          "date": "2026-09-22T22:00:00Z",
+          "body": "Your Tallyfin verification code is 168242.\n\nIt expires in 10 minutes.\n\nEnter it at https://tallyfin-app.vercel.app/",
+          "text": "From: Tallyfin <no-reply@relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Tallyfin verification code is 168242\nDate: 2026-09-22T22:00:00Z\n\nYour Tallyfin verification code is 168242.\n\nIt expires in 10 minutes.\n\nEnter it at https://tallyfin-app.vercel.app/",
+          "code": "168242",
+          "kind": "otp",
+          "owner": "tallyfin-app.vercel.app"
+        },
+        {
+          "id": "no_correct-06-m2",
+          "from": "Pebbledash <verify@relaykit.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Confirm your email address",
+          "date": "2026-09-22T22:01:00Z",
+          "body": "Welcome to Pebbledash!\n\nYour confirmation code:\n578956\n\nPaste it into the sign-up form to activate your account.\nOr open https://pebbledash.vercel.app/confirm?session=xjsz6aw3v8\n\n--\nSent by Pebbledash. You received this email because of activity on your account.",
+          "text": "From: Pebbledash <verify@relaykit.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Confirm your email address\nDate: 2026-09-22T22:01:00Z\n\nWelcome to Pebbledash!\n\nYour confirmation code:\n578956\n\nPaste it into the sign-up form to activate your account.\nOr open https://pebbledash.vercel.app/confirm?session=xjsz6aw3v8\n\n--\nSent by Pebbledash. You received this email because of activity on your account.",
+          "code": "578956",
+          "kind": "otp",
+          "owner": "pebbledash.vercel.app"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-07",
+      "category": "no_correct",
+      "description": "Only the other .co.uk bank's passcodes",
+      "service": "login.wyndmoorbank.co.uk",
+      "emails": [
+        {
+          "id": "no_correct-07-m1",
+          "from": "Halsey Savings <no-reply@halseysavings.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-22T23:00:00Z",
+          "body": "Halsey Savings one-time passcode: 35147154\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "text": "From: Halsey Savings <no-reply@halseysavings.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-22T23:00:00Z\n\nHalsey Savings one-time passcode: 35147154\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "code": "35147154",
+          "kind": "otp",
+          "owner": "halseysavings.co.uk"
+        },
+        {
+          "id": "no_correct-07-m2",
+          "from": "Halsey Savings <no-reply@halseysavings.co.uk>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your one-time passcode",
+          "date": "2026-09-22T23:01:00Z",
+          "body": "Halsey Savings one-time passcode: 81569701\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "text": "From: Halsey Savings <no-reply@halseysavings.co.uk>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your one-time passcode\nDate: 2026-09-22T23:01:00Z\n\nHalsey Savings one-time passcode: 81569701\n\nValid for 5 minutes. For your security, this passcode can only be used once.\n\n--\nHalsey Savings · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://online.halseysavings.co.uk/help · Privacy: https://online.halseysavings.co.uk/privacy",
+          "code": "81569701",
+          "kind": "otp",
+          "owner": "halseysavings.co.uk"
+        }
+      ],
+      "correct": null
+    },
+    {
+      "id": "no_correct-08",
+      "category": "no_correct",
+      "description": "Sableworks invoice and referral code, Nimbusly code",
+      "service": "sableworks.example",
+      "emails": [
+        {
+          "id": "no_correct-08-m1",
+          "from": "Sableworks <orders@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Invoice INV-666825 from Sableworks",
+          "date": "2026-09-23T00:00:00Z",
+          "body": "Hello Alex,\n\nYour invoice INV-666825 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://sableworks.example/billing/invoices\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <orders@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Invoice INV-666825 from Sableworks\nDate: 2026-09-23T00:00:00Z\n\nHello Alex,\n\nYour invoice INV-666825 is ready.\nAmount due: $42.00\nDue date: October 5, 2026\n\nView and pay: https://sableworks.example/billing/invoices\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "666825",
+          "kind": "order",
+          "owner": "sableworks.example"
+        },
+        {
+          "id": "no_correct-08-m2",
+          "from": "Nimbusly <security@nimbusly.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Nimbusly sign-in code",
+          "date": "2026-09-23T00:01:00Z",
+          "body": "Hi Alex,\n\nUse the code below to sign in to your Nimbusly account:\n\n    623755\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Nimbusly team\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "text": "From: Nimbusly <security@nimbusly.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Nimbusly sign-in code\nDate: 2026-09-23T00:01:00Z\n\nHi Alex,\n\nUse the code below to sign in to your Nimbusly account:\n\n    623755\n\nThis code expires in 15 minutes. If you didn't request it, you can safely ignore this email.\n\n— The Nimbusly team\n\n--\nNimbusly · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://nimbusly.example/help · Privacy: https://nimbusly.example/privacy",
+          "code": "623755",
+          "kind": "otp",
+          "owner": "nimbusly.example"
+        },
+        {
+          "id": "no_correct-08-m3",
+          "from": "Sableworks <news@sableworks.example>",
+          "to": "Alex Morgan <alex.morgan@mailbox.example>",
+          "subject": "Your Sableworks referral reward is waiting",
+          "date": "2026-09-23T00:02:00Z",
+          "body": "Share your code TGR-199 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://sableworks.example/invite\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "text": "From: Sableworks <news@sableworks.example>\nTo: Alex Morgan <alex.morgan@mailbox.example>\nSubject: Your Sableworks referral reward is waiting\nDate: 2026-09-23T00:02:00Z\n\nShare your code TGR-199 with friends. When they join, you both get $10 credit.\n\nInvite friends: https://sableworks.example/invite\n\n--\nSableworks · 2100 Harbor Street, Suite 400, Portland, OR 97201\nHelp: https://sableworks.example/help · Privacy: https://sableworks.example/privacy",
+          "code": "TGR-199",
+          "kind": "promo",
+          "owner": "sableworks.example"
+        }
+      ],
+      "correct": null
+    }
+  ]
+}
