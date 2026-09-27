@@ -7,7 +7,10 @@ import { type KvStore, KvUsageCounter, type UsageCounter } from './usage.js'
 export interface Bindings {
   /** Cloudflare KV namespace for the usage counter (Worker target only). */
   USAGE?: KvStore
-  /** "mock" selects the deterministic stand-in; anything else calls the real API (when a key is set). */
+  /**
+   * "mock" selects the deterministic stand-in; anything else (including unset) is live. Live without
+   * the key/project is a config error: logged, Jev -> fallback rule, RevenueCat -> last known plan.
+   */
   JEV_MODE?: string
   REVENUECAT_MODE?: string
   JEV_API_KEY?: string
@@ -24,9 +27,19 @@ export interface Deps {
   now: () => Date
   /** Per-call timeout for upstream APIs (Jev: 2 s per docs/CONTRACTS.md §5). */
   upstreamTimeoutMs: number
-  /** Monthly fill counter for a request's bindings. */
+  /** Server state store (fill counter, rate limits, plan cache) for a request's bindings. */
   usageCounter: (env: Bindings) => UsageCounter
+  /** `/v1/judge` limits per fixed UTC hour (TRIAGE D1b). */
+  judgeRateLimit: { perUser: number; perIp: number }
+  /** Client IP for the per-IP limit; platform specific (Cloudflare: CF-Connecting-IP; Vercel: src/vercel.ts). */
+  clientIp: (req: Request) => string
+  /** Config errors (never secrets, never email content). */
+  log: (message: string) => void
 }
+
+/** TRIAGE D1b: `/v1/judge` requests per fixed UTC hour. */
+export const JUDGE_LIMIT_PER_USER_PER_HOUR = 60
+export const JUDGE_LIMIT_PER_IP_PER_HOUR = 300
 
 export const defaultDeps: Deps = {
   // Wrapped so `fetch` is never invoked with a foreign `this`.
@@ -38,6 +51,11 @@ export const defaultDeps: Deps = {
     if (env.USAGE === undefined) throw new Error('USAGE KV binding missing')
     return new KvUsageCounter(env.USAGE)
   },
+  judgeRateLimit: { perUser: JUDGE_LIMIT_PER_USER_PER_HOUR, perIp: JUDGE_LIMIT_PER_IP_PER_HOUR },
+  // Cloudflare sets CF-Connecting-IP to the client address
+  // (https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip).
+  clientIp: (req) => req.headers.get('cf-connecting-ip')?.trim() || 'unknown',
+  log: (message) => console.error(message),
 }
 
 export class TimeoutError extends Error {

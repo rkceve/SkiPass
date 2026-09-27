@@ -2,8 +2,9 @@ name: live-sim
 
 # Interactive iOS Simulator in the browser, for manual UI checks from a non-Mac machine.
 # Builds SkiPass, boots an iPhone 16 simulator, streams it with serve-sim (EvanBacon/serve-sim, Apache-2.0)
-# and exposes it through a Cloudflare quick tunnel (no account). The URL is printed in the job summary.
-# Anyone with the URL can control the simulator until the job ends.
+# and exposes it through a Cloudflare quick tunnel (no account). Anyone with the URL can control the
+# simulator until the job ends, so the URL is published only encrypted with the LIVE_SIM_KEY secret,
+# as the description of the commit status "live-sim" (decrypt command in the "Publish" step below).
 
 on:
   workflow_dispatch:
@@ -59,30 +60,57 @@ jobs:
           xcrun simctl status_bar "$SIM_UDID" override --time 9:41 --batteryState charged --batteryLevel 100 || true
           xcrun simctl install "$SIM_UDID" "$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/SkiPass.app"
           xcrun simctl launch "$SIM_UDID" io.github.rkceve.skipass
+      # serve-sim is pinned to an exact version (A3-09) and runs in a step without GH_TOKEN or other
+      # credentials in its environment; it keeps running in the background after this step ends.
       - name: Stream and tunnel
+        id: tunnel
         env:
-          MINUTES: ${{ inputs.minutes }}
-          GH_TOKEN: ${{ github.token }}
+          LIVE_SIM_KEY: ${{ secrets.LIVE_SIM_KEY }}
         run: |
-          npx -y serve-sim "$SIM_UDID" > "$RUNNER_TEMP/serve-sim.log" 2>&1 &
+          if [ -z "$LIVE_SIM_KEY" ]; then
+            echo "::error::Set the repository secret LIVE_SIM_KEY (any passphrase); the URL is published only encrypted with it."
+            exit 1
+          fi
+          nohup npx -y serve-sim@0.1.47 "$SIM_UDID" > "$RUNNER_TEMP/serve-sim.log" 2>&1 &
           for i in $(seq 1 60); do curl -sf http://localhost:3200 >/dev/null && break; sleep 2; done
-          cloudflared tunnel --no-autoupdate --protocol http2 --url http://localhost:3200 > "$RUNNER_TEMP/tunnel.log" 2>&1 &
+          nohup cloudflared tunnel --no-autoupdate --protocol http2 --url http://localhost:3200 > "$RUNNER_TEMP/tunnel.log" 2>&1 &
           URL=""
           for i in $(seq 1 60); do
             URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$RUNNER_TEMP/tunnel.log" | head -1 || true)
             [ -n "$URL" ] && break; sleep 2
           done
-          echo "LIVE_URL=$URL"
+          [ -n "$URL" ] || { echo "::error::no tunnel URL"; exit 1; }
+          echo "::add-mask::$URL"
           echo "local preview: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:3200)"
           sleep 10; echo "via tunnel: $(curl -s -o /dev/null -w '%{http_code}' "$URL")"
-          echo "## Live simulator: $URL" >> "$GITHUB_STEP_SUMMARY"
-          # Job logs are only readable after the job ends, so publish the URL as a commit status now.
-          curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"             "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA"             -d "{\"state\":\"success\",\"context\":\"live-sim\",\"target_url\":\"$URL\",\"description\":\"Live simulator URL\"}" >/dev/null
+          # Anyone with the URL controls a simulator running the app built with real secrets, and this
+          # repository is public: publish it only encrypted (AES-256-CBC, PBKDF2, key = LIVE_SIM_KEY).
+          OPENSSL="$(brew --prefix openssl@3)/bin/openssl"
+          ENC=$(printf '%s' "$URL" | "$OPENSSL" enc -aes-256-cbc -pbkdf2 -salt -a -A -pass env:LIVE_SIM_KEY)
+          [ "${#ENC}" -le 140 ] || { echo "::error::encrypted URL longer than a commit status description"; exit 1; }
+          echo "enc=$ENC" >> "$GITHUB_OUTPUT"
+      # Job logs and summaries are only readable after the job ends, so the (encrypted) URL goes into
+      # a commit status now. Decrypt locally:
+      #   printf '%s' '<description>' | openssl enc -d -aes-256-cbc -pbkdf2 -a -A -pass pass:'<LIVE_SIM_KEY>'
+      - name: Publish encrypted URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ENC: ${{ steps.tunnel.outputs.enc }}
+        run: |
+          jq -n --arg d "$ENC" '{state: "success", context: "live-sim", description: $d}' \
+            | curl -sf -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @- >/dev/null
+          echo "Encrypted URL posted as commit status 'live-sim'."
+      - name: Keep online
+        env:
+          MINUTES: ${{ inputs.minutes }}
+        run: |
           M=${MINUTES:-45}; [ "$M" -gt 300 ] && M=300
           end=$(( $(date +%s) + M*60 ))
           while [ "$(date +%s)" -lt "$end" ]; do sleep 30; done
       - name: Logs
         if: always()
         run: |
-          tail -50 "$RUNNER_TEMP/serve-sim.log" || true
-          tail -20 "$RUNNER_TEMP/tunnel.log" || true
+          # Tunnel URLs are dead once the job ends; strip them anyway.
+          tail -50 "$RUNNER_TEMP/serve-sim.log" 2>/dev/null | sed -E 's#https://[a-z0-9-]+\.trycloudflare\.com#<tunnel-url>#g' || true
+          tail -20 "$RUNNER_TEMP/tunnel.log" 2>/dev/null | sed -E 's#https://[a-z0-9-]+\.trycloudflare\.com#<tunnel-url>#g' || true

@@ -3,16 +3,15 @@ name: ipa
 # Builds a device (iphoneos) IPA for sideloading from Windows (e.g. Sideloadly with a free Apple ID).
 # The app and extension are ad-hoc signed ("-") so their entitlements are embedded in the binaries;
 # the sideloading tool re-signs them with the user's own certificate and provisioning profiles.
+# Always Debug (SYSTEM.md §1, A3-13): the app uses a RevenueCat Test Store key, and purchases-ios crashes
+# on purpose when a Test Store key is used in a Release build (Configuration.swift,
+# checkForSimulatedStoreAPIKeyInRelease), so there is no Release option.
+# The IPA embeds SkiPassAppToken; artifacts of this public repo are kept 3 days only (TRIAGE D1d).
 on:
   workflow_dispatch:
-    inputs:
-      configuration:
-        description: "Build configuration"
-        type: choice
-        # Debug is required while the app uses a RevenueCat Test Store key: purchases-ios crashes on purpose
-        # when a Test Store key is used in a Release build (Configuration.swift, checkForSimulatedStoreAPIKeyInRelease).
-        options: [Debug, Release]
-        default: Debug
+
+env:
+  CONFIG: Debug
 
 jobs:
   ipa:
@@ -58,8 +57,6 @@ jobs:
       - name: Generate project
         run: xcodegen generate
       - name: Build for device
-        env:
-          CONFIG: ${{ inputs.configuration || 'Debug' }}
         run: |
           set -o pipefail
           xcodebuild build \
@@ -70,8 +67,6 @@ jobs:
             CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES \
             DEVELOPMENT_TEAM= CURRENT_PROJECT_VERSION=${{ github.run_number }} | tail -30
       - name: Package IPA
-        env:
-          CONFIG: ${{ inputs.configuration || 'Debug' }}
         run: |
           app="$RUNNER_TEMP/dd/Build/Products/$CONFIG-iphoneos/SkiPass.app"
           test -d "$app"
@@ -103,3 +98,4 @@ jobs:
         with:
           name: ${{ env.IPA_NAME }}
           path: ${{ runner.temp }}/ipa/${{ env.IPA_NAME }}
+          retention-days: 3

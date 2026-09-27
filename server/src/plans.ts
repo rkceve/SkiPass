@@ -23,3 +23,8 @@ export const PAID_PLANS: readonly Plan[] = [
 ]
 
 export const FREE_PLAN: Plan = { id: 'free', entitlementId: null, monthlyFillLimit: 10 } // OPEN(plans): values not decided
+
+/** Plan by id (for the cached last known plan); undefined for an id not in this table. */
+export function planById(id: string): Plan | undefined {
+  return [...PAID_PLANS, FREE_PLAN].find((p) => p.id === id)
+}

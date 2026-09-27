@@ -27,6 +27,18 @@ export function bindingsFromEnv(env: VercelEnv): Bindings {
   }
 }
 
+/**
+ * Client IP on Vercel: `x-vercel-forwarded-for` (not overwritten by proxies in front of Vercel),
+ * else `x-real-ip`, else the first `x-forwarded-for` entry. Vercel sets these itself and overwrites a
+ * client-sent `X-Forwarded-For` "to prevent IP spoofing" (https://vercel.com/docs/headers/request-headers).
+ * `CF-Connecting-IP` is never read here: on Vercel it would be client-controlled.
+ */
+export function vercelClientIp(req: Request): string {
+  const h = req.headers
+  const first = (v: string | null) => v?.split(',')[0]?.trim() || undefined
+  return first(h.get('x-vercel-forwarded-for')) ?? first(h.get('x-real-ip')) ?? first(h.get('x-forwarded-for')) ?? 'unknown'
+}
+
 export class UsageStoreNotConfigured extends Error {
   constructor() {
     super('usage store not configured: set KV_REST_API_URL/KV_REST_API_TOKEN (Upstash)')
@@ -45,6 +57,7 @@ export function createVercelApp(env: VercelEnv, overrides: Partial<Deps> = {}, r
       if (counter === null) throw new UsageStoreNotConfigured()
       return counter
     },
+    clientIp: vercelClientIp,
     ...overrides,
   })
   const bindings = bindingsFromEnv(env)

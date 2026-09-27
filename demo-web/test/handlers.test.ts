@@ -1,6 +1,15 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildCodeEmail, fromHeader, RESEND_URL, sendWithResend } from '../lib/email.js'
-import { COOKIE_NAME, handleSendCode, handleStatus, handleVerifyCode, type Deps, type Env } from '../lib/handlers.js'
+import {
+  COOKIE_NAME,
+  handleSendCode,
+  handleStatus,
+  handleVerifyCode,
+  SEND_LIMIT_PER_IP,
+  type Deps,
+  type Env,
+} from '../lib/handlers.js'
+import { MemoryOtpStore } from '../lib/store.js'
 
 const SITE = 'https://skipass-demo.vercel.app'
 const ENV: Env = { OTP_SECRET: 'test-secret-0123456789abcdef', RESEND_API_KEY: 're_test_key' }
@@ -23,15 +32,30 @@ function resendReturning(status: number, body: unknown) {
   )
 }
 
+/** One server-side store per test, shared by every request of that test (as Upstash would be). */
+let store: MemoryOtpStore
+beforeEach(() => {
+  store = new MemoryOtpStore()
+})
+
 function deps(over: Partial<Deps> = {}): Deps {
-  let t = T0
-  return { fetch: resendReturning(200, RESEND_OK) as unknown as typeof fetch, now: () => t, generateCode: () => '042917', ...over }
+  return {
+    fetch: resendReturning(200, RESEND_OK) as unknown as typeof fetch,
+    now: () => T0,
+    generateCode: () => '042917',
+    store: () => store,
+    ...over,
+  }
 }
 
-function post(path: string, body: unknown, cookie?: string): Request {
+function post(path: string, body: unknown, cookie?: string, ip = '198.51.100.20'): Request {
   return new Request(`${SITE}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Real-IP': ip,
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
     body: JSON.stringify(body),
   })
 }
@@ -87,19 +111,21 @@ describe('code email', () => {
   })
 })
 
+
 describe('POST /api/send-code', () => {
-  it('sends the email, then sets a signed HttpOnly SameSite=Lax cookie', async () => {
+  it('sends the email, then sets an HttpOnly SameSite=Lax cookie holding only a session id', async () => {
     const d = deps()
     const res = await handleSendCode(post('/api/send-code', { email: ' reader@example.com ' }), ENV, d)
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ sent: true, email: 'reader@example.com', expiresAt: T0 + 600_000, resendAt: T0 + 30_000 })
     const set = res.headers.get('set-cookie')!
-    expect(set).toMatch(new RegExp(`^${COOKIE_NAME}=[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+;`))
+    expect(set).toMatch(new RegExp(`^${COOKIE_NAME}=[A-Za-z0-9_-]{43};`))
     expect(set).toContain('HttpOnly')
     expect(set).toContain('SameSite=Lax')
     expect(set).toContain('Secure')
     expect(set).toContain('Max-Age=600')
     expect(set).not.toContain('042917')
+    expect(set).not.toContain('reader')
     expect(d.fetch).toHaveBeenCalledOnce()
   })
 
@@ -126,6 +152,43 @@ describe('POST /api/send-code', () => {
     expect(d.fetch).toHaveBeenCalledTimes(2)
   })
 
+  it('rate-limits per recipient address without any cookie (A3-07)', async () => {
+    const d = deps()
+    expect((await handleSendCode(post('/api/send-code', { email: 'reader@example.com' }), ENV, d)).status).toBe(200)
+    // No cookie, other IP, different letter case: still the same recipient.
+    const again = await handleSendCode(post('/api/send-code', { email: 'Reader@Example.com' }, undefined, '198.51.100.99'), ENV, d)
+    expect(again.status).toBe(429)
+    expect(((await again.json()) as { error: string }).error).toBe('rate_limited')
+    expect(d.fetch).toHaveBeenCalledOnce()
+  })
+
+  it('rate-limits sends per IP: 5 per 10 minutes (A3-07)', async () => {
+    let now = T0
+    const d = deps({ now: () => now })
+    expect(SEND_LIMIT_PER_IP).toBe(5)
+    const send = (i: number) => handleSendCode(post('/api/send-code', { email: `r${i}@example.com` }), ENV, d)
+    for (let i = 0; i < 5; i++) expect((await send(i)).status).toBe(200)
+    const sixth = await send(5)
+    expect(sixth.status).toBe(429)
+    expect(Number(sixth.headers.get('retry-after'))).toBe(600)
+    expect(d.fetch).toHaveBeenCalledTimes(5)
+    now = T0 + 600_000
+    expect((await send(6)).status).toBe(200)
+  })
+
+  it('a new send invalidates the previous code', async () => {
+    let now = T0
+    let code = '111111'
+    const d = deps({ now: () => now, generateCode: () => code })
+    const first = await handleSendCode(post('/api/send-code', { email: 'reader@example.com' }), ENV, d)
+    const oldCookie = cookieFrom(first)
+    now = T0 + 30_000
+    code = '222222'
+    await handleSendCode(post('/api/send-code', {}, oldCookie), ENV, d)
+    const res = await handleVerifyCode(post('/api/verify-code', { code: '111111' }, oldCookie), ENV, d)
+    expect(await res.json()).toEqual({ result: 'no_session' })
+  })
+
   it('explains the resend.dev owner-only rule on a Resend 403', async () => {
     const d = deps({ fetch: resendReturning(403, RESEND_403) as unknown as typeof fetch })
     const res = await handleSendCode(post('/api/send-code', { email: 'someone@example.com' }), ENV, d)
@@ -142,13 +205,15 @@ describe('POST /api/send-code', () => {
     expect(res.status).toBe(502)
   })
 
-  it('answers 503 not_configured without RESEND_API_KEY or OTP_SECRET', async () => {
+  it('answers 503 not_configured without RESEND_API_KEY, OTP_SECRET or the Upstash store', async () => {
     const d = deps()
     const noKey = await handleSendCode(post('/api/send-code', { email: 'a@example.com' }), { OTP_SECRET: 'x' }, d)
     expect(noKey.status).toBe(503)
     expect(((await noKey.json()) as { error: string }).error).toBe('not_configured')
     const noSecret = await handleSendCode(post('/api/send-code', { email: 'a@example.com' }), { RESEND_API_KEY: 'k' }, d)
     expect(noSecret.status).toBe(503)
+    const noStore = await handleSendCode(post('/api/send-code', { email: 'a@example.com' }), ENV, deps({ store: () => null }))
+    expect(noStore.status).toBe(503)
     expect(d.fetch).not.toHaveBeenCalled()
   })
 
@@ -170,18 +235,48 @@ describe('POST /api/verify-code', () => {
     expect(res.headers.get('set-cookie')).toContain('Max-Age=0')
   })
 
-  it('counts wrong codes through the cookie and locks after 5', async () => {
-    let cookie = await session()
+  it('does not verify twice with a replayed cookie (single use, A3-06)', async () => {
+    const cookie = await session()
+    expect(await (await handleVerifyCode(post('/api/verify-code', { code: '042917' }, cookie), ENV, deps())).json()).toMatchObject({
+      result: 'verified',
+    })
+    const replay = await handleVerifyCode(post('/api/verify-code', { code: '042917' }, cookie), ENV, deps())
+    expect(await replay.json()).toEqual({ result: 'no_session' })
+  })
+
+  it('counts wrong codes server-side and locks after 5', async () => {
+    const cookie = await session()
     for (let left = 4; left >= 1; left--) {
       const res = await handleVerifyCode(post('/api/verify-code', { code: '111111' }, cookie), ENV, deps())
       expect(await res.json()).toEqual({ result: 'incorrect', attemptsLeft: left })
-      cookie = cookieFrom(res)
     }
     const fifth = await handleVerifyCode(post('/api/verify-code', { code: '111111' }, cookie), ENV, deps())
     expect(await fifth.json()).toEqual({ result: 'locked' })
-    cookie = cookieFrom(fifth)
     const right = await handleVerifyCode(post('/api/verify-code', { code: '042917' }, cookie), ENV, deps())
     expect(await right.json()).toEqual({ result: 'locked' })
+  })
+
+  it('locks at 5 even when every guess replays the first cookie (A3-06)', async () => {
+    const first = await session()
+    const results: string[] = []
+    for (let i = 0; i < 20; i++) {
+      const res = await handleVerifyCode(post('/api/verify-code', { code: '111111' }, first), ENV, deps())
+      results.push(((await res.json()) as { result: string }).result)
+    }
+    expect(results.slice(0, 4)).toEqual(['incorrect', 'incorrect', 'incorrect', 'incorrect'])
+    expect(new Set(results.slice(4))).toEqual(new Set(['locked']))
+    const right = await handleVerifyCode(post('/api/verify-code', { code: '042917' }, first), ENV, deps())
+    expect(await right.json()).toEqual({ result: 'locked' })
+  })
+
+  it('locks at 5 under concurrent guesses with one cookie', async () => {
+    const cookie = await session()
+    const all = await Promise.all(
+      Array.from({ length: 20 }, () => handleVerifyCode(post('/api/verify-code', { code: '111111' }, cookie), ENV, deps())),
+    )
+    const results = await Promise.all(all.map(async (r) => ((await r.json()) as { result: string }).result))
+    expect(results.filter((r) => r === 'incorrect')).toHaveLength(4)
+    expect(results.filter((r) => r === 'locked')).toHaveLength(16)
   })
 
   it('reports expired after 10 minutes', async () => {
@@ -190,16 +285,18 @@ describe('POST /api/verify-code', () => {
     expect(await res.json()).toEqual({ result: 'expired' })
   })
 
-  it('reports no_session without a cookie and 400 for a non-6-digit code', async () => {
+  it('reports no_session without a cookie or with a forged one, and 400 for a non-6-digit code', async () => {
     const none = await handleVerifyCode(post('/api/verify-code', { code: '042917' }), ENV, deps())
     expect(await none.json()).toEqual({ result: 'no_session' })
+    const forged = await handleVerifyCode(post('/api/verify-code', { code: '042917' }, `${COOKIE_NAME}=${'A'.repeat(43)}`), ENV, deps())
+    expect(await forged.json()).toEqual({ result: 'no_session' })
     const bad = await handleVerifyCode(post('/api/verify-code', { code: '12a' }), ENV, deps())
     expect(bad.status).toBe(400)
   })
 })
 
 describe('GET /api/status', () => {
-  it('reports the pending session', async () => {
+  it('reports the pending session from the server-side state', async () => {
     const send = await handleSendCode(post('/api/send-code', { email: 'reader@example.com' }), ENV, deps())
     const req = new Request(`${SITE}/api/status`, { headers: { Cookie: cookieFrom(send) } })
     const res = await handleStatus(req, ENV, deps({ now: () => T0 + 10_000 }))
@@ -210,6 +307,14 @@ describe('GET /api/status', () => {
       resendAt: T0 + 30_000,
       attemptsLeft: 5,
     })
+  })
+
+  it('reports attempts left after wrong codes', async () => {
+    const send = await handleSendCode(post('/api/send-code', { email: 'reader@example.com' }), ENV, deps())
+    const cookie = cookieFrom(send)
+    await handleVerifyCode(post('/api/verify-code', { code: '111111' }, cookie), ENV, deps())
+    const res = await handleStatus(new Request(`${SITE}/api/status`, { headers: { Cookie: cookie } }), ENV, deps())
+    expect(((await res.json()) as { attemptsLeft: number }).attemptsLeft).toBe(4)
   })
 
   it('reports no session without a cookie', async () => {

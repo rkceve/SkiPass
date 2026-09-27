@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { JEV_URL, QUESTION_ID } from '../src/jev'
+import { describe, expect, it, vi } from 'vitest'
+import { JUDGE_LIMIT_PER_IP_PER_HOUR, JUDGE_LIMIT_PER_USER_PER_HOUR } from '../src/api'
+import { JEV_URL, QUESTION_ID, brandWord, fallbackSelect, registrableDomain } from '../src/jev'
 import { FREE_PLAN, PAID_PLANS } from '../src/plans'
 import {
   RC_ENTITLEMENT_IDS,
@@ -177,7 +178,7 @@ describe('quota', () => {
 })
 
 describe('POST /v1/judge — Jev mock mode', () => {
-  it('scores the message naming the service 0.9 and chooses it', async () => {
+  it('scores the message naming the service 0.9, chooses it and reports source "mock"', async () => {
     const c = makeClient({ deps: { now: fixedNow(SEPT) } })
     const res = await c.judge({ service: SERVICE, messages: [acmeMsg, globexMsg] })
     expect(res.status).toBe(200)
@@ -185,8 +186,14 @@ describe('POST /v1/judge — Jev mock mode', () => {
       chosenId: acmeMsg.id,
       scores: { [acmeMsg.id]: 0.9, [globexMsg.id]: 0.1 },
       remaining: FREE_PLAN.monthlyFillLimit,
-      source: 'jev',
+      source: 'mock',
     })
+  })
+
+  it('applies the fallback rule (newest message) when service is null, never always-null', async () => {
+    const c = makeClient({})
+    const res = await c.judge({ service: null, messages: [acmeMsg, globexMsg] })
+    expect(await body(res)).toMatchObject({ chosenId: globexMsg.id, source: 'mock' })
   })
 
   it('matches on the brand word alone', async () => {
@@ -198,15 +205,25 @@ describe('POST /v1/judge — Jev mock mode', () => {
   it('returns chosenId null when nothing matches', async () => {
     const c = makeClient({})
     const res = await c.judge({ service: 'initech.com', messages: [acmeMsg, globexMsg] })
-    expect(await body(res)).toMatchObject({ chosenId: null, source: 'jev' })
+    expect(await body(res)).toMatchObject({ chosenId: null, source: 'mock' })
+  })
+})
+
+describe('POST /v1/judge — Jev not configured (A3-04, D3)', () => {
+  it('uses the fallback rule with source "fallback" when JEV_MODE is live but no key is set', async () => {
+    const f = fakeFetch(() => json({}, 500))
+    const log = vi.fn()
+    const c = makeClient({ bindings: { JEV_MODE: 'live', JEV_API_KEY: '' }, deps: { fetch: f.fn, log } })
+    const res = await c.judge({ service: SERVICE, messages: [acmeMsg, globexMsg] })
+    expect(await body(res)).toMatchObject({ chosenId: acmeMsg.id, scores: {}, source: 'fallback' })
+    expect(f.calls).toHaveLength(0)
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('JEV_API_KEY'))
   })
 
-  it('is used when JEV_MODE is live but no key is set', async () => {
-    const f = fakeFetch(() => json({}, 500))
-    const c = makeClient({ bindings: { JEV_MODE: 'live', JEV_API_KEY: '' }, deps: { fetch: f.fn } })
+  it('treats an unset JEV_MODE as live (mock only when JEV_MODE=mock)', async () => {
+    const c = makeClient({ bindings: { JEV_MODE: undefined, JEV_API_KEY: undefined }, deps: { log: () => {} } })
     const res = await c.judge({ service: SERVICE, messages: [acmeMsg] })
-    expect(await body(res)).toMatchObject({ chosenId: acmeMsg.id, source: 'jev' })
-    expect(f.calls).toHaveLength(0)
+    expect((await body(res)).source).toBe('fallback')
   })
 })
 
@@ -373,9 +390,29 @@ describe('RevenueCat', () => {
     expect((await body(await after.usage())).plan).toBe('free')
   })
 
-  it('treats an unknown customer (404 resource_missing) as the free plan', async () => {
-    const c = makeClient({ bindings: live, deps: { fetch: rc('missing').fn } })
-    expect((await body(await c.usage())).plan).toBe('free')
+  it('rejects an unknown customer (404 resource_missing) with 401 unknown_user on every route, before Jev', async () => {
+    const jevCalls: string[] = []
+    const f = fakeFetch((url) => {
+      if (url === JEV_URL) {
+        jevCalls.push(url)
+        return json(jevResponse(0.9))
+      }
+      return rcResponse(url, 'missing')
+    })
+    const c = makeClient({
+      bindings: { ...live, JEV_MODE: 'live', JEV_API_KEY: 'k' },
+      deps: { fetch: f.fn, now: fixedNow(SEPT) },
+    })
+    for (const res of [
+      await c.usage(),
+      await c.fill({ messageId: 'x' }),
+      await c.judge({ service: SERVICE, messages: [acmeMsg] }),
+    ]) {
+      expect(res.status).toBe(401)
+      expect(await body(res)).toEqual({ error: 'unknown_user' })
+    }
+    expect(jevCalls).toHaveLength(0)
+    expect(await c.bindings.USAGE!.get(`usage:${c.user}:2026-09`)).toBeNull()
   })
 
   it('uses the paid plan limit for quota checks', async () => {
@@ -396,17 +433,10 @@ describe('RevenueCat', () => {
     expect(f.calls.filter((x) => x.url.endsWith('/active_entitlements'))).toHaveLength(2)
   })
 
-  it('degrades to the free plan on an upstream error', async () => {
-    const c = makeClient({ bindings: live, deps: { fetch: fakeFetch(() => json({}, 500)).fn } })
-    expect((await body(await c.usage())).plan).toBe('free')
-  })
-
-  it('does not call RevenueCat in mock mode, or without a project id', async () => {
+  it('does not call RevenueCat in mock mode', async () => {
     const f = rc([activeFor('pro', null)])
     const mock = makeClient({ bindings: { REVENUECAT_MODE: 'mock', REVENUECAT_SECRET_KEY: 'sk' }, deps: { fetch: f.fn } })
     expect((await body(await mock.usage())).plan).toBe('free')
-    const noProject = makeClient({ bindings: { ...live, REVENUECAT_PROJECT_ID: '' }, deps: { fetch: f.fn } })
-    expect((await body(await noProject.usage())).plan).toBe('free')
     expect(f.calls).toHaveLength(0)
   })
 })
@@ -419,21 +449,24 @@ describe('POST /v1/judge — quota check and Jev run concurrently', () => {
     REVENUECAT_SECRET_KEY: 'sk_test_secret',
   }
 
-  it('starts the Jev calls without waiting for the RevenueCat lookup', async () => {
+  it('starts the Jev calls without waiting for the RevenueCat lookup (user known within 10 min)', async () => {
     const standard = PAID_PLANS.find((p) => p.id === 'standard')!
-    // RevenueCat answers only once a Jev call has been issued. If the Jev calls waited for the
-    // entitlement lookup, the lookup would time out and degrade to the free plan.
+    // Once the user is known, RevenueCat answers only after a Jev call has been issued. If the Jev
+    // calls waited for the entitlement lookup, the lookup would time out.
     let jevStarted!: () => void
     const jevCalled = new Promise<void>((resolve) => (jevStarted = resolve))
+    let warm = true
     const f = fakeFetch(async (url) => {
       if (url === JEV_URL) {
         jevStarted()
         return json(jevResponse(0.97))
       }
-      await jevCalled
+      if (!warm) await jevCalled
       return rcResponse(url, [activeFor(standard.entitlementId!, null)])
     })
     const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT), upstreamTimeoutMs: 500 } })
+    expect((await c.usage()).status).toBe(200) // first contact: existence check, user cached as known
+    warm = false
     const res = await c.judge({ service: SERVICE, messages: [acmeMsg] })
     expect(res.status).toBe(200)
     expect(await body(res)).toEqual({
@@ -445,7 +478,7 @@ describe('POST /v1/judge — quota check and Jev run concurrently', () => {
   })
 
   it('returns 402 and discards the Jev result when the quota is exhausted', async () => {
-    const f = fakeFetch((url) => (url === JEV_URL ? json(jevResponse(0.97)) : json({}, 500)))
+    const f = fakeFetch((url) => (url === JEV_URL ? json(jevResponse(0.97)) : rcResponse(url, [])))
     const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
     for (let i = 0; i < FREE_PLAN.monthlyFillLimit; i++) {
       expect((await c.fill({ messageId: `m${i}` })).status).toBe(200)
@@ -492,4 +525,213 @@ describe('invalid bodies', () => {
       expect((await body(await c.usage())).used).toBe(0)
     })
   }
+})
+
+describe('known-user check (D1a)', () => {
+  const live = {
+    REVENUECAT_MODE: 'live',
+    REVENUECAT_SECRET_KEY: 'sk_test_secret',
+    JEV_MODE: 'live',
+    JEV_API_KEY: 'jev-test-key',
+  }
+
+  it('checks a user it has not seen before Jev is called', async () => {
+    const order: string[] = []
+    const f = fakeFetch((url) => {
+      order.push(url === JEV_URL ? 'jev' : 'rc')
+      return url === JEV_URL ? json(jevResponse(0.9)) : rcResponse(url, [])
+    })
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
+    expect((await c.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200)
+    // The first RevenueCat round (entitlements + active_entitlements) completes before Jev starts.
+    expect(order.slice(0, 2)).toEqual(['rc', 'rc'])
+    expect(order).toContain('jev')
+  })
+
+  it('caches a positive lookup for 10 minutes, then checks again', async () => {
+    let now = SEPT
+    let active: unknown[] | 'missing' = []
+    const f = fakeFetch((url) => (url === JEV_URL ? json(jevResponse(0.9)) : rcResponse(url, active)))
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: () => now } })
+    expect((await c.usage()).status).toBe(200)
+    // Customer deleted in RevenueCat; within 10 min the cached "known" still admits the judge call
+    // (its own concurrent plan lookup then reports the 404).
+    active = 'missing'
+    now = new Date(SEPT.getTime() + 9 * 60 * 1000)
+    const jevCount = () => f.calls.filter((x) => x.url === JEV_URL).length
+    const before = jevCount()
+    await c.judge({ service: SERVICE, messages: [acmeMsg] })
+    expect(jevCount()).toBe(before + 1)
+    // After 10 min the existence check runs first again and blocks Jev.
+    now = new Date(SEPT.getTime() + 11 * 60 * 1000)
+    const res = await c.judge({ service: SERVICE, messages: [acmeMsg] })
+    expect(res.status).toBe(401)
+    expect(await body(res)).toEqual({ error: 'unknown_user' })
+    expect(jevCount()).toBe(before + 1)
+  })
+})
+
+describe('judge rate limit (D1b)', () => {
+  it('defaults to 60 per user and 300 per IP per hour', () => {
+    expect(JUDGE_LIMIT_PER_USER_PER_HOUR).toBe(60)
+    expect(JUDGE_LIMIT_PER_IP_PER_HOUR).toBe(300)
+  })
+
+  it('answers 429 rate_limited after the per-user limit, and allows again in the next hour', async () => {
+    let now = SEPT
+    const c = makeClient({ deps: { now: () => now, judgeRateLimit: { perUser: 3, perIp: 100 } } })
+    for (let i = 0; i < 3; i++) expect((await c.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200)
+    const res = await c.judge({ service: SERVICE, messages: [acmeMsg] })
+    expect(res.status).toBe(429)
+    expect(await body(res)).toEqual({ error: 'rate_limited' })
+    // Other routes are not limited.
+    expect((await c.usage()).status).toBe(200)
+    now = new Date(SEPT.getTime() + 3600 * 1000)
+    expect((await c.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200)
+  })
+
+  it('limits one IP across rotating user ids', async () => {
+    const ip = `198.51.100.7-${Date.now()}`
+    const limits = { perUser: 100, perIp: 4 }
+    const statuses: number[] = []
+    for (let i = 0; i < 5; i++) {
+      const c = makeClient({ ip, deps: { now: fixedNow(SEPT), judgeRateLimit: limits } })
+      statuses.push((await c.judge({ service: SERVICE, messages: [acmeMsg] })).status)
+    }
+    expect(statuses).toEqual([200, 200, 200, 200, 429])
+  })
+
+  it('counts a rejected request against neither key', async () => {
+    const ip = `198.51.100.8-${Date.now()}`
+    const limits = { perUser: 1, perIp: 2 }
+    const a = makeClient({ ip, deps: { now: fixedNow(SEPT), judgeRateLimit: limits } })
+    expect((await a.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200)
+    expect((await a.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(429) // user limit
+    const b = makeClient({ ip, deps: { now: fixedNow(SEPT), judgeRateLimit: limits } })
+    expect((await b.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200) // IP still has 1 left
+  })
+})
+
+describe('RevenueCat outage (A3-02, A3-05, D2)', () => {
+  const live = { REVENUECAT_MODE: 'live', REVENUECAT_SECRET_KEY: 'sk_test_secret' }
+  const pro = PAID_PLANS.find((p) => p.id === 'pro')!
+
+  it('keeps a paying user on the last known plan while RevenueCat fails', async () => {
+    let down = false
+    const f = fakeFetch((url) => (down ? json({}, 503) : rcResponse(url, [activeFor('pro', null)])))
+    let now = SEPT
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: () => now } })
+    expect((await body(await c.usage())).plan).toBe('pro')
+    const used = FREE_PLAN.monthlyFillLimit + 5
+    for (let i = 0; i < used; i++) expect((await c.fill({ messageId: `m${i}` })).status).toBe(200)
+    down = true
+    now = new Date(SEPT.getTime() + 2 * 24 * 3600 * 1000) // days later, past the 10-min "known" cache
+    const j = await c.judge({ service: SERVICE, messages: [acmeMsg] })
+    expect(j.status).toBe(200)
+    expect((await body(j)).remaining).toBe(pro.monthlyFillLimit - used)
+    expect(await body(await c.usage())).toMatchObject({ plan: 'pro', limit: pro.monthlyFillLimit, used })
+    expect(await body(await c.fill({ messageId: 'x' }))).toEqual({ remaining: pro.monthlyFillLimit - used - 1 })
+  })
+
+  it('stores the last known plan under plan:<appUserID>', async () => {
+    const f = fakeFetch((url) => rcResponse(url, [activeFor('pro', null)]))
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
+    await c.usage()
+    expect(await c.bindings.USAGE!.get(`plan:${c.user}`)).toContain('"pro"')
+  })
+
+  it('does not enforce the quota when nothing is known (fail-open) and reports plan "unknown"', async () => {
+    const f = fakeFetch(() => json({}, 503))
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
+    const used = FREE_PLAN.monthlyFillLimit + 2
+    for (let i = 0; i < used; i++) expect((await c.fill({ messageId: `m${i}` })).status).toBe(200)
+    expect((await c.judge({ service: SERVICE, messages: [acmeMsg] })).status).toBe(200)
+    expect(await body(await c.usage())).toEqual({
+      plan: 'unknown',
+      used,
+      limit: 0,
+      resetsAt: '2026-10-01T00:00:00Z',
+    })
+  })
+
+  it('treats 404 on both project endpoints (wrong project id) as an error, not unknown_user', async () => {
+    const c = makeClient({ bindings: live, deps: { fetch: fakeFetch(() => json(rcCustomerMissing, 404)).fn } })
+    const res = await c.usage()
+    expect(res.status).toBe(200)
+    expect((await body(res)).plan).toBe('unknown')
+  })
+
+  it('treats a RevenueCat timeout like an error (no downgrade)', async () => {
+    const c = makeClient({
+      bindings: live,
+      deps: { fetch: fakeFetch(hang).fn, upstreamTimeoutMs: 20, now: fixedNow(SEPT) },
+    })
+    expect((await body(await c.usage())).plan).toBe('unknown')
+  })
+
+  it('logs a config error (not a silent "free") when the RevenueCat key or project id is missing', async () => {
+    for (const bindings of [
+      { REVENUECAT_MODE: 'live', REVENUECAT_SECRET_KEY: '' },
+      { ...live, REVENUECAT_PROJECT_ID: '' },
+      { REVENUECAT_MODE: undefined, REVENUECAT_SECRET_KEY: undefined },
+    ]) {
+      const f = fakeFetch((url) => rcResponse(url, [activeFor('pro', null)]))
+      const log = vi.fn()
+      const c = makeClient({ bindings, deps: { fetch: f.fn, log } })
+      expect((await body(await c.usage())).plan).toBe('unknown')
+      expect(log).toHaveBeenCalledWith(expect.stringContaining('REVENUECAT'))
+      expect(f.calls).toHaveLength(0)
+    }
+  })
+
+  it('logs each config problem once per instance and never a secret value', async () => {
+    const log = vi.fn()
+    const c = makeClient({
+      bindings: {
+        REVENUECAT_MODE: 'live',
+        REVENUECAT_SECRET_KEY: 'sk_secret_value',
+        REVENUECAT_PROJECT_ID: '',
+        JEV_MODE: 'live',
+        JEV_API_KEY: '',
+      },
+      deps: { log },
+    })
+    await c.usage()
+    await c.usage()
+    expect(log).toHaveBeenCalledTimes(2) // Jev + RevenueCat
+    for (const [msg] of log.mock.calls) expect(String(msg)).not.toContain('sk_secret_value')
+  })
+})
+
+describe('registrable domain with private suffixes (A3-03, D6)', () => {
+  it('keeps the owner label of private suffixes (vercel.app, github.io)', () => {
+    expect(registrableDomain('skipass-demo.vercel.app')).toBe('skipass-demo.vercel.app')
+    expect(registrableDomain('https://rkceve.github.io/probe/')).toBe('rkceve.github.io')
+    expect(registrableDomain('login.acme.co.uk')).toBe('acme.co.uk')
+    expect(brandWord('skipass-demo.vercel.app')).toBe('skipass-demo')
+  })
+
+  it('fallback picks the demo site email, not a newer code email from another *.vercel.app site', () => {
+    const demo = {
+      id: 'M:1',
+      text: judgeText({
+        from: 'Sowbank <onboarding@resend.dev>',
+        to: 'user@example.com',
+        subject: '042917 is your Sowbank verification code',
+        date: '2026-09-27T12:00:00Z',
+        body: 'Enter it on https://skipass-demo.vercel.app to finish setting up your borrower card.',
+      }),
+    }
+    const other = {
+      id: 'M:2',
+      text: judgeText({
+        from: 'Other <no-reply@example.com>',
+        to: 'user@example.com',
+        subject: 'Your code',
+        date: '2026-09-27T12:01:00Z',
+        body: 'Your code is 551903. https://someone-else.vercel.app',
+      }),
+    }
+    expect(fallbackSelect('skipass-demo.vercel.app', [demo, other])).toBe('M:1')
+  })
 })

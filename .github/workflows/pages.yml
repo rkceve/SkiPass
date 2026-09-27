@@ -2,7 +2,8 @@ name: probe-site
 
 on:
   push:
-    branches: [main, wip/i1]
+    # Only main deploys the public probe page that probe.yml depends on (A3-14); other branches use workflow_dispatch.
+    branches: [main]
     paths: ["probe-site/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
