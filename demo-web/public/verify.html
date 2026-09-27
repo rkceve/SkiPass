@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e3e7d6">
+<title>Sowbank – Enter your code</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Zilla+Slab:wght@700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main>
+  <a class="brand" href="/" aria-label="Sowbank home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#d8bb8a"/><path d="M16 27V15" stroke="#36281e" stroke-width="2.4" stroke-linecap="round"/><path d="M16 16c0-5 3-8 9-8 0 5-3 8-9 8z" fill="#3f6a1c"/><path d="M16 18c0-4-2.5-6.5-8-6.5 0 4 2.5 6.5 8 6.5z" fill="#9e2350"/></svg>
+    Sowbank
+  </a>
+
+  <div id="pending">
+    <h1>Check your email</h1>
+    <p class="lede" id="sent-to">We sent a 6-digit code to your email. It expires in 10 minutes.</p>
+
+    <section class="packet" aria-label="Verification code">
+      <form id="verify" novalidate>
+        <label for="code">Verification code</label>
+        <input class="code" id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" aria-describedby="verify-status">
+        <button class="btn" id="submit" type="submit">Verify code</button>
+      </form>
+      <p class="status" id="verify-status" role="status" aria-live="polite"></p>
+      <button class="btn-quiet" id="resend" type="button" disabled>Resend code</button>
+    </section>
+
+    <p class="after-packet"><a href="/">Use a different email</a></p>
+  </div>
+
+  <div id="done" hidden>
+    <h1>You’re in</h1>
+    <section class="packet" aria-live="polite">
+      <p class="stamp">Card issued<small id="stamp-date"></small></p>
+      <p>Your borrower card is linked to <strong id="done-email"></strong>. The spring shelf list goes out to cardholders by email.</p>
+      <a class="btn" href="/">Back to Sowbank</a>
+    </section>
+  </div>
+
+  <footer>Sowbank is a fictional seed library. This page demonstrates one-time-code AutoFill with SkiPass.</footer>
+</main>
+<script>
+(function () {
+  var form = document.getElementById('verify');
+  var input = document.getElementById('code');
+  var submit = document.getElementById('submit');
+  var status = document.getElementById('verify-status');
+  var resend = document.getElementById('resend');
+  var sentTo = document.getElementById('sent-to');
+  var email = '';
+  try { email = sessionStorage.getItem('sowbank.email') || ''; } catch (e) {}
+  var resendAt = 0;
+  var timer = null;
+  var busy = false;
+
+  function say(text, kind) {
+    status.textContent = text;
+    status.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function showEmail() {
+    if (!email) return;
+    sentTo.textContent = '';
+    sentTo.appendChild(document.createTextNode('We sent a 6-digit code to '));
+    var b = document.createElement('strong');
+    b.textContent = email;
+    sentTo.appendChild(b);
+    sentTo.appendChild(document.createTextNode('. It expires in 10 minutes.'));
+  }
+
+  function tick() {
+    var left = Math.ceil((resendAt - Date.now()) / 1000);
+    if (left > 0) {
+      resend.disabled = true;
+      resend.textContent = 'Resend code in ' + left + ' s';
+    } else {
+      resend.disabled = !email;
+      resend.textContent = 'Resend code';
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function startCooldown(at) {
+    resendAt = at;
+    if (!timer) timer = setInterval(tick, 500);
+    tick();
+  }
+
+  function post(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; });
+    });
+  }
+
+  // Restore the pending session (email, cooldown) from the cookie.
+  fetch('/api/status', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (s) {
+    if (s.active) {
+      email = s.email;
+      showEmail();
+      startCooldown(s.resendAt);
+      if (s.attemptsLeft === 0) say('Too many wrong codes. Send a new code to try again.', 'error');
+    } else if (email) {
+      showEmail();
+      startCooldown(0);
+      say('This code has expired. Send a new one.', 'error');
+    } else {
+      sentTo.textContent = 'No code is waiting for this browser. Start from the sign-up page to get one.';
+      startCooldown(0);
+    }
+  }).catch(function () { showEmail(); startCooldown(0); });
+
+  function verify() {
+    var code = input.value.replace(/\D/g, '');
+    if (busy) return;
+    if (code.length !== 6) {
+      say('Enter the 6 digits from the email.', 'error');
+      input.setAttribute('aria-invalid', 'true');
+      return;
+    }
+    busy = true;
+    submit.disabled = true;
+    submit.textContent = 'Checking…';
+    say('');
+    post('/api/verify-code', { code: code }).then(function (res) {
+      var b = res.body;
+      if (b.result === 'verified') {
+        document.getElementById('done-email').textContent = b.email;
+        document.getElementById('stamp-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('pending').hidden = true;
+        var done = document.getElementById('done');
+        done.hidden = false;
+        done.classList.add('stamped');
+        try { sessionStorage.removeItem('sowbank.email'); } catch (e) {}
+        return;
+      }
+      input.setAttribute('aria-invalid', 'true');
+      if (b.result === 'incorrect') {
+        say('That code doesn’t match. ' + b.attemptsLeft + (b.attemptsLeft === 1 ? ' try' : ' tries') + ' left.', 'error');
+        input.select();
+      } else if (b.result === 'locked') {
+        say('Too many wrong codes. Send a new code to try again.', 'error');
+      } else if (b.result === 'expired') {
+        say('This code has expired. Send a new one.', 'error');
+      } else if (b.result === 'no_session') {
+        say('No code is waiting for this browser. Send a new one.', 'error');
+      } else {
+        say(b.message || 'The code couldn’t be checked. Try again.', 'error');
+      }
+    }).catch(function () {
+      say('No connection. Check your signal and try again.', 'error');
+    }).then(function () {
+      busy = false;
+      submit.disabled = false;
+      submit.textContent = 'Verify code';
+    });
+  }
+
+  form.addEventListener('submit', function (ev) { ev.preventDefault(); verify(); });
+
+  input.addEventListener('input', function () {
+    var digits = input.value.replace(/\D/g, '').slice(0, 6);
+    if (digits !== input.value) input.value = digits;
+    input.removeAttribute('aria-invalid');
+    // AutoFill inserts all six digits at once; check them straight away.
+    if (digits.length === 6) verify();
+  });
+
+  resend.addEventListener('click', function () {
+    if (!email) { location.href = '/'; return; }
+    resend.disabled = true;
+    resend.textContent = 'Sending code…';
+    post('/api/send-code', { email: email }).then(function (res) {
+      if (res.status === 200 && res.body.sent) {
+        input.value = '';
+        input.removeAttribute('aria-invalid');
+        say('New code sent. Codes from earlier emails no longer work.', 'ok');
+        startCooldown(res.body.resendAt);
+        return;
+      }
+      if (res.status === 429) {
+        startCooldown(Date.now() + (res.body.retryAfter || 30) * 1000);
+      } else {
+        startCooldown(0);
+      }
+      say(res.body.message || 'The code couldn’t be sent. Try again in a moment.', 'error');
+    }).catch(function () {
+      startCooldown(0);
+      say('No connection. Check your signal and try again.', 'error');
+    });
+  });
+})();
+</script>
+</body>
+</html>
