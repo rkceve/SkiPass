@@ -14,14 +14,24 @@ public struct RootView: View {
     private let accounts: [MailAccount]
     private let plans: [PlanOption]
     private let usage: UsageInfo?
+    private let plansAvailable: Bool
 
-    public init(accounts: [MailAccount], plans: [PlanOption], usage: UsageInfo?, actions: SkiPassUIActions) {
+    /// - Parameter plansAvailable: false when the build has no billing (no RevenueCat key).
+    public init(
+        accounts: [MailAccount],
+        plans: [PlanOption],
+        usage: UsageInfo?,
+        plansAvailable: Bool = true,
+        actions: SkiPassUIActions
+    ) {
         self.accounts = accounts
         self.plans = plans
         self.usage = usage
+        self.plansAvailable = plansAvailable
         // One-time seed of view-owned state; later input changes are pushed
         // into the store by the `.onChange` handlers in `body`.
-        self.store = SkiPassUIStore(accounts: accounts, plans: plans, usage: usage, actions: actions)
+        self.store = SkiPassUIStore(
+            accounts: accounts, plans: plans, usage: usage, plansAvailable: plansAvailable, actions: actions)
         self.selectedTab = .home
     }
 
@@ -30,6 +40,7 @@ public struct RootView: View {
         self.accounts = store.accounts
         self.plans = store.plans
         self.usage = store.usage
+        self.plansAvailable = store.plansAvailable
         self.store = store
         self.selectedTab = initialTab
     }
@@ -47,6 +58,7 @@ public struct RootView: View {
         .onChange(of: accounts) { store.accounts = accounts }
         .onChange(of: plans) { store.plans = plans }
         .onChange(of: usage) { store.usage = usage }
+        .onChange(of: plansAvailable) { store.plansAvailable = plansAvailable }
     }
 }
 

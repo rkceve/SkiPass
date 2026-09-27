@@ -19,7 +19,6 @@ enum Theme {
     static let destructive = Color(red: 0.90, green: 0.20, blue: 0.30)
 
     static let chipIMAPForeground = Color(red: 0.16, green: 0.52, blue: 0.93)
-    static let chipSMTPForeground = Color(red: 0.55, green: 0.33, blue: 0.93)
 
     static let cardRadius: CGFloat = 24
     static let innerRadius: CGFloat = 18

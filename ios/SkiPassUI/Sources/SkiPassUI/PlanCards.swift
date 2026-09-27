@@ -102,31 +102,23 @@ private struct UsageBar: View {
     }
 }
 
-/// One row in "Other plans". Tapping forwards to `selectPlan(id:)`. A row for the current plan
-/// is informational: no button, no chevron, no press effect.
+/// One row in "Other plans" (never the current plan). Tapping forwards to `selectPlan(id:)`.
 struct PlanRow: View {
     let plan: PlanOption
     let onSelect: @MainActor () -> Void
 
     var body: some View {
-        if plan.isCurrent {
-            rowContent(showsChevron: false)
-                .cardSurface()
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("plan.\(plan.id)")
-        } else {
-            Button(action: onSelect) {
-                rowContent(showsChevron: true)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .cardSurface()
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("plan.\(plan.id)")
+        Button(action: onSelect) {
+            rowContent
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .cardSurface()
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("plan.\(plan.id)")
     }
 
-    private func rowContent(showsChevron: Bool) -> some View {
+    private var rowContent: some View {
         HStack(spacing: 16) {
             PlanIcon(systemImage: plan.systemImage, size: 60)
             VStack(alignment: .leading, spacing: 6) {
@@ -139,40 +131,10 @@ struct PlanRow: View {
             Spacer(minLength: 8)
             Text(plan.priceText)
                 .font(.body.weight(.medium))
-            if showsChevron {
-                RowChevron()
-            }
+            RowChevron()
         }
         .foregroundStyle(.primary)
         .padding(16)
-    }
-}
-
-/// "Change Plan" row as in the mockup.
-struct ChangePlanRow: View {
-    let onTap: @MainActor () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 16) {
-                Image(systemName: "arrow.left.arrow.right")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 48, height: 48)
-                    .background(Theme.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .accessibilityHidden(true)
-                Text(Copy.changePlan)
-                    .font(.title3.weight(.medium))
-                Spacer()
-                RowChevron()
-            }
-            .foregroundStyle(.primary)
-            .padding(16)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .cardSurface()
-        .accessibilityIdentifier("plan.change")
     }
 }
 

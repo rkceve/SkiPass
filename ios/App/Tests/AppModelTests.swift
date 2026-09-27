@@ -19,10 +19,13 @@ private final class FakeAccounts: AccountServices {
     var signInError: Error?
     /// Address the provider reports as signed in; nil = the login hint.
     var signedInAddress: String?
+    var saveMailboxError: Error?
+    var deleteError: Error?
 
     func loadMailboxes() throws -> [MailboxConfig] { mailboxes }
 
     func saveMailbox(_ mailbox: MailboxConfig) throws {
+        if let saveMailboxError { throw saveMailboxError }
         if let index = mailboxes.firstIndex(where: { $0.id == mailbox.id }) {
             mailboxes[index] = mailbox
         } else {
@@ -34,9 +37,14 @@ private final class FakeAccounts: AccountServices {
     func savePassword(_ password: String, mailboxID: UUID) throws { passwords[mailboxID] = password }
     func password(mailboxID: UUID) -> String? { passwords[mailboxID] }
 
+    func deletePassword(mailboxID: UUID) throws { passwords[mailboxID] = nil }
+    func deleteOAuthState(mailboxID: UUID) throws { oauthStates[mailboxID] = nil }
+
     func deleteCredentials(mailboxID: UUID) throws {
+        if let deleteError { throw deleteError }
         deletedCredentials.append(mailboxID)
         passwords[mailboxID] = nil
+        oauthStates[mailboxID] = nil
     }
 
     /// Providers whose client ID is missing in the simulated build.
@@ -57,7 +65,14 @@ private final class FakeAccounts: AccountServices {
 private final class FakeBilling: BillingServices {
     var appUserID: String? = "$RCAnonymousID:test"
     var packages: [StorePackageInfo] = []
+    /// Active product identifiers; each backs the entitlement in `entitlementByProduct`.
     var active: Set<String> = []
+    var entitlementByProduct: [String: String] = [
+        "skipass_standard_monthly": "standard", "skipass_standard_annual": "standard",
+        "skipass_pro_monthly": "pro",
+    ]
+    var offeringsError: Error?
+    var customerInfoError: Error?
     var purchased: [String] = []
     var purchaseCompletes = true
     var activeAfterPurchase: Set<String>?
@@ -72,8 +87,30 @@ private final class FakeBilling: BillingServices {
     var heldCount: Int { held.count }
 
     func configure() -> String? { appUserID }
-    func currentPackages() async throws -> [StorePackageInfo] { packages }
-    func activeEntitlementProductIDs() async throws -> Set<String> { active }
+    func currentPackages() async throws -> [StorePackageInfo] {
+        if let offeringsError { throw offeringsError }
+        return packages
+    }
+
+    func entitlements() async throws -> EntitlementSnapshot {
+        if let customerInfoError { throw customerInfoError }
+        return entitlementSnapshot
+    }
+
+    var entitlementSnapshot: EntitlementSnapshot {
+        let activeIDs = Set(active.compactMap { entitlementByProduct[$0] })
+        var products: [String: String] = [:]
+        for product in active.sorted() {
+            if let entitlement = entitlementByProduct[product] { products[entitlement] = product }
+        }
+        return EntitlementSnapshot(active: activeIDs, productIDs: products)
+    }
+
+    /// The server's rule (server/src/plans.ts): highest active entitlement, else free.
+    var serverPlan: String {
+        let ids = entitlementSnapshot.active
+        return ids.contains("pro") ? "pro" : ids.contains("standard") ? "standard" : "free"
+    }
 
     func purchase(packageID: String) async throws -> Bool {
         purchased.append(packageID)
@@ -102,32 +139,64 @@ private final class FakeBilling: BillingServices {
 
 @MainActor
 private final class FakeIdentities: IdentityServices {
+    /// Address lists in the order the syncs finished (the last one is what the system keeps).
     var syncs: [[String]] = []
+    var hold = false
+    private var held: [CheckedContinuation<Void, Never>] = []
+    var heldCount: Int { held.count }
 
     func syncIdentities(mailboxAddresses: [String]) async {
+        if hold {
+            await withCheckedContinuation { held.append($0) }
+        }
         syncs.append(mailboxAddresses)
+    }
+
+    func release() {
+        let waiting = held
+        held = []
+        waiting.forEach { $0.resume() }
     }
 }
 
 @MainActor
 private final class FakeUsage: UsageServices {
     var snapshot = UsageSnapshot(plan: "free", used: 3, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_790_000_000))
+    /// When set, the reported plan follows it (the server looks the plan up in RevenueCat).
+    var planSource: (@MainActor () -> String)?
     var calls: [String] = []
     var error: Error?
 
+    /// When true, calls wait until `release()` (a slow request in flight).
+    var hold = false
+    private var held: [CheckedContinuation<Void, Never>] = []
+    var heldCount: Int { held.count }
+
     func currentUsage(appUserID: String) async throws -> UsageSnapshot {
         calls.append(appUserID)
+        var answer = snapshot
+        if let planSource { answer.plan = planSource() }
+        if hold {
+            await withCheckedContinuation { held.append($0) }
+        }
         if let error { throw error }
-        return snapshot
+        return answer
+    }
+
+    func release() {
+        let waiting = held
+        held = []
+        waiting.forEach { $0.resume() }
     }
 }
 
 @MainActor
 private final class FakeSharedState: SharedStateServices {
-    var appUserID: String?
+    var storedAppUserID: String?
     var usage: UsageSnapshot?
 
-    func setAppUserID(_ appUserID: String) { self.appUserID = appUserID }
+    func appUserID() -> String? { storedAppUserID }
+    func setAppUserID(_ appUserID: String) { storedAppUserID = appUserID }
     func cachedUsage() -> UsageSnapshot? { usage }
     func cacheUsage(_ snapshot: UsageSnapshot) { usage = snapshot }
 }
@@ -142,9 +211,15 @@ private struct Harness {
     let shared = FakeSharedState()
     let identities = FakeIdentities()
 
-    func makeModel() -> AppModel {
+    init() {
+        // Like the real server, /v1/usage reports the plan RevenueCat has for this user.
+        usage.planSource = { [billing] in billing.serverPlan }
+    }
+
+    func makeModel(now: Date = Date(timeIntervalSince1970: 1_780_000_000)) -> AppModel {
         AppModel(services: AppServicesBundle(accounts: accounts, billing: billing, usage: usage,
-                                             sharedState: shared, identities: identities))
+                                             sharedState: shared, identities: identities),
+                 now: { now })
     }
 }
 
@@ -164,6 +239,13 @@ struct ProviderDetectionTests {
 
     @Test(arguments: ["a@outlook.com", "a@hotmail.com", "a@live.com", "a@msn.com"])
     func microsoftDomains(_ email: String) {
+        #expect(AppModel.oauthProvider(forEmail: email) == .microsoft)
+    }
+
+    /// A1-05 / D9: Microsoft consumer domains under other TLDs.
+    @Test(arguments: ["a@outlook.jp", "a@outlook.com.au", "a@hotmail.co.jp", "a@hotmail.co.uk", "a@hotmail.fr",
+                      "a@live.jp", "a@live.co.uk", "a@msn.co.jp", "a@outlook.de"])
+    func microsoftRegionalDomains(_ email: String) {
         #expect(AppModel.oauthProvider(forEmail: email) == .microsoft)
     }
 
@@ -188,31 +270,125 @@ struct MappingTests {
         let account = AppModel.mailAccount(from: config)
         #expect(account.kind == .imap)
         #expect(account.server == ServerSettings(incomingHost: "mail.myshop.jp", incomingPort: 993, username: "info"))
-        #expect(account.server?.outgoingHost == nil)
-        #expect(account.server?.outgoingPort == nil)
     }
 
+    private static let bothProducts = ["standard": "skipass_standard_monthly", "pro": "skipass_pro_monthly"]
+
     @Test func plansWithoutEntitlementMakeFreeCurrent() {
-        let plans = AppModel.planOptions(packages: [pro, standard], activeProductIDs: [])
+        let plans = AppModel.planOptions(packages: [pro, standard], currentTier: .free, entitlementProductIDs: [:])
         #expect(plans.map(\.id) == ["free", "$rc_monthly", "pro_monthly"])
         #expect(plans.filter(\.isCurrent).map(\.id) == ["free"])
         #expect(plans[1].name == "Standard")
         #expect(plans[1].tagline == "More fills")
         #expect(plans[1].priceText == "$2.99")
+        #expect(plans[1].systemImage == "square.stack.3d.up.fill")
+        #expect(plans[2].systemImage == "crown.fill")
+    }
+
+    /// A1-12: the Free row has its own name, tagline and price (not blank next to paid rows).
+    @Test func freeRowIsNotBlank() {
+        let free = AppModel.planOptions(packages: [standard], currentTier: .standard, entitlementProductIDs: [:])[0]
+        #expect(free.id == "free")
+        #expect(!free.name.isEmpty && !free.tagline.isEmpty && !free.priceText.isEmpty)
+    }
+
+    /// A1-03 / D8: tier comes from the entitlement lookup key (pro > standard), never the price
+    /// (annual Standard costs more than monthly Pro).
+    @Test func tierIsNotInferredFromPrice() {
+        let standardAnnual = StorePackageInfo(
+            id: "$rc_annual", productID: "skipass_standard_annual", title: "Standard",
+            description: "More fills", priceString: "$99.99", price: 99.99)
+        let tier = AppModel.currentTier(serverPlan: nil, activeEntitlements: ["standard", "pro"])
+        #expect(tier == .pro)
+        let plans = AppModel.planOptions(
+            packages: [standardAnnual, pro], currentTier: tier,
+            entitlementProductIDs: ["standard": "skipass_standard_annual", "pro": "skipass_pro_monthly"])
+        #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+    }
+
+    /// D8: the server's plan wins over the on-device entitlements; "unknown" falls back to them.
+    @Test func serverPlanIsTheSourceOfTruth() {
+        #expect(AppModel.currentTier(serverPlan: .standard, activeEntitlements: ["pro"]) == .standard)
+        #expect(AppModel.currentTier(serverPlan: PlanTier(rawValue: "unknown"), activeEntitlements: ["pro"]) == .pro)
+        #expect(AppModel.currentTier(serverPlan: nil, activeEntitlements: nil) == .free)
     }
 
     @Test func activeEntitlementMarksItsPackageCurrent() {
-        let plans = AppModel.planOptions(packages: [standard, pro], activeProductIDs: ["skipass_pro_monthly"])
+        let plans = AppModel.planOptions(packages: [standard, pro], currentTier: .pro,
+                                         entitlementProductIDs: ["pro": "skipass_pro_monthly"])
         #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
+    }
+
+    /// Without entitlement data the package is matched by the tier named in its identifiers.
+    @Test func packageTierFromIdentifiersWhenNoEntitlementKnown() {
+        let plans = AppModel.planOptions(packages: [standard, pro], currentTier: .standard, entitlementProductIDs: [:])
+        #expect(plans.filter(\.isCurrent).map(\.id) == ["$rc_monthly"])
+    }
+
+    /// A4: a paid plan whose product is no longer in the current offering is still shown as current.
+    @Test func currentPaidTierWithoutPackageStillShown() {
+        let plans = AppModel.planOptions(packages: [standard], currentTier: .pro,
+                                         entitlementProductIDs: ["pro": "skipass_pro_legacy"])
+        let current = plans.filter(\.isCurrent)
+        #expect(current.count == 1)
+        #expect(current.first?.name == "Pro")
+        #expect(plans.filter { !$0.isCurrent }.map(\.id) == ["free", "$rc_monthly"])
     }
 
     /// Regression (device, v0.1.4): with Standard and Pro both active (Test Store: buying Pro adds a
     /// second subscription), both were marked current; the screen showed Standard and hid Pro.
     @Test func highestActiveTierIsTheOnlyCurrentPlan() {
-        let plans = AppModel.planOptions(packages: [standard, pro],
-                                         activeProductIDs: ["skipass_standard_monthly", "skipass_pro_monthly"])
+        let tier = AppModel.currentTier(serverPlan: nil, activeEntitlements: ["standard", "pro"])
+        let plans = AppModel.planOptions(packages: [standard, pro], currentTier: tier,
+                                         entitlementProductIDs: Self.bothProducts)
         #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
         #expect(plans.filter { !$0.isCurrent }.map(\.id) == ["free", "$rc_monthly"])
+    }
+
+    /// A1-15: a cached month that has ended shows a fresh month.
+    @Test func endedMonthShowsFreshUsage() {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)  // 2026-10-03 UTC
+        let lastMonth = UsageSnapshot(plan: "free", used: 7, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_790_812_800))  // 2026-10-01
+        let info = AppModel.usageInfo(from: lastMonth, now: now)
+        #expect(info.used == 0)
+        #expect(info.limit == 10)
+        #expect(info.resetsAt == Date(timeIntervalSince1970: 1_793_491_200))  // 2026-11-01 00:00 UTC
+
+        let current = UsageSnapshot(plan: "free", used: 7, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_793_491_200))
+        #expect(AppModel.usageInfo(from: current, now: now) == UsageInfo(used: 7, limit: 10, resetsAt: current.resetsAt))
+    }
+
+    /// A1-04: closing the provider page is a cancellation, other failures are not.
+    @Test func userCancellationIsRecognised() {
+        #expect(AppModel.isUserCancellation(NSError(domain: "org.openid.appauth.general", code: -3)))
+        #expect(AppModel.isUserCancellation(NSError(domain: "com.apple.AuthenticationServices.WebAuthenticationSession", code: 1)))
+        #expect(!AppModel.isUserCancellation(NSError(domain: "org.openid.appauth.general", code: -5)))
+        #expect(!AppModel.isUserCancellation(Boom()))
+    }
+
+    /// A1-09: the committed example placeholders mean "not configured".
+    @Test func examplePlaceholdersAreNotConfiguration() {
+        let placeholders = AppConfiguration(info: [
+            "SkiPassServerURL": "https://skipass.example.invalid",
+            "SkiPassAppToken": "example-app-token",
+            "RevenueCatAPIKey": "appl_example",
+        ])
+        #expect(placeholders.serverURL == nil)
+        #expect(placeholders.appToken == nil)
+        #expect(placeholders.revenueCatAPIKey == nil)
+
+        let unset = AppConfiguration(info: ["SkiPassAppToken": "$(SKIPASS_APP_TOKEN)", "RevenueCatAPIKey": " "])
+        #expect(unset.appToken == nil)
+        #expect(unset.revenueCatAPIKey == nil)
+
+        let real = AppConfiguration(info: [
+            "SkiPassServerURL": "https://skipass-server.vercel.app",
+            "SkiPassAppToken": "t0k3n",
+            "RevenueCatAPIKey": "test_abc",
+        ])
+        #expect(real.serverURL == URL(string: "https://skipass-server.vercel.app"))
+        #expect(real.appToken == "t0k3n")
+        #expect(real.revenueCatAPIKey == "test_abc")
     }
 }
 
@@ -226,7 +402,7 @@ struct AppModelTests {
 
         await model.start()
 
-        #expect(h.shared.appUserID == "$RCAnonymousID:test")
+        #expect(h.shared.storedAppUserID == "$RCAnonymousID:test")
         #expect(model.accounts.map(\.address) == ["a@gmail.com"])
         #expect(model.plans.map(\.id) == ["free", "$rc_monthly"])
         #expect(h.usage.calls == ["$RCAnonymousID:test"])
@@ -236,7 +412,7 @@ struct AppModelTests {
 
     @Test func cachedUsageIsKeptWhenServerFails() async {
         let h = Harness()
-        let cached = UsageSnapshot(plan: "free", used: 1, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_700_000_000))
+        let cached = UsageSnapshot(plan: "free", used: 1, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_790_000_000))
         h.shared.usage = cached
         h.usage.error = Boom()
         let model = h.makeModel()
@@ -246,17 +422,126 @@ struct AppModelTests {
         #expect(model.usage == UsageInfo(used: 1, limit: 10, resetsAt: cached.resetsAt))
     }
 
-    @Test func withoutBillingNoServerCallsAndFreeOnly() async {
+    /// A1-01 / D8: RevenueCat and the server unreachable at launch: a Pro subscriber still sees Pro
+    /// (from the cached server usage), and no "unavailable" message (the build has a key).
+    @Test func offlineLaunchKeepsTheLastKnownPlan() async {
+        let h = Harness()
+        h.shared.usage = UsageSnapshot(plan: "pro", used: 535, limit: 1000, resetsAt: Date(timeIntervalSince1970: 1_790_000_000))
+        h.billing.offeringsError = Boom()
+        h.billing.customerInfoError = Boom()
+        h.usage.error = Boom()
+        let model = h.makeModel()
+
+        await model.start()
+
+        #expect(model.plansAvailable)
+        #expect(model.plans.filter(\.isCurrent).map(\.name) == ["Pro"])
+        #expect(model.usage?.limit == 1000)
+    }
+
+    /// A1-01: a failed refresh keeps the plans that were already loaded.
+    @Test func failedRefreshKeepsLoadedPlans() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.active = ["skipass_standard_monthly"]
+        let model = h.makeModel()
+        await model.start()
+        let loaded = model.plans
+
+        h.billing.offeringsError = Boom()
+        h.billing.customerInfoError = Boom()
+        h.usage.error = Boom()
+        await model.didBecomeActive()
+
+        #expect(model.plans == loaded)
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["$rc_monthly"])
+    }
+
+    /// A1-02 / D8: the plan the server enforces is the plan shown, even if the device disagrees.
+    @Test func serverPlanDecidesTheCurrentPlan() async {
+        let h = Harness()
+        h.billing.packages = [standard, pro]
+        h.billing.active = ["skipass_pro_monthly"]
+        h.usage.planSource = nil
+        h.usage.snapshot = UsageSnapshot(plan: "free", used: 7, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_790_000_000))
+        let model = h.makeModel()
+
+        await model.start()
+
+        #expect(model.plans.filter(\.isCurrent).map(\.id) == ["free"])
+        #expect(model.usage?.limit == 10)
+    }
+
+    /// D10: without a RevenueCat key the app writes a random `local:<uuid>` ID (kept across launches)
+    /// for the extension, and the Plan tab says plans are unavailable.
+    @Test func withoutRevenueCatALocalUserIDIsWrittenAndKept() async {
         let h = Harness()
         h.billing.appUserID = nil
         let model = h.makeModel()
 
         await model.start()
 
-        #expect(h.shared.appUserID == nil)
-        #expect(h.usage.calls.isEmpty)
+        let id = h.shared.storedAppUserID
+        #expect(id?.hasPrefix("local:") == true)
+        #expect(id.map { UUID(uuidString: String($0.dropFirst("local:".count))) != nil } == true)
+        #expect(!model.plansAvailable)
         #expect(model.plans.map(\.id) == ["free"])
         #expect(model.plans.first?.isCurrent == true)
+
+        await h.makeModel().start()
+        #expect(h.shared.storedAppUserID == id)
+    }
+
+    /// Server contract (F3): `plan: "unknown"` with `limit: 0` means RevenueCat was unreachable and
+    /// nothing is cached; the app keeps its last known usage and plan (no "0 of 0 left", not Free).
+    @Test func unknownServerPlanKeepsTheLastKnownUsage() async {
+        let h = Harness()
+        let cached = UsageSnapshot(plan: "pro", used: 535, limit: 1000, resetsAt: Date(timeIntervalSince1970: 1_790_000_000))
+        h.shared.usage = cached
+        h.billing.customerInfoError = Boom()
+        h.usage.planSource = nil
+        h.usage.snapshot = UsageSnapshot(plan: "unknown", used: 0, limit: 0, resetsAt: cached.resetsAt)
+        let model = h.makeModel()
+
+        await model.start()
+
+        #expect(model.usage == UsageInfo(used: 535, limit: 1000, resetsAt: cached.resetsAt))
+        #expect(model.plans.filter(\.isCurrent).map(\.name) == ["Pro"])
+        #expect(h.shared.usage == cached)
+    }
+
+    /// Server contract (F3): a local ID is unknown to RevenueCat (401 unknown_user), so the app does
+    /// not ask for usage with it; the Plan tab stays "unavailable" with no error.
+    @Test func localUserIDDoesNotAskTheServerForUsage() async {
+        let h = Harness()
+        h.billing.appUserID = nil
+        let model = h.makeModel()
+
+        await model.start()
+        await model.didBecomeActive()
+
+        #expect(h.usage.calls.isEmpty)
+        #expect(!model.plansAvailable)
+    }
+
+    /// D10: an ID left by an earlier RevenueCat build is replaced by a local one.
+    @Test func localUserIDReplacesAStaleRevenueCatID() {
+        #expect(AppModel.localAppUserID(existing: "local:abc") == "local:abc")
+        #expect(AppModel.localAppUserID(existing: "$RCAnonymousID:old").hasPrefix("local:"))
+        #expect(AppModel.localAppUserID(existing: nil).hasPrefix("local:"))
+    }
+
+    @Test func withoutRevenueCatPlanTapsDoNothing() async {
+        let h = Harness()
+        h.billing.appUserID = nil
+        let model = h.makeModel()
+        await model.start()
+
+        await model.selectPlan(id: "pro_monthly")
+        await model.selectPlan(id: "free")
+
+        #expect(h.billing.purchased.isEmpty)
+        #expect(h.billing.manageSubscriptionsCalls == 0)
     }
 
     @Test func addAccountUnknownDomainAsksForServerSettings() async {
@@ -330,18 +615,14 @@ struct AppModelTests {
         h.accounts.unconfiguredKinds = [.google, .microsoft]
         let model = h.makeModel()
 
-        await #expect(throws: AppModelError.signInNotConfigured(.google)) {
+        await #expect(throws: SkiPassUIError.googleSignInNotConfigured) {
             _ = try await model.addAccount(email: "hello@gmail.com")
         }
-        await #expect(throws: AppModelError.signInNotConfigured(.microsoft)) {
+        await #expect(throws: SkiPassUIError.microsoftSignInNotConfigured) {
             _ = try await model.addAccount(email: "team@outlook.com")
         }
         #expect(h.accounts.signIns.isEmpty)
         #expect(h.accounts.mailboxes.isEmpty)
-        #expect(AppModelError.signInNotConfigured(.google).localizedDescription
-            == "Google sign-in is not configured in this build.")
-        #expect(AppModelError.signInNotConfigured(.microsoft).localizedDescription
-            == "Microsoft sign-in is not configured in this build.")
     }
 
     @Test func missingClientIDDoesNotAffectIMAP() async {
@@ -359,11 +640,83 @@ struct AppModelTests {
         h.accounts.signInError = Boom()
         let model = h.makeModel()
 
-        await #expect(throws: Boom.self) {
+        await #expect(throws: SkiPassUIError.signInFailed) {
             _ = try await model.addAccount(email: "hello@gmail.com")
         }
         #expect(h.accounts.mailboxes.isEmpty)
         #expect(h.accounts.oauthStates.isEmpty)
+    }
+
+    /// A1-04: cancelling the Google / Microsoft page (AppAuth -3) is silent: a CancellationError,
+    /// which the sheet does not show.
+    @Test func cancelledSignInIsSilent() async {
+        let h = Harness()
+        h.accounts.signInError = NSError(domain: "org.openid.appauth.general", code: -3)
+        let model = h.makeModel()
+
+        await #expect(throws: CancellationError.self) {
+            _ = try await model.addAccount(email: "hello@gmail.com")
+        }
+        #expect(h.accounts.mailboxes.isEmpty)
+    }
+
+    /// A1-11: a mailbox that switches from IMAP to Google loses its password, and back.
+    @Test func changingKindDeletesTheOtherSecret() async throws {
+        let h = Harness()
+        let model = h.makeModel()
+        let imap = try await model.saveIMAP(
+            address: "me@gmail.com",
+            settings: ServerSettings(incomingHost: "imap.gmail.com", incomingPort: 993, username: "me@gmail.com"),
+            password: "pw")
+        #expect(h.accounts.passwords[imap.id] == "pw")
+
+        let google = try await model.addAccount(email: "me@gmail.com")
+        #expect(google.id == imap.id)
+        #expect(h.accounts.passwords[imap.id] == nil)
+        #expect(h.accounts.oauthStates[imap.id] != nil)
+
+        _ = try await model.saveIMAP(
+            address: "me@gmail.com",
+            settings: ServerSettings(incomingHost: "imap.gmail.com", incomingPort: 993, username: "me@gmail.com"),
+            password: "pw2")
+        #expect(h.accounts.oauthStates[imap.id] == nil)
+        #expect(h.accounts.passwords[imap.id] == "pw2")
+    }
+
+    /// A1-11 / A1-12: when the mailbox cannot be saved, no orphan secret stays and the UI gets a Copy error.
+    @Test func failedMailboxSaveLeavesNoOrphanSecret() async {
+        let h = Harness()
+        h.accounts.saveMailboxError = Boom()
+        let model = h.makeModel()
+
+        await #expect(throws: SkiPassUIError.saveFailed) {
+            _ = try await model.addAccount(email: "hello@gmail.com")
+        }
+        await #expect(throws: SkiPassUIError.saveFailed) {
+            _ = try await model.saveIMAP(
+                address: "info@myshop.jp",
+                settings: ServerSettings(incomingHost: "h", incomingPort: 993, username: "u"),
+                password: "pw")
+        }
+        #expect(h.accounts.oauthStates.isEmpty)
+        #expect(h.accounts.passwords.isEmpty)
+        #expect(h.accounts.mailboxes.isEmpty)
+    }
+
+    /// A1-12: a storage error on delete reaches the UI as a Copy-backed error.
+    @Test func failedDeleteReportsDeleteFailed() async throws {
+        let h = Harness()
+        let model = h.makeModel()
+        let account = try await model.saveIMAP(
+            address: "info@myshop.jp",
+            settings: ServerSettings(incomingHost: "h", incomingPort: 993, username: "u"),
+            password: "pw")
+        h.accounts.deleteError = Boom()
+
+        await #expect(throws: SkiPassUIError.deleteFailed) {
+            try await model.deleteAccount(id: account.id)
+        }
+        #expect(model.accounts.map(\.id) == [account.id])
     }
 
     @Test func saveIMAPStoresPasswordAndConfigAndReusesIDOnEdit() async throws {
@@ -552,6 +905,69 @@ struct AppModelTests {
         try await model.deleteAccount(id: account.id)
         #expect(h.identities.syncs.last == [])
         #expect(h.identities.syncs.count == 3)
+    }
+
+    /// A1-08: identity syncs run one at a time and each reads the mailbox list when it runs, so a
+    /// sync started before a delete cannot finish last with the deleted address.
+    @Test func identitySyncsAreSerializedAndTheNewestListWins() async throws {
+        let h = Harness()
+        let model = h.makeModel()
+        await model.start()
+        let account = try await model.addAccount(email: "hello@gmail.com")
+
+        h.identities.hold = true
+        let foreground = Task { await model.didBecomeActive() }
+        while h.identities.heldCount == 0 { await Task.yield() }
+        let delete = Task { try await model.deleteAccount(id: account.id) }
+        for _ in 0..<50 { await Task.yield() }
+        #expect(h.identities.heldCount == 1)  // the delete's sync waits for the running one
+        h.identities.hold = false
+        h.identities.release()
+        await foreground.value
+        try await delete.value
+
+        #expect(h.identities.syncs.last == [])
+    }
+
+    /// A1-08: a foreground event during launch does not start a second full refresh.
+    @Test func foregroundDuringStartIsIgnored() async {
+        let h = Harness()
+        h.usage.hold = true
+        let model = h.makeModel()
+
+        let launch = Task { await model.start() }
+        while h.usage.heldCount == 0 { await Task.yield() }
+        await model.didBecomeActive()
+        h.usage.hold = false
+        h.usage.release()
+        await launch.value
+
+        #expect(h.usage.calls.count == 1)
+        #expect(h.identities.syncs.count == 1)
+    }
+
+    /// A1-07: a refresh requested while another is in flight is re-run afterwards, not dropped,
+    /// so the post-purchase limit is shown.
+    @Test func usageRefreshDuringAnInFlightOneIsNotDropped() async {
+        let h = Harness()
+        let model = h.makeModel()
+        await model.start()
+        h.usage.hold = true
+        let before = h.usage.calls.count
+
+        let foreground = Task { await model.refreshUsage() }
+        while h.usage.heldCount == 0 { await Task.yield() }
+        // The purchase completes: the server now reports the Pro limit.
+        h.usage.snapshot = UsageSnapshot(plan: "pro", used: 3, limit: 1000, resetsAt: h.usage.snapshot.resetsAt)
+        let afterPurchase = Task { await model.refreshUsage() }
+        for _ in 0..<50 { await Task.yield() }
+        h.usage.hold = false
+        h.usage.release()
+        await foreground.value
+        await afterPurchase.value
+
+        #expect(h.usage.calls.count == before + 2)
+        #expect(model.usage?.limit == 1000)
     }
 
     @Test func foregroundRefreshesUsageAfterStart() async {

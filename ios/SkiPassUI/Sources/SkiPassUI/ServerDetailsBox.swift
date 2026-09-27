@@ -1,59 +1,40 @@
 import SwiftUI
 
-/// Expanded IMAP details: server, port, username and masked password rows.
-/// Outgoing rows appear only when the host app provides them.
+/// Expanded IMAP details: incoming server (IMAP chip), port, username and masked password rows.
 struct ServerDetailsBox: View {
     let address: String
     let server: ServerSettings
+    /// Changes whenever the stored password changes; a revealed password is hidden again then.
+    let passwordRevision: Int
     let revealPassword: @MainActor () async -> String?
 
     var body: some View {
         VStack(spacing: 0) {
-            DetailRow(label: Copy.incomingServer, value: server.incomingHost, chip: .imap)
-            if let outgoingHost = server.outgoingHost {
-                Divider()
-                DetailRow(label: Copy.outgoingServer, value: outgoingHost, chip: .smtp)
-            }
+            DetailRow(label: Copy.incomingServer, value: server.incomingHost, showsIMAPChip: true)
             Divider()
             DetailRow(label: Copy.incomingPort, value: String(server.incomingPort))
-            if let outgoingPort = server.outgoingPort {
-                Divider()
-                DetailRow(label: Copy.outgoingPort, value: String(outgoingPort))
-            }
             Divider()
             DetailRow(label: Copy.username, value: server.username)
             Divider()
             PasswordRow(address: address, revealPassword: revealPassword)
+                // New identity (fresh, masked state) after an edit, even if the card stays expanded.
+                .id(PasswordRowID(server: server, revision: passwordRevision))
         }
         .padding(.horizontal, 16)
         .background(Theme.innerFill, in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))
     }
 }
 
-enum ProtocolChip {
-    case imap
-    case smtp
-
-    var title: String {
-        switch self {
-        case .imap: Copy.chipIMAP
-        case .smtp: Copy.chipSMTP
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .imap: Theme.chipIMAPForeground
-        case .smtp: Theme.chipSMTPForeground
-        }
-    }
+private struct PasswordRowID: Hashable {
+    let server: ServerSettings
+    let revision: Int
 }
 
-/// Label / value row with an optional protocol chip.
+/// Label / value row with an optional "IMAP" chip.
 private struct DetailRow: View {
     let label: String
     let value: String
-    var chip: ProtocolChip?
+    var showsIMAPChip = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -65,8 +46,8 @@ private struct DetailRow: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if let chip {
-                ChipView(title: chip.title, color: chip.color)
+            if showsIMAPChip {
+                ChipView(title: Copy.chipIMAP, color: Theme.chipIMAPForeground)
             }
         }
         .font(.subheadline)
@@ -75,7 +56,7 @@ private struct DetailRow: View {
     }
 }
 
-/// Static tinted capsule ("IMAP", "SMTP", "Current"). Content, not a control,
+/// Static tinted capsule ("IMAP", "Current"). Content, not a control,
 /// so it is intentionally not Liquid Glass.
 struct ChipView: View {
     let title: String

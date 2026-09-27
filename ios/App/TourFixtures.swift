@@ -34,9 +34,7 @@ final class TourFixtureModel: SkiPassUIActions {
             server: ServerSettings(
                 incomingHost: "mail.myshop.jp",
                 incomingPort: 993,
-                username: "info@myshop.jp",
-                outgoingHost: "mail.myshop.jp",
-                outgoingPort: 465
+                username: "info@myshop.jp"
             )
         )
         let support = MailAccount(
@@ -46,9 +44,7 @@ final class TourFixtureModel: SkiPassUIActions {
             server: ServerSettings(
                 incomingHost: "mail.myshop.jp",
                 incomingPort: 993,
-                username: "support@myshop.jp",
-                outgoingHost: "mail.myshop.jp",
-                outgoingPort: 465
+                username: "support@myshop.jp"
             )
         )
         accounts = [info, support]
@@ -63,14 +59,7 @@ final class TourFixtureModel: SkiPassUIActions {
                 isCurrent: true,
                 systemImage: "square.stack.3d.up.fill"
             ),
-            PlanOption(
-                id: "free",
-                name: "Free",
-                tagline: "A simple start for personal use.",
-                priceText: "$0/mo",
-                isCurrent: false,
-                systemImage: "person.fill"
-            ),
+            PlanOption.free(isCurrent: false),
             PlanOption(
                 id: "pro",
                 name: "Pro",

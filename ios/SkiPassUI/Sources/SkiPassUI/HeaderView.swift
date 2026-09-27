@@ -23,7 +23,7 @@ struct HeaderView: View {
     }
 }
 
-/// Placeholder app icon. OPEN(ui): final app icon artwork (app name is [Open]).
+/// App icon tile for "SkiPass" (SF Symbol artwork).
 private struct AppIconTile: View {
     var body: some View {
         Image(systemName: "cloud.fill")

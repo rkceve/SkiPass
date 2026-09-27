@@ -331,19 +331,17 @@ struct AccountFormSheet: View {
             withAnimation(.smooth) { step = .imap }
             focusedField = .host
         } catch {
-            errorMessage = error.localizedDescription
+            // nil for a cancelled provider sign-in: the sheet simply stays as it was.
+            errorMessage = Copy.errorMessage(for: error)
         }
     }
 
     private func saveIMAP() async throws {
         guard let port else { return }
-        // Outgoing values are display-only and not edited here; keep what the host provided.
         let settings = ServerSettings(
             incomingHost: host.trimmingCharacters(in: .whitespaces),
             incomingPort: port,
-            username: username.trimmingCharacters(in: .whitespaces),
-            outgoingHost: editingAccount?.server?.outgoingHost,
-            outgoingPort: editingAccount?.server?.outgoingPort
+            username: username.trimmingCharacters(in: .whitespaces)
         )
         try await store.saveIMAP(address: email, settings: settings, password: password)
     }

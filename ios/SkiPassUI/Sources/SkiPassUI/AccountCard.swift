@@ -4,6 +4,7 @@ import SwiftUI
 struct AccountCard: View {
     let account: MailAccount
     let isExpanded: Bool
+    let passwordRevision: Int
     let onToggle: @MainActor () -> Void
     let onEdit: @MainActor () -> Void
     let onDelete: @MainActor () async throws -> Void
@@ -18,6 +19,7 @@ struct AccountCard: View {
     init(
         account: MailAccount,
         isExpanded: Bool,
+        passwordRevision: Int = 0,
         onToggle: @escaping @MainActor () -> Void,
         onEdit: @escaping @MainActor () -> Void,
         onDelete: @escaping @MainActor () async throws -> Void,
@@ -25,6 +27,7 @@ struct AccountCard: View {
     ) {
         self.account = account
         self.isExpanded = isExpanded
+        self.passwordRevision = passwordRevision
         self.onToggle = onToggle
         self.onEdit = onEdit
         self.onDelete = onDelete
@@ -44,11 +47,11 @@ struct AccountCard: View {
                         ServerDetailsBox(
                             address: account.address,
                             server: server,
+                            passwordRevision: passwordRevision,
                             revealPassword: revealPassword
                         )
                     }
-                    // OPEN(ui): oauth expanded content not specified. Google / Microsoft
-                    // cards show no server rows and only the Delete action (nothing to edit).
+                    // SYSTEM.md §2: Google / Microsoft cards show no server rows, Delete only.
                     AccountActionRow(
                         address: account.address,
                         showsEdit: account.kind == .imap,
@@ -88,7 +91,8 @@ struct AccountCard: View {
         do {
             try await onDelete()
         } catch {
-            errorMessage = error.localizedDescription
+            guard let message = Copy.errorMessage(for: error) else { return }
+            errorMessage = message
             isShowingError = true
         }
     }
@@ -166,21 +170,15 @@ private struct StatusLabel: View {
         }
     }
 
-    // OPEN(ui): the mockups only show the connected state. Non-connected states
-    // change the dot color and the accessibility value only; no visible copy yet.
     private var dotColor: Color {
         switch status {
         case .connected: Theme.statusGreen
-        case .needsSignIn: .orange
-        case .error: Theme.destructive
         }
     }
 
     private var statusText: String {
         switch status {
         case .connected: Copy.statusConnected
-        case .needsSignIn: Copy.statusNeedsSignIn
-        case .error(let message): message
         }
     }
 }
