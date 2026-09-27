@@ -102,3 +102,16 @@ are built in **Debug** (RevenueCat Test Store key crashes Release by design) and
 
 `ci` green (core, ui-package, app+app tests, extension tests, server). Server `npm test` + typecheck.
 Demo-web `npm test` + typecheck. Tour recording is not a gate.
+
+## 8. Accepted trade-offs (decided in the 2026-09-27 audit triage)
+
+- When the server is unreachable (timeout, 5xx, 401, 429, bad reply) the extension fills via the local
+  fallback rule without a quota check; the fill is reported later if possible. Quota enforcement is
+  therefore best-effort by design (demo resilience over strict metering).
+- A fill happens before it is counted, so concurrent fills can pass the same quota check.
+- The app token is embedded in the app and is public by nature; abuse is limited by rejecting unknown
+  RevenueCat customers and rate-limiting `/v1/judge` (60/user/h, 300/IP/h).
+- If RevenueCat is down the server uses the last known plan (fail-open when unknown) rather than
+  downgrading a paying user.
+- Keychain sharing between app and extension after re-signing can only be verified on a device; both
+  processes log the resolved App Group and Keychain group.
