@@ -39,13 +39,13 @@ final class TourFixtureModel: SkiPassUIActions {
             )
         )
         let support = MailAccount(
-            address: "support@myshop.example",
+            address: "help@myshop.example",
             kind: .imap,
             status: .connected,
             server: ServerSettings(
                 incomingHost: "mail.myshop.example",
                 incomingPort: 993,
-                username: "support@myshop.example"
+                username: "help@myshop.example"
             )
         )
         let sales = MailAccount(

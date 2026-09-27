@@ -43,7 +43,11 @@ final class ScreenshotTests: XCTestCase {
         let planTab = app.tabBars.buttons["Plan"].waitForExistence(timeout: 3)
             ? app.tabBars.buttons["Plan"] : app.buttons["Plan"].firstMatch
         planTab.tap()
-        XCTAssertTrue(app.buttons["plan.pro"].waitForExistence(timeout: 10), "Plan screen did not appear")
+        let pro = app.buttons["plan.pro"]
+        XCTAssertTrue(pro.waitForExistence(timeout: 10), "Plan screen did not appear")
+        // Scroll so the last plan row clears the floating tab bar.
+        app.scrollViews.containing(NSPredicate(format: "identifier == %@", "plan.pro")).firstMatch
+            .swipeUp(velocity: .slow)
         capture("03-plan")
     }
 

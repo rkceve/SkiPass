@@ -90,7 +90,7 @@ jobs:
               for f in "$SHOT_DIR"/*.ready; do
                 [ -e "$f" ] || continue
                 n=$(basename "$f" .ready)
-                xcrun simctl io "$SIM_UDID" screenshot --type=png "screenshots/$n.png" >/dev/null 2>&1
+                xcrun simctl io "$SIM_UDID" screenshot --type=png --mask=ignored "screenshots/$n.png" >/dev/null 2>&1
                 rm -f "$f"
                 touch "$SHOT_DIR/$n.done"
               done
