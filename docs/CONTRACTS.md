@@ -68,14 +68,15 @@ See `ios/SkiPassCore/Sources/SkiPassModels/*.swift`. Summary:
 
 ## 5. Server HTTP API (Cloudflare Worker, implemented by I5; Swift client in `SkiPassServerClient`)
 
-All requests: `Content-Type: application/json`, headers `X-SkiPass-App-Token: <SkiPassAppToken>`, `X-SkiPass-User: <RevenueCat app user ID>`. Missing/invalid token → 401 `{"error":"unauthorized"}`.
+All requests: `Content-Type: application/json`, headers `X-SkiPass-App-Token: <SkiPassAppToken>`, `X-SkiPass-User: <RevenueCat app user ID>`. Missing/invalid token → 401 `{"error":"unauthorized"}`. A user id RevenueCat does not know (customer 404) → 401 `{"error":"unknown_user"}` on every route (2026-09-27).
 
 `POST /v1/judge` — does NOT count usage.
 ```json
 request:  {"service": "acme.example.com" | null,
            "messages": [{"id": "uuid:123", "text": "From: ...\nTo: ...\nSubject: ...\nDate: ...\n\n<body text>"}]}
-200:      {"chosenId": "uuid:123" | null, "scores": {"uuid:123": 0.97}, "remaining": 42, "source": "jev" | "fallback"}
+200:      {"chosenId": "uuid:123" | null, "scores": {"uuid:123": 0.97}, "remaining": 42, "source": "jev" | "fallback" | "mock"}
 402:      {"error": "quota_exhausted", "remaining": 0}
+429:      {"error": "rate_limited"}
 ```
 `POST /v1/fills` — counts exactly one fill.
 ```json
@@ -85,7 +86,7 @@ request:  {"messageId": "uuid:123"}
 ```
 `GET /v1/usage`
 ```json
-200:      {"plan": "free" | "standard" | "pro", "used": 3, "limit": 10, "resetsAt": "2026-10-01T00:00:00Z"}
+200:      {"plan": "free" | "standard" | "pro" | "unknown", "used": 3, "limit": 10, "resetsAt": "2026-10-01T00:00:00Z"}
 ```
 Jev call (per message, in parallel; `POST https://api.typesafe.ai/v1/systemone`, `model: "jev-latest"`, one Noul question id `is_code_for_service`):
 - state: the message `text` (full message, decided).
@@ -116,3 +117,4 @@ Agents with CI duties read runs/logs through the GitHub REST API using the token
 
 - 2026-09-24: `SkiPassAuth` now depends on `SkiPassMail` + `AppAuthCore` only (extension-safe); new `SkiPassAuthUI` (app only, `AppAuth`) for interactive sign-in; new `SkiPassAuthTests`. The extension links `SkiPassAuth`, never `SkiPassAuthUI`.
 - 2026-09-27: Jev question wording updated after a live comparison (correct email 0.65 -> 0.87); upstream timeout 2 s -> 3 s; Jev live on Vercel.
+- 2026-09-27 (audit fixes, TRIAGE D1-D3): §5 server additions. (1) 401 `{"error":"unknown_user"}` on every route when RevenueCat v2 does not know `X-SkiPass-User` (positive lookups cached 10 min). Clients treat it like any 401 (server trouble -> local fallback). (2) `POST /v1/judge` 429 `{"error":"rate_limited"}` above 60 requests per user or 300 per client IP per UTC hour; clients treat 429 like an unavailable server (local fallback). (3) `source: "mock"` when the server runs with `JEV_MODE=mock` (mock only when set explicitly; live without a key -> `source: "fallback"`); clients accept it like `"jev"`. (4) RevenueCat outage: the last known plan (kept 30 days) is used; with none, the quota is not enforced for that request, `/v1/usage` answers `"plan": "unknown"` with `"limit": 0`, and judge/fills report `"remaining": 0` (meaning "not known", not "exhausted"; clients must not show it as a count).

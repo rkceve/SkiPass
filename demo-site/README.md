@@ -1,6 +1,10 @@
-# SkiPass demo site (Cloudflare Worker + Hono)
+# SkiPass demo site (Cloudflare Worker + Hono) — LEGACY
 
-The only web page used in the demo video: a fictional service's one-time-code entry screen.
+> **LEGACY — not deployed, not used in the demo. Superseded by [`../demo-web/`](../demo-web/)**
+> (https://skipass-demo.vercel.app). Kept only as reference; CI still runs its tests and typecheck
+> (`ci.yml`, job `demo-site`). Do not deploy it: its `/verify` has no attempt limit.
+
+Originally the web page for the demo video: a fictional service's one-time-code entry screen.
 Opening the page emails a fresh 6-digit code to one fixed, real mailbox (`DEMO_TO`); SkiPass reads
 that mailbox and fills the code into `<input autocomplete="one-time-code">`.
 
