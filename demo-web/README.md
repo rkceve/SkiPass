@@ -5,27 +5,36 @@ an email address, gets a 6-digit code by email within seconds, and types (or Aut
 whose field is `<input autocomplete="one-time-code" inputmode="numeric">`, which is where the SkiPass
 iOS AutoFill extension offers the code. Production: https://skipass-demo.vercel.app
 
-The older single-mailbox Cloudflare version lives in `../demo-site/` and is unchanged.
+The older single-mailbox Cloudflare version in `../demo-site/` is legacy (not deployed).
 
 ## Flow
 
 | Route | What it does |
 |---|---|
 | `GET /` | Sign-up page: email field, "Email me a code" |
-| `POST /api/send-code` | `{"email"}` → sends the code email (awaited), sets the session cookie. Email may be omitted when resending with a cookie. 400 bad address, 429 + `Retry-After` within 30 s of the last send, 403 `recipient_not_allowed` on Resend's sandbox rule, 502 send failure, 503 `not_configured` |
+| `POST /api/send-code` | `{"email"}` → sends the code email (awaited), sets the session cookie. Email may be omitted when resending with a cookie. 400 bad address, 429 `rate_limited` + `Retry-After` within 30 s of the last send to that address or after 5 sends from one IP in 10 min, 403 `recipient_not_allowed` on Resend's sandbox rule, 502 send failure, 503 `not_configured` |
 | `GET /verify` | Code page (`autocomplete="one-time-code"`), resend with a 30 s countdown, verified / incorrect / locked / expired states. Six digits entered at once (AutoFill) are checked immediately |
 | `POST /api/verify-code` | `{"code"}` → `{"result": "verified" \| "incorrect" (+attemptsLeft) \| "locked" \| "expired" \| "no_session"}` |
-| `GET /api/status` | What the cookie says (email, expiry, resend time, attempts left), so `/verify` can restore itself |
+| `GET /api/status` | The session behind the cookie (email, expiry, resend time, attempts left), so `/verify` can restore itself |
 
-## Stateless OTP
+## OTP state (server side, Upstash Redis)
 
-No database. After a send the browser holds one cookie `sowbank_otp` (HttpOnly, SameSite=Lax, Secure
-on HTTPS, Max-Age = time left): `base64url(JSON{email, sha256(code + OTP_SECRET), expiry (10 min),
-attempts, sentAt})` + `.` + `HMAC-SHA256(OTP_SECRET)`. Verification recomputes the hash from the
-submitted code. 5 wrong codes lock the session; a new send starts a fresh one.
+The browser holds one cookie `sowbank_otp` (HttpOnly, SameSite=Lax, Secure on HTTPS, Max-Age = time
+left) containing only a random 32-byte session id. Everything else lives in Upstash Redis
+(`lib/store.ts`), so replaying an old cookie or deleting it gains nothing:
 
-Known limits of the stateless design (fine for a demo): a client can replay an older cookie to reset
-its attempt count or re-verify until expiry, and deleting the cookie skips the 30 s send limit.
+| Key | Content | Expiry |
+|---|---|---|
+| `otp:<sessionId>` | hash `{e: email, h: sha256(code + OTP_SECRET), x: expiry, a: wrong attempts, s: sentAt}` | at the code expiry (10 min) |
+| `send:to:<HMAC(email)>` | resend cooldown for that address (1 send / 30 s) | 30 s |
+| `send:ip:<client IP>` | sends from that IP (5 / 10 min) | 10 min after the first send |
+
+Checks that must not interleave run as single Lua `EVAL` scripts (atomic in Redis): the send
+reservation (IP budget + recipient cooldown) and verification (compare hash, count a wrong attempt,
+lock at 5, delete the session on success so a code is single-use). A new send deletes the previous
+session. The send slot is taken before calling Resend, so a failed send also waits out the cooldown.
+Without the Upstash variables `send-code` and `verify-code` answer 503 `not_configured` (fail closed);
+Upstash calls time out after 2 s.
 
 ## Why no framework
 
@@ -51,10 +60,11 @@ the page says so. To email anyone, verify a domain in Resend and set `MAIL_FROM`
 
 | Name | Required | Notes |
 |---|---|---|
-| `OTP_SECRET` | yes | random 32 bytes; signs the cookie and salts the code hash |
+| `OTP_SECRET` | yes | random 32 bytes; salts the code hash and keys the recipient rate-limit HMAC |
 | `RESEND_API_KEY` | yes | `re_...`; without it `/api/send-code` answers 503 `not_configured` |
 | `MAIL_FROM` | no | default `onboarding@resend.dev`; bare address or `Name <address>` |
 | `SITE_URL` | no | URL written in the email; default `https://skipass-demo.vercel.app` |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | yes | Upstash Redis REST credentials (the same database as `skipass-server`, connected with `npx vercel integration-resource connect <resource> skipass-demo`); `UPSTASH_REDIS_REST_URL` / `_TOKEN` also accepted |
 
 ## Commands
 
