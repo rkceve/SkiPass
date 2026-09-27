@@ -131,6 +131,7 @@ struct PlanRow: View {
             Spacer(minLength: 8)
             Text(plan.priceText)
                 .font(.body.weight(.medium))
+                .fixedSize()  // "$24.99/mo" never wraps; the tagline wraps instead
             RowChevron()
         }
         .foregroundStyle(.primary)

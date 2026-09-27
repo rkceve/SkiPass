@@ -116,6 +116,8 @@ private struct AccountSummaryRow: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
+                        // Long addresses shrink a little before the middle is truncated.
+                        .minimumScaleFactor(0.75)
                         .truncationMode(.middle)
                     StatusLabel(kind: account.kind, status: account.status)
                 }
