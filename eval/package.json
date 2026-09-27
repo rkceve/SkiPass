@@ -1,0 +1,16 @@
+{
+  "name": "skipass-eval",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx generate.ts",
+    "dry": "tsx run.ts --dry",
+    "eval": "tsx run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

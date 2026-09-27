@@ -1,0 +1,3118 @@
+{
+  "runAt": "2026-09-27T22:47:05.665Z",
+  "finishedAt": "2026-09-27T22:47:15.732Z",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "requestModel": "jev-latest",
+  "scenarios": 64,
+  "totals": {
+    "baseline": {
+      "n": 64,
+      "correct": 10,
+      "false_fill": 54,
+      "miss": 0,
+      "error": 0
+    },
+    "heuristic": {
+      "n": 64,
+      "correct": 37,
+      "false_fill": 27,
+      "miss": 0,
+      "error": 0
+    },
+    "jev": {
+      "n": 64,
+      "correct": 62,
+      "false_fill": 2,
+      "miss": 0,
+      "error": 0
+    }
+  },
+  "bySubset": {
+    "has_correct": {
+      "baseline": {
+        "n": 56,
+        "correct": 10,
+        "false_fill": 46,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 56,
+        "correct": 37,
+        "false_fill": 19,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 56,
+        "correct": 54,
+        "false_fill": 2,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "none_correct": {
+      "baseline": {
+        "n": 8,
+        "correct": 0,
+        "false_fill": 8,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 8,
+        "correct": 0,
+        "false_fill": 8,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 8,
+        "correct": 8,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    }
+  },
+  "perCategory": {
+    "older_target": {
+      "baseline": {
+        "n": 7,
+        "correct": 0,
+        "false_fill": 7,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "brand_via_provider": {
+      "baseline": {
+        "n": 7,
+        "correct": 2,
+        "false_fill": 5,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 2,
+        "false_fill": 5,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "domain_in_link_only": {
+      "baseline": {
+        "n": 7,
+        "correct": 1,
+        "false_fill": 6,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "same_site_two_codes": {
+      "baseline": {
+        "n": 7,
+        "correct": 4,
+        "false_fill": 3,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 6,
+        "false_fill": 1,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 5,
+        "false_fill": 2,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "promo_codes": {
+      "baseline": {
+        "n": 7,
+        "correct": 1,
+        "false_fill": 6,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 2,
+        "false_fill": 5,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "order_invoice_numbers": {
+      "baseline": {
+        "n": 7,
+        "correct": 0,
+        "false_fill": 7,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 2,
+        "false_fill": 5,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "japanese": {
+      "baseline": {
+        "n": 7,
+        "correct": 1,
+        "false_fill": 6,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 4,
+        "false_fill": 3,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "subdomain_site": {
+      "baseline": {
+        "n": 7,
+        "correct": 1,
+        "false_fill": 6,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 7,
+        "correct": 7,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    },
+    "no_correct": {
+      "baseline": {
+        "n": 8,
+        "correct": 0,
+        "false_fill": 8,
+        "miss": 0,
+        "error": 0
+      },
+      "heuristic": {
+        "n": 8,
+        "correct": 0,
+        "false_fill": 8,
+        "miss": 0,
+        "error": 0
+      },
+      "jev": {
+        "n": 8,
+        "correct": 8,
+        "false_fill": 0,
+        "miss": 0,
+        "error": 0
+      }
+    }
+  },
+  "jev": {
+    "requests": 146,
+    "failedRequests": 0,
+    "retriedRequests": 0,
+    "requestLatencyMs": {
+      "p50": 133.08780000000115,
+      "p95": 187.65589999999975,
+      "max": 297.99710000000005
+    },
+    "scenarioLatencyMs": {
+      "p50": 150.6966999999995,
+      "p95": 229.54110000000003,
+      "max": 298.03949999999986
+    },
+    "requestsOverProdTimeout": 0,
+    "scenariosOverProdTimeout": 0,
+    "inputTokens": 79562,
+    "outputTokens": 3358,
+    "meanInputTokensPerRequest": 544.945205479452,
+    "estimatedCostUsd": 0.0033416039999999998,
+    "estimatedCostUsdPerScenario": 0.000052212562499999996,
+    "models": [
+      "jev-1.13.0"
+    ]
+  },
+  "results": [
+    {
+      "id": "older_target-01",
+      "category": "older_target",
+      "service": "lumora.example",
+      "correct": "older_target-01-m1",
+      "picks": {
+        "baseline": "older_target-01-m2",
+        "heuristic": "older_target-01-m1",
+        "jev": "older_target-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 268.2408,
+        "calls": [
+          {
+            "messageId": "older_target-01-m1",
+            "noul": 0.96,
+            "latencyMs": 267.6531,
+            "attempts": 1,
+            "inputTokens": 534,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-01-m2",
+            "noul": 0.01,
+            "latencyMs": 193.1938,
+            "attempts": 1,
+            "inputTokens": 535,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-02",
+      "category": "older_target",
+      "service": "quillfeather.example",
+      "correct": "older_target-02-m1",
+      "picks": {
+        "baseline": "older_target-02-m3",
+        "heuristic": "older_target-02-m1",
+        "jev": "older_target-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 229.54110000000003,
+        "calls": [
+          {
+            "messageId": "older_target-02-m1",
+            "noul": 0.98,
+            "latencyMs": 125.61869999999999,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-02-m2",
+            "noul": 0.01,
+            "latencyMs": 112.31100000000004,
+            "attempts": 1,
+            "inputTokens": 542,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-02-m3",
+            "noul": 0.01,
+            "latencyMs": 228.59269999999992,
+            "attempts": 1,
+            "inputTokens": 530,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-03",
+      "category": "older_target",
+      "service": "brightpine.example",
+      "correct": "older_target-03-m1",
+      "picks": {
+        "baseline": "older_target-03-m2",
+        "heuristic": "older_target-03-m1",
+        "jev": "older_target-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 129.64879999999994,
+        "calls": [
+          {
+            "messageId": "older_target-03-m1",
+            "noul": 0.97,
+            "latencyMs": 129.59659999999997,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-03-m2",
+            "noul": 0.01,
+            "latencyMs": 121.88,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-04",
+      "category": "older_target",
+      "service": "kestrelnotes.example",
+      "correct": "older_target-04-m1",
+      "picks": {
+        "baseline": "older_target-04-m2",
+        "heuristic": "older_target-04-m1",
+        "jev": "older_target-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 113.43670000000009,
+        "calls": [
+          {
+            "messageId": "older_target-04-m1",
+            "noul": 0.97,
+            "latencyMs": 113.37750000000005,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-04-m2",
+            "noul": 0.01,
+            "latencyMs": 104.15560000000005,
+            "attempts": 1,
+            "inputTokens": 554,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-05",
+      "category": "older_target",
+      "service": "sableworks.example",
+      "correct": "older_target-05-m1",
+      "picks": {
+        "baseline": "older_target-05-m4",
+        "heuristic": "older_target-05-m1",
+        "jev": "older_target-05-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 172.47000000000003,
+        "calls": [
+          {
+            "messageId": "older_target-05-m1",
+            "noul": 0.97,
+            "latencyMs": 126.31200000000013,
+            "attempts": 1,
+            "inputTokens": 525,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-05-m2",
+            "noul": 0.01,
+            "latencyMs": 165.32309999999984,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-05-m3",
+            "noul": 0.01,
+            "latencyMs": 122.7186999999999,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-05-m4",
+            "noul": 0.01,
+            "latencyMs": 170.96810000000005,
+            "attempts": 1,
+            "inputTokens": 553,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-06",
+      "category": "older_target",
+      "service": "rookwise.example",
+      "correct": "older_target-06-m1",
+      "picks": {
+        "baseline": "older_target-06-m2",
+        "heuristic": "older_target-06-m1",
+        "jev": "older_target-06-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 176.17949999999996,
+        "calls": [
+          {
+            "messageId": "older_target-06-m1",
+            "noul": 0.97,
+            "latencyMs": 121.15519999999992,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-06-m2",
+            "noul": 0.01,
+            "latencyMs": 175.71569999999997,
+            "attempts": 1,
+            "inputTokens": 554,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "older_target-07",
+      "category": "older_target",
+      "service": "zentrik.example",
+      "correct": "older_target-07-m1",
+      "picks": {
+        "baseline": "older_target-07-m3",
+        "heuristic": "older_target-07-m1",
+        "jev": "older_target-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 163.28430000000003,
+        "calls": [
+          {
+            "messageId": "older_target-07-m1",
+            "noul": 0.98,
+            "latencyMs": 157.93160000000012,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-07-m2",
+            "noul": 0.01,
+            "latencyMs": 119.82020000000011,
+            "attempts": 1,
+            "inputTokens": 510,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "older_target-07-m3",
+            "noul": 0.01,
+            "latencyMs": 162.88329999999996,
+            "attempts": 1,
+            "inputTokens": 542,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-01",
+      "category": "brand_via_provider",
+      "service": "veloxa.example",
+      "correct": "brand_via_provider-01-m1",
+      "picks": {
+        "baseline": "brand_via_provider-01-m2",
+        "heuristic": "brand_via_provider-01-m2",
+        "jev": "brand_via_provider-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 117.04690000000005,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-01-m1",
+            "noul": 0.86,
+            "latencyMs": 117.00509999999986,
+            "attempts": 1,
+            "inputTokens": 507,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-01-m2",
+            "noul": 0.01,
+            "latencyMs": 107.35979999999995,
+            "attempts": 1,
+            "inputTokens": 529,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-02",
+      "category": "brand_via_provider",
+      "service": "marrowby.example",
+      "correct": "brand_via_provider-02-m1",
+      "picks": {
+        "baseline": "brand_via_provider-02-m2",
+        "heuristic": "brand_via_provider-02-m2",
+        "jev": "brand_via_provider-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 140.81860000000006,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-02-m1",
+            "noul": 0.76,
+            "latencyMs": 112.56410000000005,
+            "attempts": 1,
+            "inputTokens": 508,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-02-m2",
+            "noul": 0.02,
+            "latencyMs": 140.4286000000002,
+            "attempts": 1,
+            "inputTokens": 521,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-03",
+      "category": "brand_via_provider",
+      "service": "juniperly.example",
+      "correct": "brand_via_provider-03-m2",
+      "picks": {
+        "baseline": "brand_via_provider-03-m2",
+        "heuristic": "brand_via_provider-03-m2",
+        "jev": "brand_via_provider-03-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 138.9905000000001,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-03-m1",
+            "noul": 0.01,
+            "latencyMs": 138.93810000000008,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-03-m2",
+            "noul": 0.86,
+            "latencyMs": 118.95889999999986,
+            "attempts": 1,
+            "inputTokens": 472,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-04",
+      "category": "brand_via_provider",
+      "service": "trellium.example",
+      "correct": "brand_via_provider-04-m1",
+      "picks": {
+        "baseline": "brand_via_provider-04-m3",
+        "heuristic": "brand_via_provider-04-m3",
+        "jev": "brand_via_provider-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 169.58249999999998,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-04-m1",
+            "noul": 0.81,
+            "latencyMs": 169.53420000000006,
+            "attempts": 1,
+            "inputTokens": 496,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-04-m2",
+            "noul": 0.01,
+            "latencyMs": 152.47379999999998,
+            "attempts": 1,
+            "inputTokens": 522,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-04-m3",
+            "noul": 0.01,
+            "latencyMs": 119.97780000000012,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-05",
+      "category": "brand_via_provider",
+      "service": "nimbusly.example",
+      "correct": "brand_via_provider-05-m2",
+      "picks": {
+        "baseline": "brand_via_provider-05-m3",
+        "heuristic": "brand_via_provider-05-m3",
+        "jev": "brand_via_provider-05-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 248.3696,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-05-m1",
+            "noul": 0.01,
+            "latencyMs": 142.43809999999985,
+            "attempts": 1,
+            "inputTokens": 558,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-05-m2",
+            "noul": 0.8,
+            "latencyMs": 247.4328999999998,
+            "attempts": 1,
+            "inputTokens": 517,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-05-m3",
+            "noul": 0.02,
+            "latencyMs": 123.76340000000027,
+            "attempts": 1,
+            "inputTokens": 480,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-06",
+      "category": "brand_via_provider",
+      "service": "pebblecart.example",
+      "correct": "brand_via_provider-06-m3",
+      "picks": {
+        "baseline": "brand_via_provider-06-m3",
+        "heuristic": "brand_via_provider-06-m3",
+        "jev": "brand_via_provider-06-m3"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 188.98070000000007,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-06-m1",
+            "noul": 0.01,
+            "latencyMs": 125.10860000000002,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-06-m2",
+            "noul": 0.01,
+            "latencyMs": 188.06449999999995,
+            "attempts": 1,
+            "inputTokens": 511,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-06-m3",
+            "noul": 0.78,
+            "latencyMs": 148.67309999999998,
+            "attempts": 1,
+            "inputTokens": 486,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "brand_via_provider-07",
+      "category": "brand_via_provider",
+      "service": "cobaltix.example",
+      "correct": "brand_via_provider-07-m1",
+      "picks": {
+        "baseline": "brand_via_provider-07-m2",
+        "heuristic": "brand_via_provider-07-m2",
+        "jev": "brand_via_provider-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 165.60969999999998,
+        "calls": [
+          {
+            "messageId": "brand_via_provider-07-m1",
+            "noul": 0.84,
+            "latencyMs": 165.5697,
+            "attempts": 1,
+            "inputTokens": 480,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "brand_via_provider-07-m2",
+            "noul": 0.01,
+            "latencyMs": 151.3753999999999,
+            "attempts": 1,
+            "inputTokens": 560,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-01",
+      "category": "domain_in_link_only",
+      "service": "glimmerly.example",
+      "correct": "domain_in_link_only-01-m1",
+      "picks": {
+        "baseline": "domain_in_link_only-01-m2",
+        "heuristic": "domain_in_link_only-01-m1",
+        "jev": "domain_in_link_only-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 122.73500000000013,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-01-m1",
+            "noul": 0.97,
+            "latencyMs": 122.6900999999998,
+            "attempts": 1,
+            "inputTokens": 535,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-01-m2",
+            "noul": 0.01,
+            "latencyMs": 111.60800000000017,
+            "attempts": 1,
+            "inputTokens": 532,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-02",
+      "category": "domain_in_link_only",
+      "service": "skipass-demo.vercel.app",
+      "correct": "domain_in_link_only-02-m1",
+      "picks": {
+        "baseline": "domain_in_link_only-02-m2",
+        "heuristic": "domain_in_link_only-02-m1",
+        "jev": "domain_in_link_only-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 131.60950000000003,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-02-m1",
+            "noul": 0.87,
+            "latencyMs": 131.58170000000018,
+            "attempts": 1,
+            "inputTokens": 495,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-02-m2",
+            "noul": 0.01,
+            "latencyMs": 112.05659999999989,
+            "attempts": 1,
+            "inputTokens": 558,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-03",
+      "category": "domain_in_link_only",
+      "service": "orbitly.example",
+      "correct": "domain_in_link_only-03-m1",
+      "picks": {
+        "baseline": "domain_in_link_only-03-m2",
+        "heuristic": "domain_in_link_only-03-m1",
+        "jev": "domain_in_link_only-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 127.05139999999983,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-03-m1",
+            "noul": 0.97,
+            "latencyMs": 109.43499999999995,
+            "attempts": 1,
+            "inputTokens": 525,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-03-m2",
+            "noul": 0.01,
+            "latencyMs": 126.77289999999994,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-04",
+      "category": "domain_in_link_only",
+      "service": "halvardair.example",
+      "correct": "domain_in_link_only-04-m2",
+      "picks": {
+        "baseline": "domain_in_link_only-04-m3",
+        "heuristic": "domain_in_link_only-04-m2",
+        "jev": "domain_in_link_only-04-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 161.2195999999999,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-04-m1",
+            "noul": 0.01,
+            "latencyMs": 161.16229999999996,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-04-m2",
+            "noul": 0.96,
+            "latencyMs": 156.92180000000008,
+            "attempts": 1,
+            "inputTokens": 510,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-04-m3",
+            "noul": 0.01,
+            "latencyMs": 131.33449999999993,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-05",
+      "category": "domain_in_link_only",
+      "service": "sableworks.example",
+      "correct": "domain_in_link_only-05-m2",
+      "picks": {
+        "baseline": "domain_in_link_only-05-m2",
+        "heuristic": "domain_in_link_only-05-m2",
+        "jev": "domain_in_link_only-05-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 298.03949999999986,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-05-m1",
+            "noul": 0.01,
+            "latencyMs": 297.99710000000005,
+            "attempts": 1,
+            "inputTokens": 540,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-05-m2",
+            "noul": 0.97,
+            "latencyMs": 127.7813000000001,
+            "attempts": 1,
+            "inputTokens": 504,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-06",
+      "category": "domain_in_link_only",
+      "service": "skipass-demo.vercel.app",
+      "correct": "domain_in_link_only-06-m1",
+      "picks": {
+        "baseline": "domain_in_link_only-06-m2",
+        "heuristic": "domain_in_link_only-06-m1",
+        "jev": "domain_in_link_only-06-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 151.79050000000007,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-06-m1",
+            "noul": 0.88,
+            "latencyMs": 151.76220000000012,
+            "attempts": 1,
+            "inputTokens": 495,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-06-m2",
+            "noul": 0.03,
+            "latencyMs": 115.46590000000015,
+            "attempts": 1,
+            "inputTokens": 488,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain_in_link_only-07",
+      "category": "domain_in_link_only",
+      "service": "trellium.example",
+      "correct": "domain_in_link_only-07-m1",
+      "picks": {
+        "baseline": "domain_in_link_only-07-m2",
+        "heuristic": "domain_in_link_only-07-m1",
+        "jev": "domain_in_link_only-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 128.4632999999999,
+        "calls": [
+          {
+            "messageId": "domain_in_link_only-07-m1",
+            "noul": 0.97,
+            "latencyMs": 128.42300000000023,
+            "attempts": 1,
+            "inputTokens": 528,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "domain_in_link_only-07-m2",
+            "noul": 0.01,
+            "latencyMs": 112.79349999999977,
+            "attempts": 1,
+            "inputTokens": 511,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-01",
+      "category": "same_site_two_codes",
+      "service": "lumora.example",
+      "correct": "same_site_two_codes-01-m2",
+      "picks": {
+        "baseline": "same_site_two_codes-01-m2",
+        "heuristic": "same_site_two_codes-01-m2",
+        "jev": "same_site_two_codes-01-m1"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "false_fill"
+      },
+      "jev": {
+        "wallMs": 158.85300000000007,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-01-m1",
+            "noul": 0.97,
+            "latencyMs": 158.78920000000016,
+            "attempts": 1,
+            "inputTokens": 534,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-01-m2",
+            "noul": 0.96,
+            "latencyMs": 118.32089999999971,
+            "attempts": 1,
+            "inputTokens": 534,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-02",
+      "category": "same_site_two_codes",
+      "service": "orbitly.example",
+      "correct": "same_site_two_codes-02-m2",
+      "picks": {
+        "baseline": "same_site_two_codes-02-m3",
+        "heuristic": "same_site_two_codes-02-m2",
+        "jev": "same_site_two_codes-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "false_fill"
+      },
+      "jev": {
+        "wallMs": 141.57549999999947,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-02-m1",
+            "noul": 0.97,
+            "latencyMs": 131.22910000000047,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-02-m2",
+            "noul": 0.96,
+            "latencyMs": 140.9677999999999,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-02-m3",
+            "noul": 0.01,
+            "latencyMs": 113.2523000000001,
+            "attempts": 1,
+            "inputTokens": 538,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-03",
+      "category": "same_site_two_codes",
+      "service": "skipass-demo.vercel.app",
+      "correct": "same_site_two_codes-03-m2",
+      "picks": {
+        "baseline": "same_site_two_codes-03-m2",
+        "heuristic": "same_site_two_codes-03-m2",
+        "jev": "same_site_two_codes-03-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 154.54680000000008,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-03-m1",
+            "noul": 0.89,
+            "latencyMs": 154.4992999999995,
+            "attempts": 1,
+            "inputTokens": 495,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-03-m2",
+            "noul": 0.89,
+            "latencyMs": 116.81970000000001,
+            "attempts": 1,
+            "inputTokens": 495,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-04",
+      "category": "same_site_two_codes",
+      "service": "zentrik.example",
+      "correct": "same_site_two_codes-04-m2",
+      "picks": {
+        "baseline": "same_site_two_codes-04-m3",
+        "heuristic": "same_site_two_codes-04-m2",
+        "jev": "same_site_two_codes-04-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 157.33590000000004,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-04-m1",
+            "noul": 0.96,
+            "latencyMs": 157.3036000000002,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-04-m2",
+            "noul": 0.98,
+            "latencyMs": 121.21210000000065,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-04-m3",
+            "noul": 0.01,
+            "latencyMs": 146.46290000000045,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-05",
+      "category": "same_site_two_codes",
+      "service": "brightpine.example",
+      "correct": "same_site_two_codes-05-m3",
+      "picks": {
+        "baseline": "same_site_two_codes-05-m3",
+        "heuristic": "same_site_two_codes-05-m3",
+        "jev": "same_site_two_codes-05-m3"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 166.67720000000008,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-05-m1",
+            "noul": 0.97,
+            "latencyMs": 110.08289999999943,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-05-m2",
+            "noul": 0.97,
+            "latencyMs": 128.19959999999992,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-05-m3",
+            "noul": 0.97,
+            "latencyMs": 166.11160000000018,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-06",
+      "category": "same_site_two_codes",
+      "service": "kestrelnotes.example",
+      "correct": "same_site_two_codes-06-m3",
+      "picks": {
+        "baseline": "same_site_two_codes-06-m3",
+        "heuristic": "same_site_two_codes-06-m3",
+        "jev": "same_site_two_codes-06-m3"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 148.9399000000003,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-06-m1",
+            "noul": 0.62,
+            "latencyMs": 148.88839999999982,
+            "attempts": 1,
+            "inputTokens": 512,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-06-m2",
+            "noul": 0.01,
+            "latencyMs": 138.933,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-06-m3",
+            "noul": 0.69,
+            "latencyMs": 135.8679000000002,
+            "attempts": 1,
+            "inputTokens": 513,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "same_site_two_codes-07",
+      "category": "same_site_two_codes",
+      "service": "pebblecart.example",
+      "correct": "same_site_two_codes-07-m2",
+      "picks": {
+        "baseline": "same_site_two_codes-07-m3",
+        "heuristic": "same_site_two_codes-07-m3",
+        "jev": "same_site_two_codes-07-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 179.21590000000015,
+        "calls": [
+          {
+            "messageId": "same_site_two_codes-07-m1",
+            "noul": 0.97,
+            "latencyMs": 117.02430000000004,
+            "attempts": 1,
+            "inputTokens": 529,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-07-m2",
+            "noul": 0.97,
+            "latencyMs": 145.76789999999983,
+            "attempts": 1,
+            "inputTokens": 529,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "same_site_two_codes-07-m3",
+            "noul": 0.17,
+            "latencyMs": 178.32949999999983,
+            "attempts": 1,
+            "inputTokens": 561,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-01",
+      "category": "promo_codes",
+      "service": "quillfeather.example",
+      "correct": "promo_codes-01-m1",
+      "picks": {
+        "baseline": "promo_codes-01-m2",
+        "heuristic": "promo_codes-01-m2",
+        "jev": "promo_codes-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 150.6966999999995,
+        "calls": [
+          {
+            "messageId": "promo_codes-01-m1",
+            "noul": 0.97,
+            "latencyMs": 150.65539999999964,
+            "attempts": 1,
+            "inputTokens": 558,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-01-m2",
+            "noul": 0.02,
+            "latencyMs": 142.28600000000006,
+            "attempts": 1,
+            "inputTokens": 569,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-02",
+      "category": "promo_codes",
+      "service": "veloxa.example",
+      "correct": "promo_codes-02-m1",
+      "picks": {
+        "baseline": "promo_codes-02-m2",
+        "heuristic": "promo_codes-02-m2",
+        "jev": "promo_codes-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 188.10069999999996,
+        "calls": [
+          {
+            "messageId": "promo_codes-02-m1",
+            "noul": 0.97,
+            "latencyMs": 146.21440000000075,
+            "attempts": 1,
+            "inputTokens": 528,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-02-m2",
+            "noul": 0.14,
+            "latencyMs": 187.65589999999975,
+            "attempts": 1,
+            "inputTokens": 544,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-03",
+      "category": "promo_codes",
+      "service": "juniperly.example",
+      "correct": "promo_codes-03-m1",
+      "picks": {
+        "baseline": "promo_codes-03-m2",
+        "heuristic": "promo_codes-03-m2",
+        "jev": "promo_codes-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 137.6868000000004,
+        "calls": [
+          {
+            "messageId": "promo_codes-03-m1",
+            "noul": 0.98,
+            "latencyMs": 137.65660000000025,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-03-m2",
+            "noul": 0.03,
+            "latencyMs": 137.3083999999999,
+            "attempts": 1,
+            "inputTokens": 526,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-04",
+      "category": "promo_codes",
+      "service": "marrowby.example",
+      "correct": "promo_codes-04-m1",
+      "picks": {
+        "baseline": "promo_codes-04-m2",
+        "heuristic": "promo_codes-04-m1",
+        "jev": "promo_codes-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 138.39329999999973,
+        "calls": [
+          {
+            "messageId": "promo_codes-04-m1",
+            "noul": 0.96,
+            "latencyMs": 138.36079999999947,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-04-m2",
+            "noul": 0.01,
+            "latencyMs": 108.2430000000004,
+            "attempts": 1,
+            "inputTokens": 563,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-05",
+      "category": "promo_codes",
+      "service": "rookwise.example",
+      "correct": "promo_codes-05-m1",
+      "picks": {
+        "baseline": "promo_codes-05-m2",
+        "heuristic": "promo_codes-05-m2",
+        "jev": "promo_codes-05-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 164.41129999999976,
+        "calls": [
+          {
+            "messageId": "promo_codes-05-m1",
+            "noul": 0.82,
+            "latencyMs": 108.75650000000041,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-05-m2",
+            "noul": 0.14,
+            "latencyMs": 163.79079999999976,
+            "attempts": 1,
+            "inputTokens": 556,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-06",
+      "category": "promo_codes",
+      "service": "cobaltix.example",
+      "correct": "promo_codes-06-m2",
+      "picks": {
+        "baseline": "promo_codes-06-m2",
+        "heuristic": "promo_codes-06-m2",
+        "jev": "promo_codes-06-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 144.66600000000017,
+        "calls": [
+          {
+            "messageId": "promo_codes-06-m1",
+            "noul": 0.03,
+            "latencyMs": 119.17950000000019,
+            "attempts": 1,
+            "inputTokens": 569,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-06-m2",
+            "noul": 0.97,
+            "latencyMs": 144.1823000000004,
+            "attempts": 1,
+            "inputTokens": 550,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "promo_codes-07",
+      "category": "promo_codes",
+      "service": "nimbusly.example",
+      "correct": "promo_codes-07-m1",
+      "picks": {
+        "baseline": "promo_codes-07-m3",
+        "heuristic": "promo_codes-07-m3",
+        "jev": "promo_codes-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 154.00690000000031,
+        "calls": [
+          {
+            "messageId": "promo_codes-07-m1",
+            "noul": 0.98,
+            "latencyMs": 128.03020000000015,
+            "attempts": 1,
+            "inputTokens": 544,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-07-m2",
+            "noul": 0.01,
+            "latencyMs": 152.95390000000043,
+            "attempts": 1,
+            "inputTokens": 539,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "promo_codes-07-m3",
+            "noul": 0.14,
+            "latencyMs": 116.4377999999997,
+            "attempts": 1,
+            "inputTokens": 567,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-01",
+      "category": "order_invoice_numbers",
+      "service": "pebblecart.example",
+      "correct": "order_invoice_numbers-01-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-01-m2",
+        "heuristic": "order_invoice_numbers-01-m2",
+        "jev": "order_invoice_numbers-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 149.39109999999982,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-01-m1",
+            "noul": 0.97,
+            "latencyMs": 135.10279999999966,
+            "attempts": 1,
+            "inputTokens": 549,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-01-m2",
+            "noul": 0.02,
+            "latencyMs": 149.00970000000052,
+            "attempts": 1,
+            "inputTokens": 573,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-02",
+      "category": "order_invoice_numbers",
+      "service": "sableworks.example",
+      "correct": "order_invoice_numbers-02-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-02-m2",
+        "heuristic": "order_invoice_numbers-02-m2",
+        "jev": "order_invoice_numbers-02-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 164.88819999999942,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-02-m1",
+            "noul": 0.96,
+            "latencyMs": 111.88349999999991,
+            "attempts": 1,
+            "inputTokens": 538,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-02-m2",
+            "noul": 0.02,
+            "latencyMs": 164.3765999999996,
+            "attempts": 1,
+            "inputTokens": 550,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-03",
+      "category": "order_invoice_numbers",
+      "service": "halvardair.example",
+      "correct": "order_invoice_numbers-03-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-03-m2",
+        "heuristic": "order_invoice_numbers-03-m2",
+        "jev": "order_invoice_numbers-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 161.8082000000004,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-03-m1",
+            "noul": 0.98,
+            "latencyMs": 161.76170000000002,
+            "attempts": 1,
+            "inputTokens": 533,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-03-m2",
+            "noul": 0.03,
+            "latencyMs": 145.36509999999998,
+            "attempts": 1,
+            "inputTokens": 550,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-04",
+      "category": "order_invoice_numbers",
+      "service": "glimmerly.example",
+      "correct": "order_invoice_numbers-04-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-04-m2",
+        "heuristic": "order_invoice_numbers-04-m1",
+        "jev": "order_invoice_numbers-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 169.38749999999982,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-04-m1",
+            "noul": 0.97,
+            "latencyMs": 136.3154000000004,
+            "attempts": 1,
+            "inputTokens": 522,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-04-m2",
+            "noul": 0.01,
+            "latencyMs": 169.10260000000017,
+            "attempts": 1,
+            "inputTokens": 527,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-05",
+      "category": "order_invoice_numbers",
+      "service": "lumora.example",
+      "correct": "order_invoice_numbers-05-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-05-m2",
+        "heuristic": "order_invoice_numbers-05-m2",
+        "jev": "order_invoice_numbers-05-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 159.05249999999978,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-05-m1",
+            "noul": 0.8,
+            "latencyMs": 159.01240000000053,
+            "attempts": 1,
+            "inputTokens": 501,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-05-m2",
+            "noul": 0.02,
+            "latencyMs": 112.38209999999981,
+            "attempts": 1,
+            "inputTokens": 517,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-06",
+      "category": "order_invoice_numbers",
+      "service": "trellium.example",
+      "correct": "order_invoice_numbers-06-m2",
+      "picks": {
+        "baseline": "order_invoice_numbers-06-m3",
+        "heuristic": "order_invoice_numbers-06-m2",
+        "jev": "order_invoice_numbers-06-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 158.4282000000003,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-06-m1",
+            "noul": 0.02,
+            "latencyMs": 158.39499999999953,
+            "attempts": 1,
+            "inputTokens": 569,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-06-m2",
+            "noul": 0.97,
+            "latencyMs": 129.7527,
+            "attempts": 1,
+            "inputTokens": 546,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-06-m3",
+            "noul": 0.01,
+            "latencyMs": 129.61509999999998,
+            "attempts": 1,
+            "inputTokens": 551,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_invoice_numbers-07",
+      "category": "order_invoice_numbers",
+      "service": "zentrik.example",
+      "correct": "order_invoice_numbers-07-m1",
+      "picks": {
+        "baseline": "order_invoice_numbers-07-m2",
+        "heuristic": "order_invoice_numbers-07-m2",
+        "jev": "order_invoice_numbers-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 184.1207000000004,
+        "calls": [
+          {
+            "messageId": "order_invoice_numbers-07-m1",
+            "noul": 0.97,
+            "latencyMs": 184.07859999999982,
+            "attempts": 1,
+            "inputTokens": 526,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "order_invoice_numbers-07-m2",
+            "noul": 0.07,
+            "latencyMs": 150.3816999999999,
+            "attempts": 1,
+            "inputTokens": 549,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-01",
+      "category": "japanese",
+      "service": "komorebi-id.example",
+      "correct": "japanese-01-m1",
+      "picks": {
+        "baseline": "japanese-01-m2",
+        "heuristic": "japanese-01-m1",
+        "jev": "japanese-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 171.03679999999986,
+        "calls": [
+          {
+            "messageId": "japanese-01-m1",
+            "noul": 0.97,
+            "latencyMs": 159.77170000000024,
+            "attempts": 1,
+            "inputTokens": 616,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-01-m2",
+            "noul": 0.01,
+            "latencyMs": 170.6891999999998,
+            "attempts": 1,
+            "inputTokens": 618,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-02",
+      "category": "japanese",
+      "service": "shizuku-cloud.example",
+      "correct": "japanese-02-m2",
+      "picks": {
+        "baseline": "japanese-02-m2",
+        "heuristic": "japanese-02-m2",
+        "jev": "japanese-02-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 123.05379999999968,
+        "calls": [
+          {
+            "messageId": "japanese-02-m1",
+            "noul": 0.01,
+            "latencyMs": 118.64220000000023,
+            "attempts": 1,
+            "inputTokens": 614,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-02-m2",
+            "noul": 0.98,
+            "latencyMs": 122.48019999999997,
+            "attempts": 1,
+            "inputTokens": 579,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-03",
+      "category": "japanese",
+      "service": "kotonoha-books.example",
+      "correct": "japanese-03-m1",
+      "picks": {
+        "baseline": "japanese-03-m2",
+        "heuristic": "japanese-03-m2",
+        "jev": "japanese-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 140.70090000000073,
+        "calls": [
+          {
+            "messageId": "japanese-03-m1",
+            "noul": 0.98,
+            "latencyMs": 140.65319999999974,
+            "attempts": 1,
+            "inputTokens": 620,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-03-m2",
+            "noul": 0.06,
+            "latencyMs": 118.9965000000002,
+            "attempts": 1,
+            "inputTokens": 639,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-04",
+      "category": "japanese",
+      "service": "hotaru-mobile.example",
+      "correct": "japanese-04-m1",
+      "picks": {
+        "baseline": "japanese-04-m2",
+        "heuristic": "japanese-04-m2",
+        "jev": "japanese-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 127.83289999999943,
+        "calls": [
+          {
+            "messageId": "japanese-04-m1",
+            "noul": 0.77,
+            "latencyMs": 127.73919999999998,
+            "attempts": 1,
+            "inputTokens": 610,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-04-m2",
+            "noul": 0.02,
+            "latencyMs": 127.56810000000041,
+            "attempts": 1,
+            "inputTokens": 659,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-05",
+      "category": "japanese",
+      "service": "tsumugi-sec.example",
+      "correct": "japanese-05-m1",
+      "picks": {
+        "baseline": "japanese-05-m2",
+        "heuristic": "japanese-05-m1",
+        "jev": "japanese-05-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 150.34280000000035,
+        "calls": [
+          {
+            "messageId": "japanese-05-m1",
+            "noul": 0.96,
+            "latencyMs": 150.3158000000003,
+            "attempts": 1,
+            "inputTokens": 614,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-05-m2",
+            "noul": 0.01,
+            "latencyMs": 132.83969999999954,
+            "attempts": 1,
+            "inputTokens": 543,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-06",
+      "category": "japanese",
+      "service": "hibari-ticket.example",
+      "correct": "japanese-06-m1",
+      "picks": {
+        "baseline": "japanese-06-m3",
+        "heuristic": "japanese-06-m3",
+        "jev": "japanese-06-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 153.02189999999973,
+        "calls": [
+          {
+            "messageId": "japanese-06-m1",
+            "noul": 0.97,
+            "latencyMs": 142.8709000000008,
+            "attempts": 1,
+            "inputTokens": 578,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-06-m2",
+            "noul": 0.03,
+            "latencyMs": 118.17090000000007,
+            "attempts": 1,
+            "inputTokens": 612,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-06-m3",
+            "noul": 0.06,
+            "latencyMs": 152.48340000000007,
+            "attempts": 1,
+            "inputTokens": 622,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-07",
+      "category": "japanese",
+      "service": "komorebi-id.example",
+      "correct": "japanese-07-m2",
+      "picks": {
+        "baseline": "japanese-07-m3",
+        "heuristic": "japanese-07-m2",
+        "jev": "japanese-07-m2"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 144.1237999999994,
+        "calls": [
+          {
+            "messageId": "japanese-07-m1",
+            "noul": 0.98,
+            "latencyMs": 108.79809999999998,
+            "attempts": 1,
+            "inputTokens": 616,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-07-m2",
+            "noul": 0.98,
+            "latencyMs": 131.9317000000001,
+            "attempts": 1,
+            "inputTokens": 616,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "japanese-07-m3",
+            "noul": 0.02,
+            "latencyMs": 143.64229999999952,
+            "attempts": 1,
+            "inputTokens": 620,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-01",
+      "category": "subdomain_site",
+      "service": "login.wyndmoorbank.co.uk",
+      "correct": "subdomain_site-01-m1",
+      "picks": {
+        "baseline": "subdomain_site-01-m2",
+        "heuristic": "subdomain_site-01-m1",
+        "jev": "subdomain_site-01-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 148.96659999999974,
+        "calls": [
+          {
+            "messageId": "subdomain_site-01-m1",
+            "noul": 0.92,
+            "latencyMs": 148.92230000000018,
+            "attempts": 1,
+            "inputTokens": 583,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-01-m2",
+            "noul": 0.01,
+            "latencyMs": 134.79219999999987,
+            "attempts": 1,
+            "inputTokens": 567,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-02",
+      "category": "subdomain_site",
+      "service": "online.halseysavings.co.uk",
+      "correct": "subdomain_site-02-m2",
+      "picks": {
+        "baseline": "subdomain_site-02-m2",
+        "heuristic": "subdomain_site-02-m2",
+        "jev": "subdomain_site-02-m2"
+      },
+      "outcomes": {
+        "baseline": "correct",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 170.39829999999893,
+        "calls": [
+          {
+            "messageId": "subdomain_site-02-m1",
+            "noul": 0.01,
+            "latencyMs": 170.35900000000038,
+            "attempts": 1,
+            "inputTokens": 555,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-02-m2",
+            "noul": 0.96,
+            "latencyMs": 119.02859999999964,
+            "attempts": 1,
+            "inputTokens": 549,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-03",
+      "category": "subdomain_site",
+      "service": "accounts.orbitly.example",
+      "correct": "subdomain_site-03-m1",
+      "picks": {
+        "baseline": "subdomain_site-03-m2",
+        "heuristic": "subdomain_site-03-m1",
+        "jev": "subdomain_site-03-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 142.1152000000002,
+        "calls": [
+          {
+            "messageId": "subdomain_site-03-m1",
+            "noul": 0.96,
+            "latencyMs": 135.97179999999935,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-03-m2",
+            "noul": 0.01,
+            "latencyMs": 141.65119999999843,
+            "attempts": 1,
+            "inputTokens": 542,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-04",
+      "category": "subdomain_site",
+      "service": "id.ferroline.example",
+      "correct": "subdomain_site-04-m1",
+      "picks": {
+        "baseline": "subdomain_site-04-m2",
+        "heuristic": "subdomain_site-04-m1",
+        "jev": "subdomain_site-04-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 162.36399999999958,
+        "calls": [
+          {
+            "messageId": "subdomain_site-04-m1",
+            "noul": 0.97,
+            "latencyMs": 162.306700000001,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-04-m2",
+            "noul": 0.01,
+            "latencyMs": 143.34649999999965,
+            "attempts": 1,
+            "inputTokens": 549,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-05",
+      "category": "subdomain_site",
+      "service": "tallyfin-app.vercel.app",
+      "correct": "subdomain_site-05-m1",
+      "picks": {
+        "baseline": "subdomain_site-05-m2",
+        "heuristic": "subdomain_site-05-m1",
+        "jev": "subdomain_site-05-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 127.46039999999994,
+        "calls": [
+          {
+            "messageId": "subdomain_site-05-m1",
+            "noul": 0.95,
+            "latencyMs": 127.40170000000035,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-05-m2",
+            "noul": 0.01,
+            "latencyMs": 126.22649999999885,
+            "attempts": 1,
+            "inputTokens": 545,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-06",
+      "category": "subdomain_site",
+      "service": "skipass-demo.vercel.app",
+      "correct": "subdomain_site-06-m1",
+      "picks": {
+        "baseline": "subdomain_site-06-m2",
+        "heuristic": "subdomain_site-06-m1",
+        "jev": "subdomain_site-06-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 131.23509999999987,
+        "calls": [
+          {
+            "messageId": "subdomain_site-06-m1",
+            "noul": 0.85,
+            "latencyMs": 113.3158999999996,
+            "attempts": 1,
+            "inputTokens": 495,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-06-m2",
+            "noul": 0.01,
+            "latencyMs": 130.4964,
+            "attempts": 1,
+            "inputTokens": 537,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "subdomain_site-07",
+      "category": "subdomain_site",
+      "service": "login.kotonoha-books.co.jp",
+      "correct": "subdomain_site-07-m1",
+      "picks": {
+        "baseline": "subdomain_site-07-m2",
+        "heuristic": "subdomain_site-07-m1",
+        "jev": "subdomain_site-07-m1"
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "correct",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 134.13609999999971,
+        "calls": [
+          {
+            "messageId": "subdomain_site-07-m1",
+            "noul": 0.96,
+            "latencyMs": 113.72539999999935,
+            "attempts": 1,
+            "inputTokens": 636,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "subdomain_site-07-m2",
+            "noul": 0.01,
+            "latencyMs": 133.08780000000115,
+            "attempts": 1,
+            "inputTokens": 589,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-01",
+      "category": "no_correct",
+      "service": "lumora.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-01-m2",
+        "heuristic": "no_correct-01-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 181.91929999999957,
+        "calls": [
+          {
+            "messageId": "no_correct-01-m1",
+            "noul": 0.01,
+            "latencyMs": 181.85800000000017,
+            "attempts": 1,
+            "inputTokens": 542,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-01-m2",
+            "noul": 0.01,
+            "latencyMs": 115.19330000000082,
+            "attempts": 1,
+            "inputTokens": 521,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-02",
+      "category": "no_correct",
+      "service": "quillfeather.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-02-m2",
+        "heuristic": "no_correct-02-m1",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 137.0048000000006,
+        "calls": [
+          {
+            "messageId": "no_correct-02-m1",
+            "noul": 0.15,
+            "latencyMs": 136.95679999999993,
+            "attempts": 1,
+            "inputTokens": 568,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-02-m2",
+            "noul": 0.01,
+            "latencyMs": 117.3171999999995,
+            "attempts": 1,
+            "inputTokens": 543,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-03",
+      "category": "no_correct",
+      "service": "pebblecart.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-03-m2",
+        "heuristic": "no_correct-03-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 195.13490000000093,
+        "calls": [
+          {
+            "messageId": "no_correct-03-m1",
+            "noul": 0.01,
+            "latencyMs": 134.6183000000001,
+            "attempts": 1,
+            "inputTokens": 516,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-03-m2",
+            "noul": 0.02,
+            "latencyMs": 194.59389999999985,
+            "attempts": 1,
+            "inputTokens": 573,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-04",
+      "category": "no_correct",
+      "service": "brightpine.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-04-m2",
+        "heuristic": "no_correct-04-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 118.72079999999914,
+        "calls": [
+          {
+            "messageId": "no_correct-04-m1",
+            "noul": 0.01,
+            "latencyMs": 118.65769999999975,
+            "attempts": 1,
+            "inputTokens": 565,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-04-m2",
+            "noul": 0.07,
+            "latencyMs": 113.98909999999887,
+            "attempts": 1,
+            "inputTokens": 549,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-05",
+      "category": "no_correct",
+      "service": "kotonoha-books.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-05-m2",
+        "heuristic": "no_correct-05-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 108.16870000000017,
+        "calls": [
+          {
+            "messageId": "no_correct-05-m1",
+            "noul": 0.03,
+            "latencyMs": 108.10770000000048,
+            "attempts": 1,
+            "inputTokens": 616,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-05-m2",
+            "noul": 0.06,
+            "latencyMs": 105.31950000000143,
+            "attempts": 1,
+            "inputTokens": 639,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-06",
+      "category": "no_correct",
+      "service": "skipass-demo.vercel.app",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-06-m2",
+        "heuristic": "no_correct-06-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 130.52319999999963,
+        "calls": [
+          {
+            "messageId": "no_correct-06-m1",
+            "noul": 0.01,
+            "latencyMs": 122.13479999999981,
+            "attempts": 1,
+            "inputTokens": 498,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-06-m2",
+            "noul": 0.01,
+            "latencyMs": 130.01909999999953,
+            "attempts": 1,
+            "inputTokens": 521,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-07",
+      "category": "no_correct",
+      "service": "login.wyndmoorbank.co.uk",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-07-m2",
+        "heuristic": "no_correct-07-m2",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 149.23619999999937,
+        "calls": [
+          {
+            "messageId": "no_correct-07-m1",
+            "noul": 0.01,
+            "latencyMs": 123.53620000000046,
+            "attempts": 1,
+            "inputTokens": 553,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-07-m2",
+            "noul": 0.01,
+            "latencyMs": 148.7598999999991,
+            "attempts": 1,
+            "inputTokens": 553,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_correct-08",
+      "category": "no_correct",
+      "service": "sableworks.example",
+      "correct": null,
+      "picks": {
+        "baseline": "no_correct-08-m3",
+        "heuristic": "no_correct-08-m3",
+        "jev": null
+      },
+      "outcomes": {
+        "baseline": "false_fill",
+        "heuristic": "false_fill",
+        "jev": "correct"
+      },
+      "jev": {
+        "wallMs": 125.53379999999925,
+        "calls": [
+          {
+            "messageId": "no_correct-08-m1",
+            "noul": 0.02,
+            "latencyMs": 125.48249999999825,
+            "attempts": 1,
+            "inputTokens": 550,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-08-m2",
+            "noul": 0.01,
+            "latencyMs": 118.72339999999895,
+            "attempts": 1,
+            "inputTokens": 553,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          },
+          {
+            "messageId": "no_correct-08-m3",
+            "noul": 0.04,
+            "latencyMs": 106.16039999999884,
+            "attempts": 1,
+            "inputTokens": 525,
+            "outputTokens": 23,
+            "model": "jev-1.13.0",
+            "error": null
+          }
+        ]
+      }
+    }
+  ]
+}
