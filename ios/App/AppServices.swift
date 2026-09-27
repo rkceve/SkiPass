@@ -15,6 +15,10 @@ protocol AccountServices: AnyObject {
 
     func savePassword(_ password: String, mailboxID: UUID) throws
     func password(mailboxID: UUID) -> String?
+    /// Removes `password.<mailboxID>` only.
+    func deletePassword(mailboxID: UUID) throws
+    /// Removes `oauth.<mailboxID>` only.
+    func deleteOAuthState(mailboxID: UUID) throws
     /// Removes every secret stored for the mailbox (password and OAuth state).
     func deleteCredentials(mailboxID: UUID) throws
 
@@ -34,11 +38,20 @@ struct OAuthSignInResult: Hashable, Sendable {
     var authStateData: Data
 }
 
+/// The customer's RevenueCat entitlements, reduced to what the plan display needs.
+struct EntitlementSnapshot: Hashable, Sendable {
+    /// Identifiers (lookup keys, e.g. "standard", "pro") of the active entitlements.
+    var active: Set<String>
+    /// Product identifier behind each entitlement the customer has had (active or expired),
+    /// by entitlement identifier.
+    var productIDs: [String: String]
+}
+
 /// One purchasable package of the current RevenueCat offering, reduced to what the UI needs.
 struct StorePackageInfo: Hashable, Sendable {
     /// `Package.identifier`; used as `PlanOption.id`.
     var id: String
-    /// `StoreProduct.productIdentifier`; matched against active entitlements.
+    /// `StoreProduct.productIdentifier`; matched against the entitlements' products.
     var productID: String
     var title: String
     var description: String
@@ -54,8 +67,8 @@ protocol BillingServices: AnyObject {
     func configure() -> String?
     /// Packages of the current offering (empty when there is none).
     func currentPackages() async throws -> [StorePackageInfo]
-    /// Product identifiers behind the customer's active entitlements.
-    func activeEntitlementProductIDs() async throws -> Set<String>
+    /// The customer's entitlements (`CustomerInfo.entitlements`).
+    func entitlements() async throws -> EntitlementSnapshot
     /// Purchases the package with `Package.identifier == packageID`.
     /// Returns false when the user cancelled.
     func purchase(packageID: String) async throws -> Bool
@@ -81,6 +94,8 @@ protocol UsageServices: AnyObject {
 /// App Group values shared with the extension (CONTRACTS §4).
 @MainActor
 protocol SharedStateServices: AnyObject {
+    /// `rc.appUserID`: the ID the extension sends to the server.
+    func appUserID() -> String?
     func setAppUserID(_ appUserID: String)
     func cachedUsage() -> UsageSnapshot?
     func cacheUsage(_ snapshot: UsageSnapshot)

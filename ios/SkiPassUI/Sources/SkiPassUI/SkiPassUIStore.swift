@@ -18,6 +18,11 @@ final class SkiPassUIStore {
     var accounts: [MailAccount]
     var plans: [PlanOption]
     var usage: UsageInfo?
+    /// False only when the build has no billing (no RevenueCat key): the Plan tab then says
+    /// "Plans are unavailable in this build." instead of listing other plans.
+    var plansAvailable: Bool
+    /// Bumped whenever an account's password is saved, so a revealed password is hidden again.
+    private(set) var passwordRevisions: [UUID: Int] = [:]
     var expandedAccountID: UUID?
     var accountSheet: AccountSheet?
     /// "Now" used for the reset countdown; injectable so previews match the mockup.
@@ -29,12 +34,14 @@ final class SkiPassUIStore {
         accounts: [MailAccount],
         plans: [PlanOption],
         usage: UsageInfo?,
+        plansAvailable: Bool = true,
         actions: any SkiPassUIActions,
         referenceDate: Date = .now
     ) {
         self.accounts = accounts
         self.plans = plans
         self.usage = usage
+        self.plansAvailable = plansAvailable
         self.actions = actions
         self.referenceDate = referenceDate
     }
@@ -53,12 +60,17 @@ final class SkiPassUIStore {
     func saveIMAP(address: String, settings: ServerSettings, password: String) async throws {
         let account = try await actions.saveIMAP(address: address, settings: settings, password: password)
         upsert(account)
+        passwordRevisions[account.id, default: 0] += 1
     }
 
     func deleteAccount(id: UUID) async throws {
         try await actions.deleteAccount(id: id)
         accounts.removeAll { $0.id == id }
         if expandedAccountID == id { expandedAccountID = nil }
+    }
+
+    func passwordRevision(for id: UUID) -> Int {
+        passwordRevisions[id] ?? 0
     }
 
     func revealPassword(id: UUID) async -> String? {

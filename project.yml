@@ -52,21 +52,15 @@ targets:
       - package: SkiPassCore
         product: SkiPassStorage
       - package: SkiPassCore
-        product: SkiPassMail
-      - package: SkiPassCore
         product: SkiPassAuth
       - package: SkiPassCore
         product: SkiPassAuthUI
-      - package: SkiPassCore
-        product: SkiPassExtraction
       - package: SkiPassCore
         product: SkiPassServerClient
       - package: SkiPassUI
         product: SkiPassUI
       - package: RevenueCat
         product: RevenueCat
-      - package: RevenueCat
-        product: RevenueCatUI
       - target: SkiPassAutoFill
         embed: true
 

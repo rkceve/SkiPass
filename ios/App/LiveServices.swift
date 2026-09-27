@@ -11,9 +11,9 @@ import os
 // All concrete construction lives in this file.
 //
 // Symbols used from packages written in parallel (read from origin/wip/i2 b76d60d and origin/wip/i5 7a8a6bc):
-//   SkiPassStorage: MailboxStore() throws / list / add / update / remove(id:)
+//   SkiPassStorage: MailboxStore(defaults:) list / add / update / remove(id:); KeychainStore.delete(account:)
 //                   CredentialStore() setIMAPPassword / imapPassword / setOAuthStateData / removeAll(for:)
-//                   AppGroupState() throws  revenueCatAppUserID / usageSnapshot() / setUsageSnapshot(_:) throws
+//                   AppGroupState(defaults:) revenueCatAppUserID / usageSnapshot() / setUsageSnapshot(_:) throws
 //   SkiPassAuth:    OAuthService() (client IDs from Info.plist)
 //   SkiPassAuthUI:  OAuthService.signIn (app-only split, CONTRACTS §8 2026-09-24)
 //                   .signIn(kind:presenting:loginHint:) async throws -> (address: String, authStateData: Data)
@@ -41,16 +41,29 @@ struct AppConfiguration: Sendable {
     var revenueCatAPIKey: String?
 
     init(bundle: Bundle) {
-        serverURL = Self.value("SkiPassServerURL", in: bundle).flatMap(URL.init(string:))
-        appToken = Self.value("SkiPassAppToken", in: bundle)
-        revenueCatAPIKey = Self.value("RevenueCatAPIKey", in: bundle)
+        self.init(info: bundle.infoDictionary ?? [:])
     }
 
-    /// Non-empty, substituted Info.plist string (an unset xcconfig variable leaves "" or "$(NAME)").
-    private static func value(_ key: String, in bundle: Bundle) -> String? {
-        guard let raw = bundle.object(forInfoDictionaryKey: key) as? String else { return nil }
+    init(info: [String: Any]) {
+        serverURL = Self.value("SkiPassServerURL", in: info).flatMap(URL.init(string:))
+        appToken = Self.value("SkiPassAppToken", in: info)
+        revenueCatAPIKey = Self.value("RevenueCatAPIKey", in: info)
+    }
+
+    /// Placeholders of `ios/Config/Secrets.example.xcconfig`, kept by builds made without the
+    /// corresponding secret; they mean "not configured".
+    static let exampleValues: Set<String> = [
+        "https://skipass.example.invalid",
+        "example-app-token",
+        "appl_example",
+    ]
+
+    /// Non-empty, substituted Info.plist string that is not an example placeholder (an unset
+    /// xcconfig variable leaves "" or "$(NAME)").
+    private static func value(_ key: String, in info: [String: Any]) -> String? {
+        guard let raw = info[key] as? String else { return nil }
         let value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !value.isEmpty, !value.hasPrefix("$(") else { return nil }
+        guard !value.isEmpty, !value.hasPrefix("$("), !exampleValues.contains(value) else { return nil }
         return value
     }
 }
@@ -64,34 +77,39 @@ enum LiveServicesError: Error {
 
 @MainActor
 final class LiveAccountServices: AccountServices {
-    private let mailboxStore: MailboxStore?
-    private let credentialStore = CredentialStore()
+    /// Runtime-resolved App Group defaults, or the app's own defaults when none is available.
+    private let mailboxStore = MailboxStore(defaults: SharedStorageEnvironment.current.defaults)
+    private let secrets: KeychainStore
+    private let credentialStore: CredentialStore
     private let oauthService = OAuthService()
 
     init() {
-        mailboxStore = try? MailboxStore()
-    }
-
-    private func store() throws -> MailboxStore {
-        guard let mailboxStore else { throw StorageError.appGroupUnavailable }
-        return mailboxStore
+        secrets = KeychainStore()
+        credentialStore = CredentialStore(secrets: secrets)
     }
 
     func loadMailboxes() throws -> [MailboxConfig] {
-        try store().list()
+        try mailboxStore.list()
     }
 
     func saveMailbox(_ mailbox: MailboxConfig) throws {
-        let mailboxes = try store()
-        if try mailboxes.list().contains(where: { $0.id == mailbox.id }) {
-            try mailboxes.update(mailbox)
+        if try mailboxStore.list().contains(where: { $0.id == mailbox.id }) {
+            try mailboxStore.update(mailbox)
         } else {
-            try mailboxes.add(mailbox)
+            try mailboxStore.add(mailbox)
         }
     }
 
     func deleteMailbox(id: UUID) throws {
-        try store().remove(id: id)
+        try mailboxStore.remove(id: id)
+    }
+
+    func deletePassword(mailboxID: UUID) throws {
+        try secrets.delete(account: StorageConstants.KeychainAccount.password(mailboxID))
+    }
+
+    func deleteOAuthState(mailboxID: UUID) throws {
+        try secrets.delete(account: StorageConstants.KeychainAccount.oauth(mailboxID))
     }
 
     func savePassword(_ password: String, mailboxID: UUID) throws {
@@ -171,9 +189,12 @@ final class LiveBillingServices: BillingServices {
         }
     }
 
-    func activeEntitlementProductIDs() async throws -> Set<String> {
-        let customerInfo = try await Purchases.shared.customerInfo()
-        return Set(customerInfo.entitlements.active.values.map(\.productIdentifier))
+    func entitlements() async throws -> EntitlementSnapshot {
+        let entitlements = try await Purchases.shared.customerInfo().entitlements
+        return EntitlementSnapshot(
+            active: Set(entitlements.active.keys),
+            productIDs: entitlements.all.mapValues(\.productIdentifier)
+        )
     }
 
     func purchase(packageID: String) async throws -> Bool {
@@ -245,20 +266,24 @@ final class LiveIdentityServices: IdentityServices {
 
 @MainActor
 final class LiveSharedStateServices: SharedStateServices {
-    private let state = try? AppGroupState()
+    private let state = AppGroupState(defaults: SharedStorageEnvironment.current.defaults)
     private let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "AppGroupState")
 
+    func appUserID() -> String? {
+        state.revenueCatAppUserID
+    }
+
     func setAppUserID(_ appUserID: String) {
-        state?.revenueCatAppUserID = appUserID
+        state.revenueCatAppUserID = appUserID
     }
 
     func cachedUsage() -> UsageSnapshot? {
-        state?.usageSnapshot()
+        state.usageSnapshot()
     }
 
     func cacheUsage(_ snapshot: UsageSnapshot) {
         do {
-            try state?.setUsageSnapshot(snapshot)
+            try state.setUsageSnapshot(snapshot)
         } catch {
             logger.error("Caching usage failed: \(String(describing: error), privacy: .public)")
         }

@@ -25,6 +25,7 @@ struct SkiPassApp: App {
             accounts: model.accounts,
             plans: model.plans,
             usage: model.usage,
+            plansAvailable: model.plansAvailable,
             actions: model
         )
         .task { await model.start() }

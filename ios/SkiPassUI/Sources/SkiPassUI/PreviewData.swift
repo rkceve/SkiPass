@@ -19,9 +19,7 @@ enum PreviewData {
         server: ServerSettings(
             incomingHost: "mail.myshop.jp",
             incomingPort: 993,
-            username: "info@myshop.jp",
-            outgoingHost: "mail.myshop.jp",
-            outgoingPort: 465
+            username: "info@myshop.jp"
         )
     )
 
@@ -33,9 +31,7 @@ enum PreviewData {
         server: ServerSettings(
             incomingHost: "mail.myshop.jp",
             incomingPort: 993,
-            username: "support@myshop.jp",
-            outgoingHost: "mail.myshop.jp",
-            outgoingPort: 465
+            username: "support@myshop.jp"
         )
     )
 
@@ -69,14 +65,7 @@ enum PreviewData {
 
     // MARK: Plans (screen 2)
 
-    static let freePlan = PlanOption(
-        id: "free",
-        name: "Free",
-        tagline: "A simple start for personal use.",
-        priceText: "$0/mo",
-        isCurrent: false,
-        systemImage: "person.fill"
-    )
+    static let freePlan = PlanOption.free(isCurrent: false)
 
     static let standardPlan = PlanOption(
         id: "standard",

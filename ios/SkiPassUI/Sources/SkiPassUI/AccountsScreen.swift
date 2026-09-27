@@ -10,8 +10,8 @@ struct AccountsScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Gear and Add are the screen's glass controls; one container lets them
-                // share a sampling region (glass cannot sample other glass).
+                // Add is the header's glass control (no settings gear, SYSTEM.md §2); the
+                // container gives it one sampling region with the header.
                 VStack(alignment: .leading, spacing: 24) {
                     HeaderView()
 
@@ -26,6 +26,7 @@ struct AccountsScreen: View {
                         AccountCard(
                             account: account,
                             isExpanded: store.expandedAccountID == account.id,
+                            passwordRevision: store.passwordRevision(for: account.id),
                             onToggle: {
                                 withAnimation(CardMotion.toggle) { store.toggleExpanded(account.id) }
                             },

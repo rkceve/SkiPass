@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Screen 2 (Plan tab): header, current plan with usage, other plans, Change Plan.
+/// Screen 2 (Plan tab): header, current plan with usage, other plans.
 /// Low-pressure by design: nothing beyond what the mockup shows.
 struct PlanScreen: View {
     let store: SkiPassUIStore
@@ -17,17 +17,19 @@ struct PlanScreen: View {
                 }
 
                 let others = store.otherPlans
-                SectionTitle(text: Copy.otherPlansTitle)
-                    .padding(.top, 8)
-
-                if others.isEmpty {
-                    // No purchasable plans: RevenueCat is not configured in this build (or the
-                    // offering is empty), so only the current plan exists.
+                if !store.plansAvailable {
+                    // No RevenueCat key in this build: nothing can be purchased.
+                    SectionTitle(text: Copy.otherPlansTitle)
+                        .padding(.top, 8)
                     Text(Copy.plansUnavailable)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("plan.unavailable")
-                } else {
+                } else if !others.isEmpty {
+                    // Billing is configured but the offering is not loaded yet (or failed):
+                    // show nothing rather than a misleading message.
+                    SectionTitle(text: Copy.otherPlansTitle)
+                        .padding(.top, 8)
                     VStack(spacing: 16) {
                         ForEach(others) { plan in
                             PlanRow(plan: plan) {
@@ -36,11 +38,6 @@ struct PlanScreen: View {
                         }
                     }
                 }
-
-                ChangePlanRow {
-                    // OPEN(ui): Change Plan behavior not specified; intentionally a no-op.
-                }
-                .padding(.top, 8)
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)

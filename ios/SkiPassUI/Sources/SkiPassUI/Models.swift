@@ -8,33 +8,22 @@ public enum AccountKind: Hashable, Sendable {
     case imap
 }
 
+/// Only the connected state exists: nothing in the app detects a mailbox that needs signing in
+/// again (the extension skips failing mailboxes without recording it).
 public enum ConnectionStatus: Hashable, Sendable {
     case connected
-    case needsSignIn
-    case error(String)
 }
 
-/// Server settings for IMAP accounts. Outgoing values are display-only;
-/// their rows are shown only when non-nil.
+/// Incoming (IMAP) server settings of an IMAP account (SYSTEM.md §2: host, port, username).
 public struct ServerSettings: Hashable, Sendable {
     public var incomingHost: String
     public var incomingPort: Int
     public var username: String
-    public var outgoingHost: String?
-    public var outgoingPort: Int?
 
-    public init(
-        incomingHost: String,
-        incomingPort: Int,
-        username: String,
-        outgoingHost: String? = nil,
-        outgoingPort: Int? = nil
-    ) {
+    public init(incomingHost: String, incomingPort: Int, username: String) {
         self.incomingHost = incomingHost
         self.incomingPort = incomingPort
         self.username = username
-        self.outgoingHost = outgoingHost
-        self.outgoingPort = outgoingPort
     }
 }
 
@@ -107,8 +96,43 @@ public struct UsageInfo: Hashable, Sendable {
     }
 }
 
+/// Errors the host app throws to the UI. The UI shows a message from `Copy` for each case
+/// (never a raw `localizedDescription`); a thrown `CancellationError` shows nothing.
 public enum SkiPassUIError: Error, Hashable, Sendable {
     /// Thrown by `SkiPassUIActions.addAccount(email:)` when the address is not a
     /// Google / Microsoft account and IMAP server settings are required.
     case needsServerSettings
+    /// This build has no OAuth client ID for Google.
+    case googleSignInNotConfigured
+    /// This build has no OAuth client ID for Microsoft.
+    case microsoftSignInNotConfigured
+    /// The provider sign-in failed (other than the user cancelling it).
+    case signInFailed
+    /// The account could not be saved (storage / Keychain error).
+    case saveFailed
+    /// The account could not be deleted (storage / Keychain error).
+    case deleteFailed
+}
+
+extension PlanOption {
+    /// The Free plan row (server plan id "free").
+    public static func free(isCurrent: Bool) -> PlanOption {
+        PlanOption(
+            id: "free",
+            name: Copy.freePlanName,
+            tagline: Copy.freePlanTagline,
+            priceText: Copy.freePlanPrice,
+            isCurrent: isCurrent,
+            systemImage: "person.fill"
+        )
+    }
+
+    /// Display name of a paid server plan id ("standard" / "pro"); nil for anything else.
+    public static func paidPlanName(planID: String) -> String? {
+        switch planID {
+        case "standard": Copy.standardPlanName
+        case "pro": Copy.proPlanName
+        default: nil
+        }
+    }
 }
