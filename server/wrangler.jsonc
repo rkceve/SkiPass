@@ -8,7 +8,9 @@
   "vars": {
     // "live" calls the real API; "mock" uses the deterministic stand-in (docs/CONTRACTS.md §5).
     "JEV_MODE": "live",
-    "REVENUECAT_MODE": "live"
+    "REVENUECAT_MODE": "live",
+    // RevenueCat project for the API v2 entitlement lookup (not secret).
+    "REVENUECAT_PROJECT_ID": "projc9e01f04"
   },
   "kv_namespaces": [
     {

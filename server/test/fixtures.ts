@@ -1,5 +1,5 @@
-// Upstream payloads copied from the official docs' example payloads (fetched 2026-09-23).
-// Only the question id key and the noul value are substituted where noted.
+// Upstream payloads copied from the official docs' example payloads (Jev fetched 2026-09-23,
+// RevenueCat API v2 fetched 2026-09-27). Substitutions are noted per fixture.
 
 /**
  * Jev response. Source: https://docs.typesafe.ai/api.md, "Noul answer" example response:
@@ -21,101 +21,54 @@ export function jevResponse(noul: number) {
 }
 
 /**
- * RevenueCat v1 "Get or Create Customer" 200 response sample, verbatim.
- * Source: https://www.revenuecat.com/docs/api-v1/customers.md ("Response samples").
+ * RevenueCat API v2 "Get a list of entitlements" item, from the docs' response sample
+ * (https://www.revenuecat.com/docs/api-v2/entitlement):
+ * {"object":"entitlement","id":"entla1b2c3d4e5","lookup_key":"premium","display_name":"Premium"}
+ * Substituted: `id`, `lookup_key`, `display_name`.
  */
-export const revenueCatSubscriberSample = {
-  request_date: '2019-07-26T17:40:10Z',
-  request_date_ms: 1564162810884,
-  subscriber: {
-    entitlements: {
-      pro_cat: {
-        expires_date: null,
-        grace_period_expires_date: null,
-        product_identifier: 'onetime',
-        purchase_date: '2019-04-05T21:52:45Z',
-      },
-    },
-    first_seen: '2019-02-21T00:08:41Z',
-    management_url: 'https://apps.apple.com/account/subscriptions',
-    non_subscriptions: {
-      onetime: [
-        {
-          id: 'cadba0c81b',
-          is_sandbox: true,
-          purchase_date: '2019-04-05T21:52:45Z',
-          store: 'app_store',
-        },
-      ],
-    },
-    original_app_user_id: 'XXX-XXXXX-XXXXX-XX',
-    original_application_version: '1.0',
-    original_purchase_date: '2019-01-30T23:54:10Z',
-    other_purchases: {},
-    subscriptions: {
-      annual: {
-        auto_resume_date: null,
-        billing_issues_detected_at: null,
-        expires_date: '2019-08-14T21:07:40Z',
-        grace_period_expires_date: null,
-        is_sandbox: true,
-        original_purchase_date: '2019-02-21T00:42:05Z',
-        ownership_type: 'PURCHASED',
-        period_type: 'normal',
-        purchase_date: '2019-07-14T20:07:40Z',
-        refunded_at: null,
-        store: 'play_store',
-        store_transaction_id: 'GPA.6801-7988-0152-76034..5',
-        unsubscribe_detected_at: '2019-07-17T22:48:38Z',
-      },
-      onemonth: {
-        auto_resume_date: null,
-        billing_issues_detected_at: null,
-        expires_date: '2019-06-17T22:47:55Z',
-        grace_period_expires_date: null,
-        is_sandbox: true,
-        original_purchase_date: '2019-02-21T00:42:05Z',
-        ownership_type: 'PURCHASED',
-        period_type: 'normal',
-        purchase_date: '2019-06-17T22:42:55Z',
-        refunded_at: null,
-        store: 'app_store',
-        store_transaction_id: 1000000652379790,
-        unsubscribe_detected_at: '2019-06-17T22:48:38Z',
-      },
-      rc_promo_pro_cat_monthly: {
-        auto_resume_date: null,
-        billing_issues_detected_at: null,
-        expires_date: '2019-08-26T01:02:16Z',
-        grace_period_expires_date: null,
-        is_sandbox: false,
-        original_purchase_date: '2019-07-26T01:02:16Z',
-        ownership_type: 'FAMILY_SHARED',
-        period_type: 'normal',
-        purchase_date: '2019-07-26T01:02:16Z',
-        refunded_at: null,
-        store: 'promotional',
-        store_transaction_id: 'a42db3af39530cb82b17eaf9c6576393',
-        unsubscribe_detected_at: null,
-      },
-    },
-  },
+export function rcEntitlement(id: string, lookupKey: string) {
+  return { object: 'entitlement', id, lookup_key: lookupKey, display_name: lookupKey }
+}
+
+/** Entitlement object ids used by the tests, one per lookup key in plans.ts. */
+export const RC_ENTITLEMENT_IDS: Record<string, string> = {
+  pro: 'entla1b2c3d4e5',
+  standard: 'entlb2c3d4e5f6',
+}
+
+/** v2 list envelope (`object`, `items`, `next_page`, `url`), as in the docs' list samples. */
+export function rcList(url: string, items: unknown[], nextPage: string | null = null) {
+  return { object: 'list', items, next_page: nextPage, url }
+}
+
+/** A project's entitlement list: `premium` (the docs' sample, not in plans.ts) plus pro/standard. */
+export function rcEntitlementList(project: string) {
+  return rcList(`/v2/projects/${project}/entitlements`, [
+    rcEntitlement('entlc3d4e5f6a7', 'premium'),
+    ...Object.entries(RC_ENTITLEMENT_IDS).map(([key, id]) => rcEntitlement(id, key)),
+  ])
 }
 
 /**
- * The same sample with its single entitlement renamed from `pro_cat` to `entitlementId` and,
- * optionally, `expires_date` replaced (the sample's subscription expiry `2019-08-14T21:07:40Z`
- * is used by the tests as a realistic non-null value).
+ * Active entitlement item, from the "Get a customer" docs sample's `active_entitlements`
+ * (https://www.revenuecat.com/docs/api-v2/customer):
+ * {"object":"customer.active_entitlement","entitlement_id":"entla1b2c3d4e5","expires_at":1658399423658}
+ * Substituted: `entitlement_id`, `expires_at`.
  */
-export function revenueCatWithEntitlement(entitlementId: string, expiresDate: string | null) {
-  const { pro_cat } = revenueCatSubscriberSample.subscriber.entitlements
-  return {
-    ...revenueCatSubscriberSample,
-    subscriber: {
-      ...revenueCatSubscriberSample.subscriber,
-      entitlements: { [entitlementId]: { ...pro_cat, expires_date: expiresDate } },
-    },
-  }
+export function rcActiveEntitlement(entitlementId: string, expiresAt: number | null) {
+  return { object: 'customer.active_entitlement', entitlement_id: entitlementId, expires_at: expiresAt }
+}
+
+/** The docs sample's `expires_at` (2022-07-21T10:30:23.658Z), used as a realistic non-null value. */
+export const RC_SAMPLE_EXPIRES_AT = 1658399423658
+
+/** v2 error for an unknown customer, verbatim from the live API (2026-09-27, HTTP 404). */
+export const rcCustomerMissing = {
+  doc_url: 'https://errors.rev.cat/resource-missing',
+  message: 'Could not find customer ID associated with this project',
+  object: 'error',
+  retryable: false,
+  type: 'resource_missing',
 }
 
 /** Message text in the exact layout of `FetchedMessage.judgeText` (SkiPassModels). */

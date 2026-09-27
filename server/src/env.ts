@@ -1,20 +1,31 @@
-/** Worker bindings (wrangler.jsonc vars + KV, and secrets set with `wrangler secret put`). */
+import { type KvStore, KvUsageCounter, type UsageCounter } from './usage.js'
+
+/**
+ * Configuration. Cloudflare: wrangler.jsonc vars + KV, and secrets set with `wrangler secret put`.
+ * Vercel: project environment variables, passed in by src/vercel.ts.
+ */
 export interface Bindings {
-  USAGE: KVNamespace
+  /** Cloudflare KV namespace for the usage counter (Worker target only). */
+  USAGE?: KvStore
   /** "mock" selects the deterministic stand-in; anything else calls the real API (when a key is set). */
   JEV_MODE?: string
   REVENUECAT_MODE?: string
   JEV_API_KEY?: string
+  /** RevenueCat REST API v2 secret key (`sk_…`). */
   REVENUECAT_SECRET_KEY?: string
+  /** RevenueCat project id; API v2 paths are per project. */
+  REVENUECAT_PROJECT_ID?: string
   APP_TOKEN?: string
 }
 
-/** Injectable side effects, so tests can control the network and the clock. */
+/** Injectable side effects, so tests can control the network, the clock and the counter store. */
 export interface Deps {
   fetch: typeof fetch
   now: () => Date
   /** Per-call timeout for upstream APIs (Jev: 2 s per docs/CONTRACTS.md §5). */
   upstreamTimeoutMs: number
+  /** Monthly fill counter for a request's bindings. */
+  usageCounter: (env: Bindings) => UsageCounter
 }
 
 export const defaultDeps: Deps = {
@@ -22,6 +33,11 @@ export const defaultDeps: Deps = {
   fetch: (input, init) => fetch(input, init),
   now: () => new Date(),
   upstreamTimeoutMs: 2000,
+  // Cloudflare: the `USAGE` KV binding. The Vercel entry (src/vercel.ts) overrides this with Redis.
+  usageCounter: (env) => {
+    if (env.USAGE === undefined) throw new Error('USAGE KV binding missing')
+    return new KvUsageCounter(env.USAGE)
+  },
 }
 
 export class TimeoutError extends Error {

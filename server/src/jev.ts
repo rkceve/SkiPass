@@ -9,7 +9,7 @@
 //   "Response structure"), both fetched 2026-09-23.
 
 import { getDomain, getDomainWithoutSuffix, getHostname } from 'tldts'
-import { type Deps, withTimeout } from './env'
+import { type Deps, withTimeout } from './env.js'
 
 export const JEV_URL = 'https://api.typesafe.ai/v1/systemone'
 export const JEV_MODEL = 'jev-latest'

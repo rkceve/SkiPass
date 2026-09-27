@@ -1,0 +1,8 @@
+# Vercel picks the Hono entry from a fixed list of paths (app/index/server, at the root or in
+# src/), with src/ taking precedence. The Vercel entry is ./app.ts, so the Worker entry
+# src/index.ts must not be uploaded. Also keep local secrets, Worker state and tests out.
+src/index.ts
+.env*
+.dev.vars*
+.wrangler
+test
