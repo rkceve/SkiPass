@@ -1,8 +1,11 @@
 import { env } from 'cloudflare:workers'
-import { createApp } from '../src/app'
+import { createApp } from '../src/api'
 import type { Bindings, Deps } from '../src/env'
+import { clearEntitlementCache } from '../src/revenuecat'
 
 export const TOKEN = 'test-app-token'
+/** Project id from the RevenueCat API v2 docs' samples. */
+export const RC_PROJECT = 'proj1ab2c3d4'
 
 let userCounter = 0
 /** KV storage is isolated per test file, not per test, so every test uses its own user id. */
@@ -41,12 +44,15 @@ export function makeClient(opts: {
   user?: string
   token?: string | null
 }) {
+  // Every client starts with an empty RevenueCat entitlement table cache.
+  clearEntitlementCache()
   const app = createApp(opts.deps)
   const bindings: Bindings = {
     USAGE: env.USAGE,
     APP_TOKEN: TOKEN,
     JEV_MODE: 'mock',
     REVENUECAT_MODE: 'mock',
+    REVENUECAT_PROJECT_ID: RC_PROJECT,
     ...opts.bindings,
   }
   const user = opts.user ?? freshUser()

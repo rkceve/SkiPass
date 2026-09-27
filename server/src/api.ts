@@ -1,15 +1,16 @@
 // SkiPass server HTTP API — docs/CONTRACTS.md §5 is the binding contract for paths, headers,
 // bodies and status codes. Bindings are read from `c.env` as in
-// https://hono.dev/docs/getting-started/cloudflare-workers ("Bindings").
+// https://hono.dev/docs/getting-started/cloudflare-workers ("Bindings"). The same app runs on
+// Vercel (src/vercel.ts), which passes its environment variables in as the bindings.
 //
 // Privacy: nothing here logs or persists message text or metadata. The only stored data is the
-// per-user monthly fill count in KV.
+// per-user monthly fill count (Workers KV or Upstash Redis).
 
 import { Hono, type Context } from 'hono'
-import { type Bindings, type Deps, defaultDeps } from './env'
-import { type JudgeMessage, judgeMessages } from './jev'
-import { lookupPlan } from './revenuecat'
-import { formatInstant, readUsed, resetsAt, writeUsed } from './usage'
+import { type Bindings, type Deps, defaultDeps } from './env.js'
+import { type JudgeMessage, judgeMessages } from './jev.js'
+import { lookupPlan } from './revenuecat.js'
+import { formatInstant, resetsAt } from './usage.js'
 
 export const APP_TOKEN_HEADER = 'X-SkiPass-App-Token'
 export const USER_HEADER = 'X-SkiPass-User'
@@ -91,9 +92,11 @@ export function createApp(overrides: Partial<Deps> = {}) {
   }
   const rcConfig = (c: Ctx) => {
     const key = c.env.REVENUECAT_SECRET_KEY ?? ''
+    const projectId = c.env.REVENUECAT_PROJECT_ID ?? ''
     return {
-      mode: c.env.REVENUECAT_MODE === 'mock' || key === '' ? 'mock' : 'live',
+      mode: c.env.REVENUECAT_MODE === 'mock' || key === '' || projectId === '' ? 'mock' : 'live',
       secretKey: key,
+      projectId,
     } as const
   }
 
@@ -102,7 +105,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
     const user = c.get('appUserID')
     const [plan, used] = await Promise.all([
       lookupPlan(deps, rcConfig(c), user),
-      readUsed(c.env.USAGE, user, now),
+      deps.usageCounter(c.env).read(user, now),
     ])
     return { user, plan, used, remaining: Math.max(0, plan.monthlyFillLimit - used) }
   }
@@ -137,11 +140,12 @@ export function createApp(overrides: Partial<Deps> = {}) {
       return invalidRequest(c)
     }
     const now = deps.now()
-    const q = await quota(c, now)
-    if (q.used >= q.plan.monthlyFillLimit) return quotaExhausted(c)
-    const used = q.used + 1
-    await writeUsed(c.env.USAGE, q.user, now, used)
-    return c.json({ remaining: Math.max(0, q.plan.monthlyFillLimit - used) })
+    const user = c.get('appUserID')
+    const plan = await lookupPlan(deps, rcConfig(c), user)
+    // The counter checks the limit and counts in one step (atomically on Redis).
+    const r = await deps.usageCounter(c.env).tryConsume(user, now, plan.monthlyFillLimit)
+    if (!r.ok) return quotaExhausted(c)
+    return c.json({ remaining: Math.max(0, plan.monthlyFillLimit - r.used) })
   })
 
   // GET /v1/usage

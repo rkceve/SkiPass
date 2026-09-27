@@ -1,8 +1,35 @@
 import { describe, expect, it } from 'vitest'
 import { JEV_URL, QUESTION_ID } from '../src/jev'
 import { FREE_PLAN, PAID_PLANS } from '../src/plans'
-import { jevResponse, judgeText, revenueCatSubscriberSample, revenueCatWithEntitlement } from './fixtures'
-import { fakeFetch, hang, json, makeClient } from './helpers'
+import {
+  RC_ENTITLEMENT_IDS,
+  RC_SAMPLE_EXPIRES_AT,
+  jevResponse,
+  judgeText,
+  rcActiveEntitlement,
+  rcCustomerMissing,
+  rcEntitlementList,
+  rcList,
+} from './fixtures'
+import { RC_PROJECT, fakeFetch, hang, json, makeClient } from './helpers'
+
+const RC_ENTITLEMENTS_URL = `https://api.revenuecat.com/v2/projects/${RC_PROJECT}/entitlements?limit=100`
+const rcActiveUrl = (user: string) =>
+  `https://api.revenuecat.com/v2/projects/${RC_PROJECT}/customers/${encodeURIComponent(user)}/active_entitlements`
+
+/** RevenueCat v2 answers: the entitlement list, and `active` (or 404) for any customer. */
+function rcResponse(url: string, active: unknown[] | 'missing'): Response {
+  if (url === RC_ENTITLEMENTS_URL) return json(rcEntitlementList(RC_PROJECT))
+  if (url.endsWith('/active_entitlements')) {
+    if (active === 'missing') return json(rcCustomerMissing, 404)
+    return json(rcList(new URL(url).pathname, active))
+  }
+  return json({ error: 'unexpected url' }, 500)
+}
+
+/** Active entitlement for the plan with lookup key `lookupKey`. */
+const activeFor = (lookupKey: string, expiresAt: number | null) =>
+  rcActiveEntitlement(RC_ENTITLEMENT_IDS[lookupKey], expiresAt)
 
 const SERVICE = 'login.acme.co.uk'
 
@@ -101,7 +128,7 @@ describe('quota', () => {
   it('stores the count under usage:<appUserID>:<YYYY-MM>', async () => {
     const c = makeClient({ deps: { now: fixedNow(SEPT) } })
     await c.fill({ messageId: acmeMsg.id })
-    expect(await c.bindings.USAGE.get(`usage:${c.user}:2026-09`)).toBe('1')
+    expect(await c.bindings.USAGE!.get(`usage:${c.user}:2026-09`)).toBe('1')
   })
 
   it('at limit-1: judge and the last fill succeed, remaining reaches 0', async () => {
@@ -300,54 +327,84 @@ describe('POST /v1/judge — live Jev', () => {
 
 describe('RevenueCat', () => {
   const live = { REVENUECAT_MODE: 'live', REVENUECAT_SECRET_KEY: 'sk_test_secret' }
-  const rc = (payload: unknown, status = 200) => fakeFetch(() => json(payload, status))
+  const rc = (active: unknown[] | 'missing') => fakeFetch((url) => rcResponse(url, active))
 
-  it('calls GET /v1/subscribers/{app_user_id} with the secret key (id URL-encoded)', async () => {
-    const f = rc(revenueCatSubscriberSample)
+  it('calls the v2 entitlement list and active_entitlements with the secret key (id URL-encoded)', async () => {
+    const f = rc([rcActiveEntitlement('entlc3d4e5f6a7', null)])
     const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
     const res = await c.usage()
-    // The docs sample only has the `pro_cat` entitlement, which is not in plans.ts -> free.
+    // Only `premium` is active, which is not in plans.ts -> free.
     expect(await body(res)).toMatchObject({ plan: 'free', limit: FREE_PLAN.monthlyFillLimit })
-    expect(f.calls).toHaveLength(1)
-    expect(f.calls[0].url).toBe(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(c.user)}`)
-    expect(f.calls[0].url).toContain('%24RCAnonymousID%3A')
-    expect(f.calls[0].init.method).toBe('GET')
-    expect(new Headers(f.calls[0].init.headers).get('Authorization')).toBe('Bearer sk_test_secret')
+    expect(f.calls.map((x) => x.url).sort()).toEqual([RC_ENTITLEMENTS_URL, rcActiveUrl(c.user)].sort())
+    expect(rcActiveUrl(c.user)).toContain('%24RCAnonymousID%3A')
+    for (const call of f.calls) {
+      expect(call.init.method).toBe('GET')
+      expect(new Headers(call.init.headers).get('Authorization')).toBe('Bearer sk_test_secret')
+    }
   })
 
-  it('maps an active (non-expiring) entitlement to its plan', async () => {
+  it('maps an active (non-expiring) entitlement to its plan by lookup key', async () => {
     const pro = PAID_PLANS.find((p) => p.id === 'pro')!
-    const c = makeClient({ bindings: live, deps: { fetch: rc(revenueCatWithEntitlement(pro.entitlementId!, null)).fn } })
+    const c = makeClient({ bindings: live, deps: { fetch: rc([activeFor(pro.entitlementId!, null)]).fn } })
     expect(await body(await c.usage())).toMatchObject({ plan: 'pro', limit: pro.monthlyFillLimit })
   })
 
-  it('treats a future expires_date as active and a past one as expired', async () => {
-    const standard = PAID_PLANS.find((p) => p.id === 'standard')!
-    const payload = revenueCatWithEntitlement(standard.entitlementId!, '2019-08-14T21:07:40Z')
-    const before = makeClient({ bindings: live, deps: { fetch: rc(payload).fn, now: fixedNow(new Date('2019-08-01T00:00:00Z')) } })
+  it('prefers the higher tier when several entitlements are active', async () => {
+    const c = makeClient({
+      bindings: live,
+      deps: { fetch: rc([activeFor('standard', null), activeFor('pro', null)]).fn },
+    })
+    expect((await body(await c.usage())).plan).toBe('pro')
+  })
+
+  it('treats a future expires_at as active and a past one as expired', async () => {
+    const active = [activeFor('standard', RC_SAMPLE_EXPIRES_AT)]
+    const before = makeClient({
+      bindings: live,
+      deps: { fetch: rc(active).fn, now: fixedNow(new Date('2022-07-21T00:00:00Z')) },
+    })
     expect((await body(await before.usage())).plan).toBe('standard')
-    const after = makeClient({ bindings: live, deps: { fetch: rc(payload).fn, now: fixedNow(new Date('2019-08-15T00:00:00Z')) } })
+    const after = makeClient({
+      bindings: live,
+      deps: { fetch: rc(active).fn, now: fixedNow(new Date('2022-07-22T00:00:00Z')) },
+    })
     expect((await body(await after.usage())).plan).toBe('free')
+  })
+
+  it('treats an unknown customer (404 resource_missing) as the free plan', async () => {
+    const c = makeClient({ bindings: live, deps: { fetch: rc('missing').fn } })
+    expect((await body(await c.usage())).plan).toBe('free')
   })
 
   it('uses the paid plan limit for quota checks', async () => {
     const standard = PAID_PLANS.find((p) => p.id === 'standard')!
     const c = makeClient({
       bindings: live,
-      deps: { fetch: rc(revenueCatWithEntitlement(standard.entitlementId!, null)).fn, now: fixedNow(SEPT) },
+      deps: { fetch: rc([activeFor('standard', null)]).fn, now: fixedNow(SEPT) },
     })
     expect(await body(await c.fill({ messageId: acmeMsg.id }))).toEqual({ remaining: standard.monthlyFillLimit - 1 })
   })
 
+  it('caches the entitlement list between requests', async () => {
+    const f = rc([activeFor('pro', null)])
+    const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT) } })
+    await c.usage()
+    await c.usage()
+    expect(f.calls.filter((x) => x.url === RC_ENTITLEMENTS_URL)).toHaveLength(1)
+    expect(f.calls.filter((x) => x.url.endsWith('/active_entitlements'))).toHaveLength(2)
+  })
+
   it('degrades to the free plan on an upstream error', async () => {
-    const c = makeClient({ bindings: live, deps: { fetch: rc({}, 500).fn } })
+    const c = makeClient({ bindings: live, deps: { fetch: fakeFetch(() => json({}, 500)).fn } })
     expect((await body(await c.usage())).plan).toBe('free')
   })
 
-  it('does not call RevenueCat in mock mode', async () => {
-    const f = rc(revenueCatWithEntitlement('pro', null))
-    const c = makeClient({ bindings: { REVENUECAT_MODE: 'mock', REVENUECAT_SECRET_KEY: 'sk' }, deps: { fetch: f.fn } })
-    expect((await body(await c.usage())).plan).toBe('free')
+  it('does not call RevenueCat in mock mode, or without a project id', async () => {
+    const f = rc([activeFor('pro', null)])
+    const mock = makeClient({ bindings: { REVENUECAT_MODE: 'mock', REVENUECAT_SECRET_KEY: 'sk' }, deps: { fetch: f.fn } })
+    expect((await body(await mock.usage())).plan).toBe('free')
+    const noProject = makeClient({ bindings: { ...live, REVENUECAT_PROJECT_ID: '' }, deps: { fetch: f.fn } })
+    expect((await body(await noProject.usage())).plan).toBe('free')
     expect(f.calls).toHaveLength(0)
   })
 })
@@ -372,7 +429,7 @@ describe('POST /v1/judge — quota check and Jev run concurrently', () => {
         return json(jevResponse(0.97))
       }
       await jevCalled
-      return json(revenueCatWithEntitlement(standard.entitlementId!, null))
+      return rcResponse(url, [activeFor(standard.entitlementId!, null)])
     })
     const c = makeClient({ bindings: live, deps: { fetch: f.fn, now: fixedNow(SEPT), upstreamTimeoutMs: 500 } })
     const res = await c.judge({ service: SERVICE, messages: [acmeMsg] })

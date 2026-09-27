@@ -5,7 +5,10 @@ export type PlanId = 'free' | 'standard' | 'pro'
 
 export interface Plan {
   id: PlanId
-  /** RevenueCat entitlement identifier that grants this plan; null for the free plan. */
+  /**
+   * RevenueCat entitlement identifier that grants this plan; null for the free plan. This is the
+   * entitlement's `lookup_key` in API v2 (the identifier the SDKs use), not its `entl…` object id.
+   */
   entitlementId: string | null
   monthlyFillLimit: number
 }
