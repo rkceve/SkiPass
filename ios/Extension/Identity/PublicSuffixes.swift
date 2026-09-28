@@ -1,6 +1,6 @@
 import Foundation
 
-// Two-label public suffixes used by `EmailDomains.registrableDomain` (TRIAGE D6: the Swift rule must
+// Two-label public suffixes used by `EmailDomains.registrableDomain` (the Swift rule must
 // give the same result as the server's `tldts.getDomain(host, { allowPrivateDomains: true })` for the
 // bundled cases; parity test: Tests/registrable-domain-parity.json).
 //
@@ -8,7 +8,7 @@ import Foundation
 // - icann: every "<sld>.<cc>" that tldts reports as an ICANN public suffix, for all two-letter
 //   country codes and the second-level labels co com net org edu gov ac or ne go mil gob gouv info biz
 //   ltd plc me sch nom gen firm web int in ind id lg ed ad gr nhs bank pro name tv;
-// - private: PaaS suffixes from the PSL private section seen in sign-in links (the TRIAGE D6 list plus
+// - private: PaaS suffixes from the PSL private section seen in sign-in links (the server's list plus
 //   a few more hosting platforms), each checked with allowPrivateDomains: true.
 // Not covered (the server may differ): three-label suffixes, other second-level labels (e.g. Japanese
 // prefecture suffixes such as tokyo.jp) and other private suffixes.

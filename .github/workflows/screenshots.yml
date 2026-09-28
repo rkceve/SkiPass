@@ -1,0 +1,141 @@
+name: screenshots
+
+# Store screenshots of the SkiPass app (iPhone 16 simulator, 1179x2556, status bar 9:41) driven by
+# ios/UITests/ScreenshotTests.swift with the DEBUG-only in-memory fixtures (fictional addresses,
+# no network). Output artifact `screenshots`: 01-home.png, 02-imap-expanded.png, 03-plan.png.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Select Xcode and simulator
+        run: bash .github/workflows/scripts/select-sim.sh
+
+      # Same Xcode + iOS runtime pair as the tour recording, on an iPhone 16.
+      - name: Pin Xcode, runtime and iPhone 16
+        env:
+          PIN_XCODE: /Applications/Xcode_26.3.0.app
+          PIN_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-26-2
+        run: |
+          test -d "$PIN_XCODE" || { echo "::error::pinned Xcode $PIN_XCODE is not installed"; exit 1; }
+          sudo xcode-select -s "$PIN_XCODE/Contents/Developer"
+          xcrun simctl list runtimes available | grep -q "$PIN_RUNTIME" \
+            || { echo "::error::pinned runtime $PIN_RUNTIME is not available"; exit 1; }
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"].get(sys.argv[1], [])
+          match = [d for d in devices if d["name"] == "iPhone 16"]
+          print(match[0]["udid"] if match else "")' "$PIN_RUNTIME")
+          [ -n "$udid" ] || udid=$(xcrun simctl create "iPhone 16" com.apple.CoreSimulator.SimDeviceType.iPhone-16 "$PIN_RUNTIME")
+          {
+            echo "XCODE_APP=$PIN_XCODE"
+            echo "SIM_RUNTIME=$PIN_RUNTIME"
+            echo "SIM_UDID=$udid"
+          } >> "$GITHUB_ENV"
+          xcodebuild -version
+
+      - name: Install XcodeGen and generate
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Boot simulator and override status bar
+        run: |
+          xcrun simctl boot "$SIM_UDID" || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          open -a Simulator --args -CurrentDeviceUDID "$SIM_UDID"
+          sleep 10
+          xcrun simctl ui "$SIM_UDID" appearance light
+          xcrun simctl status_bar "$SIM_UDID" override --time 9:41 \
+            --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            --batteryState charged --batteryLevel 100
+
+      - name: Build for testing
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -skipMacroValidation -skipPackagePluginValidation \
+            | tee build-screenshots.log | tail -30
+
+      - name: App icon in the built app
+        run: |
+          app=build/dd/Build/Products/Debug-iphonesimulator/SkiPass.app
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIcons" "$app/Info.plist"
+          ls -la "$app" | grep -E "AppIcon|Assets.car"
+
+      # The test writes <name>.ready into SHOT_DIR at each screen; this loop answers with a
+      # native-resolution `simctl io screenshot` and <name>.done.
+      - name: Take screenshots
+        run: |
+          mkdir -p out screenshots
+          SHOT_DIR="$RUNNER_TEMP/shots"
+          mkdir -p "$SHOT_DIR"
+          (
+            while true; do
+              for f in "$SHOT_DIR"/*.ready; do
+                [ -e "$f" ] || continue
+                n=$(basename "$f" .ready)
+                xcrun simctl io "$SIM_UDID" screenshot --type=png --mask=ignored "screenshots/$n.png" >/dev/null 2>&1
+                rm -f "$f"
+                touch "$SHOT_DIR/$n.done"
+              done
+              sleep 0.2
+            done
+          ) &
+          watcher=$!
+          set +e
+          TEST_RUNNER_SKIPASS_SCREENSHOTS=1 TEST_RUNNER_SKIPASS_SHOT_DIR="$SHOT_DIR" xcodebuild test-without-building \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -only-testing:SkiPassUITests/ScreenshotTests \
+            -resultBundlePath out/screenshots.xcresult \
+            > out/test.log 2>&1
+          status=$?
+          set -e
+          kill "$watcher" 2>/dev/null || true
+          grep -E "error:|Test Case|passed|failed|skipped" out/test.log | head -50 || true
+          if grep -q "Test skipped" out/test.log; then echo "screenshot test was skipped"; exit 1; fi
+          exit $status
+
+      - name: Check screenshots
+        run: |
+          fail=0
+          for n in 01-home 02-imap-expanded 03-plan; do
+            f="screenshots/$n.png"
+            if [ ! -s "$f" ]; then echo "::error::$f missing"; fail=1; continue; fi
+            w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+            h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/ {print $2}')
+            echo "$f: ${w}x${h}"
+            [ "$w" = 1179 ] && [ "$h" = 2556 ] || { echo "::error::$f is ${w}x${h}, expected 1179x2556"; fail=1; }
+          done
+          exit $fail
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots
+          path: screenshots
+
+      - name: Upload diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-diagnostics
+          path: |
+            out
+            build-screenshots.log

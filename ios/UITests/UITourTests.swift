@@ -3,8 +3,7 @@
 // fixtures behind the DEBUG-only `-SkiPassTourFixtures` launch argument (ios/App/TourFixtures.swift).
 //
 // Runs only when the test runner has SKIPASS_TOUR=1 (xcodebuild strips the TEST_RUNNER_ prefix,
-// so the workflow sets TEST_RUNNER_SKIPASS_TOUR=1). The SkiPass app must already be installed
-// on the simulator: this bundle's target application is SkiPassProbe.
+// so the workflow sets TEST_RUNNER_SKIPASS_TOUR=1).
 import XCTest
 
 @MainActor
@@ -31,8 +30,8 @@ final class UITourTests: XCTestCase {
         XCTAssertTrue(addButton.waitForExistence(timeout: 30), "Home screen did not appear")
         pause("home")
 
-        // Expand info@myshop.jp and show the server rows.
-        let info = "info@myshop.jp"
+        // Expand info@myshop.example and show the server rows.
+        let info = "info@myshop.example"
         let infoExpand = app.buttons["account.\(info).expand"]
         XCTAssertTrue(infoExpand.waitForExistence(timeout: 10))
         infoExpand.tap()
@@ -55,7 +54,7 @@ final class UITourTests: XCTestCase {
         XCTAssertTrue(email.waitForExistence(timeout: 10), "add sheet did not appear")
         pause("add-sheet")
 
-        let newAddress = "hello@studio.co"
+        let newAddress = "hello@studio.example"
         email.tap()
         email.typeText(newAddress)
         XCTAssertEqual(email.value as? String, newAddress)
@@ -69,8 +68,8 @@ final class UITourTests: XCTestCase {
         pause("imap-form")
 
         host.tap()
-        host.typeText("mail.studio.co")
-        XCTAssertEqual(host.value as? String, "mail.studio.co")
+        host.typeText("mail.studio.example")
+        XCTAssertEqual(host.value as? String, "mail.studio.example")
 
         // Port (default 993) and username (the typed address) are prefilled by the form.
         replaceText(in: app.textFields["accountForm.port"], with: "993")
@@ -170,8 +169,8 @@ final class UITourTests: XCTestCase {
             Thread.sleep(forTimeInterval: 0.6)  // let deceleration finish before rechecking
         }
         // After the IMAP sheet closes, iOS 26.2 sometimes keeps reporting an element that is
-        // fully on screen as not hittable (seen on main 0a104dd and wip/i11 cf31d30: the new card
-        // at y 476 pt, visible in the screenshot). Accept a fully visible frame; `tapOnScreen`
+        // fully on screen as not hittable (observed for the new card at y 476 pt, visible in the
+        // screenshot). Accept a fully visible frame; `tapOnScreen`
         // then taps its center by coordinate.
         if element.isHittable || isFullyOnScreen(element, in: app) { return }
         XCTFail("\(element.identifier) not hittable after \(attempts) swipes; frame \(element.frame)")

@@ -14,7 +14,7 @@ public enum ConnectionStatus: Hashable, Sendable {
     case connected
 }
 
-/// Incoming (IMAP) server settings of an IMAP account (SYSTEM.md §2: host, port, username).
+/// Incoming (IMAP) server settings of an IMAP account (docs/ARCHITECTURE.md §2: host, port, username).
 public struct ServerSettings: Hashable, Sendable {
     public var incomingHost: String
     public var incomingPort: Int

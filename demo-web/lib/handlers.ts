@@ -5,7 +5,7 @@
 //   POST /api/verify-code {"code": "123456"} -> {result: verified | incorrect | locked | expired | no_session}
 //   GET  /api/status      -> {active: false} | {active: true, email, expiresAt, resendAt, attemptsLeft}
 //
-// State lives in Upstash Redis (lib/store.ts, TRIAGE D7); the cookie holds only a random session id.
+// State lives in Upstash Redis (lib/store.ts); the cookie holds only a random session id.
 
 import { buildCodeEmail, DEFAULT_SITE_URL, sendWithResend } from './email.js'
 import { createHmac } from 'node:crypto'
@@ -27,7 +27,7 @@ export interface Env {
   UPSTASH_REDIS_REST_TOKEN?: string
 }
 
-/** Sends allowed from one client IP per window (TRIAGE D7). */
+/** Sends allowed from one client IP per window. */
 export const SEND_LIMIT_PER_IP = 5
 export const SEND_IP_WINDOW_MS = 10 * 60 * 1000
 
@@ -139,7 +139,7 @@ export async function handleSendCode(req: Request, env: Env, deps: Deps = defaul
   }
   if (!env.RESEND_API_KEY) return NOT_CONFIGURED('its email key (RESEND_API_KEY)')
 
-  // Rate limits independent of cookies (A3-07): 1 send per address per 30 s, 5 sends per IP per 10 min.
+  // Rate limits independent of cookies: 1 send per address per 30 s, 5 sends per IP per 10 min.
   // The slot is taken before calling Resend, so a failed send still waits out the cooldown.
   const reserved = await store.reserveSend(`send:ip:${clientIp(req)}`, recipientKey(email, secret), now, {
     ipLimit: SEND_LIMIT_PER_IP,
@@ -199,7 +199,7 @@ export async function handleVerifyCode(req: Request, env: Env, deps: Deps = defa
   const sessionId = sessionIdFrom(req)
   if (sessionId === null) return json(200, { result: 'no_session' })
 
-  // Attempts are counted server-side in one atomic step (A3-06): replaying an old cookie or sending
+  // Attempts are counted server-side in one atomic step: replaying an old cookie or sending
   // guesses in parallel cannot reset or skip the count, and a verified session is deleted (single use).
   const r = await store.verify(sessionId, hashCode(code, secret), deps.now(), MAX_ATTEMPTS)
   switch (r.result) {

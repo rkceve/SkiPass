@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-08-03",
   "vars": {
-    // "live" calls the real API; "mock" uses the deterministic stand-in (docs/CONTRACTS.md §5).
+    // "live" calls the real API; "mock" uses the deterministic stand-in (docs/API.md).
     "JEV_MODE": "live",
     "REVENUECAT_MODE": "live",
     // RevenueCat project for the API v2 entitlement lookup (not secret).

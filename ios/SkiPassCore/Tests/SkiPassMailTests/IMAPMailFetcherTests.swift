@@ -4,8 +4,8 @@ import SkiPassModels
 import SwiftMail
 import XCTest
 
-/// Fetch order and budget handling of `IMAPMailFetcher` against a scripted IMAP session
-/// (A2-01, A2-05, TRIAGE D12). No network is touched.
+/// Fetch order and budget handling of `IMAPMailFetcher` against a scripted IMAP session.
+/// No network is touched.
 final class IMAPMailFetcherOrderTests: XCTestCase {
     private let since = ISO8601DateFormatter().date(from: "2026-09-23T10:00:00Z")!
     private let mailbox = MailboxConfig(address: "me@example.com", kind: .imap, imapHost: "imap.example.com",

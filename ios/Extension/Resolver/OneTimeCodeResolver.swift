@@ -12,7 +12,7 @@ public struct ResolvedCode: Sendable, Hashable {
     }
 }
 
-/// How a failed fill report is retried (TRIAGE D4: up to 3 attempts, in the background).
+/// How a failed fill report is retried (up to 3 attempts, in the background).
 public struct FillReportRetry: Sendable {
     /// Total attempts, including the first.
     public var attempts: Int
@@ -30,16 +30,16 @@ public struct FillReportRetry: Sendable {
     }
 }
 
-/// UI-free orchestration of the extension flow (CONTRACTS §6, steps 2–4).
+/// UI-free orchestration of the extension flow (docs/ARCHITECTURE.md §3, steps 2–4).
 ///
 /// Depends only on the `SkiPassModels` protocols so it can be unit-tested with fakes.
 /// Every failure resolves to `nil`; the caller cancels silently (decided: no UI).
 public struct OneTimeCodeResolver: Sendable {
     public typealias MailboxSource = @Sendable () async throws -> [MailboxConfig]
 
-    /// Messages older than this are ignored (CONTRACTS §6: last 10 minutes).
+    /// Messages older than this are ignored (docs/ARCHITECTURE.md §3: last 10 minutes).
     public static let lookback: TimeInterval = 10 * 60
-    /// Per-mailbox fetch budget (CONTRACTS §6: 4 s).
+    /// Per-mailbox fetch budget (docs/ARCHITECTURE.md §3: 4 s).
     public static let defaultPerMailboxBudget: Duration = .seconds(4)
 
     private let mailboxes: MailboxSource
@@ -52,7 +52,7 @@ public struct OneTimeCodeResolver: Sendable {
     private let fillReportRetry: FillReportRetry
     private let chosenObserver: (@Sendable (FetchedMessage) -> Void)?
 
-    /// `chosenObserver` receives the message whose code is returned (only that one: A2-10, so
+    /// `chosenObserver` receives the message whose code is returned (only that one, so
     /// promotions and other sites' mail never register identities); the extension records the
     /// domains it mentions for identity registration.
     public init(mailboxes: @escaping MailboxSource,
@@ -106,7 +106,7 @@ public struct OneTimeCodeResolver: Sendable {
     }
 
     /// Counts one fill. Call only after the system accepted the code. A failed report is retried
-    /// per `fillReportRetry` (TRIAGE D4); the final error is ignored: the code has already been
+    /// per `fillReportRetry`; the final error is ignored: the code has already been
     /// filled and nothing is shown to the user. Returns the number of attempts made.
     @discardableResult
     public func reportFill(messageID: String) async -> Int {

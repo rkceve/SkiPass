@@ -1,5 +1,5 @@
 // Server state: the monthly fill counter (key `usage:<appUserID>:<YYYY-MM>`, UTC, per
-// docs/CONTRACTS.md §5), the judge rate-limit windows (`rl:judge:…`) and the last known plan per
+// docs/API.md), the judge rate-limit windows (`rl:judge:…`) and the last known plan per
 // user (`plan:<appUserID>`). One interface, three stores:
 //   - KvUsageCounter    — Cloudflare Workers KV (the Worker target).
 //     KV API: get(key) / put(key, value, {expirationTtl}) —
@@ -88,7 +88,7 @@ export interface UsageCounter {
    * `expireAtSec`, epoch seconds) and returns true; otherwise counts nothing and returns false.
    */
   tryHitAll(hits: Hit[], expireAtSec: number): Promise<boolean>
-  /** Last known plan of a user (D2), or null. */
+  /** Last known plan of a user, or null. */
   getPlan(appUserID: string): Promise<PlanCacheEntry | null>
   setPlan(appUserID: string, entry: PlanCacheEntry, ttlSec: number): Promise<void>
 }
@@ -163,7 +163,7 @@ export function redisConfigFromEnv(env: Record<string, string | undefined>): Red
 
 export class RedisError extends Error {}
 
-/** Per-request budget for Upstash calls (D5), so a slow Redis fails the request fast. */
+/** Per-request budget for Upstash calls, so a slow Redis fails the request fast. */
 export const REDIS_TIMEOUT_MS = 2000
 
 /**

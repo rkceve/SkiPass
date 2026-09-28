@@ -10,7 +10,7 @@ struct AccountsScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Add is the header's glass control (no settings gear, SYSTEM.md §2); the
+                // Add is the header's glass control (no settings gear, docs/ARCHITECTURE.md §2); the
                 // container gives it one sampling region with the header.
                 VStack(alignment: .leading, spacing: 24) {
                     HeaderView()

@@ -23,7 +23,7 @@ final class AppModel: SkiPassUIActions {
     /// A plan change (purchase sheet / subscription management) is in progress; further taps are ignored.
     @ObservationIgnored private var isChangingPlan = false
 
-    // Last known plan inputs. Failed refreshes keep them (SYSTEM.md §2, TRIAGE D8).
+    // Last known plan inputs. Failed refreshes keep them (docs/ARCHITECTURE.md §2).
     @ObservationIgnored private var packages: [StorePackageInfo] = []
     @ObservationIgnored private var entitlements: EntitlementSnapshot?
     /// The server's `/v1/usage.plan` (source of truth for the current plan); nil when unknown.
@@ -63,7 +63,7 @@ final class AppModel: SkiPassUIActions {
             billingConfigured = true
             userID = revenueCatID
         } else {
-            // No RevenueCat key (TRIAGE D10): a stable local ID so the extension can still ask the server.
+            // No RevenueCat key: a stable local ID so the extension can still ask the server.
             plansAvailable = false
             userID = Self.localAppUserID(existing: services.sharedState.appUserID())
         }
@@ -107,7 +107,7 @@ final class AppModel: SkiPassUIActions {
             let snapshot = try await services.usage.currentUsage(appUserID: appUserID)
             guard PlanTier(rawValue: snapshot.plan) != nil else {
                 // plan "unknown" (limit 0): the server could not reach RevenueCat and has nothing
-                // cached. Keep the last known usage and plan (TRIAGE D8).
+                // cached. Keep the last known usage and plan.
                 logger.notice("Usage plan unknown on the server; keeping the last known values")
                 return
             }
@@ -291,7 +291,7 @@ final class AppModel: SkiPassUIActions {
         if id == Self.freePlanID {
             guard currentTier != .free else { return }
             do {
-                // SYSTEM.md §2: a Test Store subscription cannot be cancelled here; it expires by
+                // docs/ARCHITECTURE.md §2: a Test Store subscription cannot be cancelled here; it expires by
                 // itself (see LiveBillingServices.showManageSubscriptions).
                 try await services.billing.showManageSubscriptions()
             } catch {
@@ -317,8 +317,8 @@ final class AppModel: SkiPassUIActions {
         await refreshUsage()
     }
 
-    // OPEN(enable-autofill): how the user is guided to turn on the AutoFill extension is not decided;
-    // nothing is presented for it here.
+    // Note: the app does not guide the user to turn on the AutoFill extension; it is enabled in
+    // Settings > General > AutoFill & Passwords.
 
     private func existingMailbox(address: String) -> MailboxConfig? {
         let mailboxes = (try? services.accounts.loadMailboxes()) ?? []
@@ -384,7 +384,7 @@ extension AppModel {
     static let freePlanID = "free"
     static let localAppUserIDPrefix = "local:"
 
-    /// The stored local ID when there is one, else a new random `local:<uuid>` (TRIAGE D10).
+    /// The stored local ID when there is one, else a new random `local:<uuid>`.
     static func localAppUserID(existing: String?) -> String {
         if let existing, existing.hasPrefix(localAppUserIDPrefix) { return existing }
         return localAppUserIDPrefix + UUID().uuidString.lowercased()
@@ -401,9 +401,8 @@ extension AppModel {
     }
 
     /// Google / Microsoft consumer domains that sign in through the provider's official page.
-    /// Everything else continues with the IMAP form.
-    // OPEN(provider-detection): Google Workspace / Microsoft 365 custom domains cannot be told
-    // apart from other IMAP hosts by the domain alone; they currently get the IMAP form.
+    /// Everything else continues with the IMAP form. Google Workspace / Microsoft 365 custom domains
+    /// cannot be told apart from other IMAP hosts by the domain alone, so they get the IMAP form too.
     static func oauthProvider(forEmail email: String) -> ProviderKind? {
         guard let at = email.lastIndex(of: "@") else { return nil }
         let domain = email[email.index(after: at)...]
@@ -451,7 +450,7 @@ extension AppModel {
         return calendar.date(byAdding: .month, value: 1, to: monthStart) ?? date
     }
 
-    /// Current plan (TRIAGE D8): the server's `/v1/usage.plan` when known; otherwise the highest
+    /// Current plan: the server's `/v1/usage.plan` when known; otherwise the highest
     /// active RevenueCat entitlement by lookup key (`pro` > `standard`, never by price); else Free.
     static func currentTier(serverPlan: PlanTier?, activeEntitlements: Set<String>?) -> PlanTier {
         if let serverPlan { return serverPlan }

@@ -11,7 +11,7 @@ import SwiftMail
 ///   the pipelined part fetch, which sends the same `FetchMessagePartCommand`
 ///   (IMAPConnection+PipelinedFetch.swift L243).
 ///
-/// Order and budget (A2-01, TRIAGE D12):
+/// Order and budget:
 /// - Envelopes are fetched newest UID first, in batches, and the exact recency cut (INTERNALDATE) is
 ///   applied before anything is capped; fetching stops once a batch reaches messages older than `since`.
 /// - Bodies are fetched newest first, several messages per pipelined burst
@@ -73,7 +73,7 @@ public struct IMAPMailFetcher: MailFetching {
         } catch is CancellationError {
             throw CancellationError()
         } catch {
-            // Budget over or a later command failed: keep what was already read (A2-01).
+            // Budget over or a later command failed: keep what was already read.
             let partial = collected.newestFirst()
             if partial.isEmpty { throw error }
             return partial

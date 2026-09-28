@@ -51,7 +51,7 @@ struct AccountCard: View {
                             revealPassword: revealPassword
                         )
                     }
-                    // SYSTEM.md §2: Google / Microsoft cards show no server rows, Delete only.
+                    // docs/ARCHITECTURE.md §2: Google / Microsoft cards show no server rows, Delete only.
                     AccountActionRow(
                         address: account.address,
                         showsEdit: account.kind == .imap,
@@ -79,7 +79,7 @@ struct AccountCard: View {
         } message: {
             Text(account.address)
         }
-        // OPEN(ui): error presentation style not specified; a plain alert is used.
+        // Errors from delete are shown in a plain alert.
         .alert(Copy.errorTitle, isPresented: $isShowingError) {
             Button(Copy.ok, role: .cancel) {}
         } message: {
@@ -116,6 +116,8 @@ private struct AccountSummaryRow: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
+                        // Long addresses shrink a little before the middle is truncated.
+                        .minimumScaleFactor(0.75)
                         .truncationMode(.middle)
                     StatusLabel(kind: account.kind, status: account.status)
                 }

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Every user-visible string of the app (SYSTEM.md §2). Strings marked "mockup" are copied
-/// verbatim from design/screen1-accounts.png or design/screen2-plan.png. The host app reaches
+/// Every user-visible string of the app (docs/ARCHITECTURE.md §2). Strings marked "mockup" are copied
+/// verbatim from the original screen designs (Home and Plan). The host app reaches
 /// the few it needs through public API (`PlanOption.free`, `PlanOption.paidPlanName`,
 /// `SkiPassUIError`), so all copy stays in this one file.
 enum Copy {
@@ -64,7 +64,7 @@ enum Copy {
     // MARK: Plan screen (mockup)
     static let planTitle = "Plan"
     static let currentChip = "Current"
-    static let remainingSends = "Remaining sends"  // [Open] one count = one code fill
+    static let remainingSends = "Remaining sends"  // one count = one code fill
     static let otherPlansTitle = "Other plans"
     static let plansUnavailable = "Plans are unavailable in this build."  // not in mockups
 

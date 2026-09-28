@@ -145,7 +145,8 @@ final class SharedStorageResolverTests: XCTestCase {
     }
 
     /// Used by the app's log line that checks whether the embedded extension's profile grants the
-    /// keychain group the app chose (TRIAGE "Not fixed": explicit logging of the resolved groups).
+    /// keychain group the app chose (keychain sharing can only be verified on a device, so the
+    /// resolved groups are logged explicitly).
     func testKeychainAccessGroupsAndWildcardCoverage() {
         let entitlements: [String: Any] = [
             "keychain-access-groups": ["LCUTH33TX7.*", "group.io.github.rkceve.skipass"],

@@ -1,7 +1,7 @@
 import Foundation
 import SkiPassModels
 
-/// Runs identity registrations one at a time and coalesces requests (A2-13).
+/// Runs identity registrations one at a time and coalesces requests.
 ///
 /// `replaceCredentialIdentities` rewrites the whole store, so two overlapping registrations built
 /// from different snapshots could finish in the wrong order and drop a newly seen domain. Here a
@@ -36,7 +36,7 @@ actor IdentitySyncCoordinator {
     }
 }
 
-/// What the extension may register, given what it can read (A2-12).
+/// What the extension may register, given what it can read.
 enum IdentitySyncInput: Equatable {
     /// Register identities for these mailbox addresses (empty = remove all: there is no mailbox).
     case register([String])

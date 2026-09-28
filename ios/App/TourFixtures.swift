@@ -1,7 +1,7 @@
-// Test fixture for the UI tour recording (ios/UITests/UITourTests.swift); not a feature.
+// Test fixture for the UI tour recording and the store screenshots (ios/UITests); not a feature.
 // Compiled only into Debug builds. Launching with `-SkiPassTourFixtures` replaces the live
-// services (storage, OAuth, RevenueCat, server) with in-memory data matching the mockups
-// (design/screen1-accounts.png, design/screen2-plan.png): no accounts, keychain or network.
+// services (storage, OAuth, RevenueCat, server) with in-memory data: no accounts, keychain or
+// network. All addresses use the reserved `.example` TLD (RFC 2606).
 #if DEBUG
 import Foundation
 import Observation
@@ -16,8 +16,9 @@ enum TourFixtures {
     }
 }
 
-/// In-memory stand-in for `AppModel` during the tour. Values mirror `SkiPassUI`'s
-/// internal `PreviewData` (which the app target cannot import).
+/// In-memory stand-in for `AppModel` during the tour. The IMAP accounts and plans mirror
+/// `SkiPassUI`'s internal `PreviewData` (which the app target cannot import); OAuth accounts are
+/// left out so no provider names appear on screen.
 @MainActor
 @Observable
 final class TourFixtureModel: SkiPassUIActions {
@@ -28,27 +29,37 @@ final class TourFixtureModel: SkiPassUIActions {
 
     init(now: Date = .now) {
         let info = MailAccount(
-            address: "info@myshop.jp",
+            address: "info@myshop.example",
             kind: .imap,
             status: .connected,
             server: ServerSettings(
-                incomingHost: "mail.myshop.jp",
+                incomingHost: "mail.myshop.example",
                 incomingPort: 993,
-                username: "info@myshop.jp"
+                username: "info@myshop.example"
             )
         )
         let support = MailAccount(
-            address: "support@myshop.jp",
+            address: "help@myshop.example",
             kind: .imap,
             status: .connected,
             server: ServerSettings(
-                incomingHost: "mail.myshop.jp",
+                incomingHost: "mail.myshop.example",
                 incomingPort: 993,
-                username: "support@myshop.jp"
+                username: "help@myshop.example"
             )
         )
-        accounts = [info, support]
-        passwords = [info.id: "tour-fixture-1", support.id: "tour-fixture-2"]
+        let sales = MailAccount(
+            address: "sales@studio.example",
+            kind: .imap,
+            status: .connected,
+            server: ServerSettings(
+                incomingHost: "imap.studio.example",
+                incomingPort: 993,
+                username: "sales@studio.example"
+            )
+        )
+        accounts = [info, support, sales]
+        passwords = [info.id: "tour-fixture-1", support.id: "tour-fixture-2", sales.id: "tour-fixture-3"]
 
         plans = [
             PlanOption(
@@ -70,7 +81,7 @@ final class TourFixtureModel: SkiPassUIActions {
             ),
         ]
 
-        // "465 of 1,000 left", resetting in 12 days as in the mockup.
+        // "465 of 1,000 left", resetting in 12 days.
         let calendar = Calendar.current
         let resetsAt = calendar.date(byAdding: .day, value: 12, to: calendar.startOfDay(for: now))
             .flatMap { calendar.date(byAdding: .hour, value: 12, to: $0) } ?? now

@@ -13,13 +13,13 @@ final class EmailDomainsTests: XCTestCase {
         XCTAssertEqual(EmailDomains.registrableDomain("login.rakuten.co.jp"), "rakuten.co.jp")
         XCTAssertEqual(EmailDomains.registrableDomain("Example.COM:443"), "example.com")
         XCTAssertEqual(EmailDomains.registrableDomain("github.com"), "github.com")
-        // The server uses tldts with allowPrivateDomains (TRIAGE D6), so a vercel.app site keeps its own name.
+        // The server uses tldts with allowPrivateDomains, so a vercel.app site keeps its own name.
         XCTAssertEqual(EmailDomains.registrableDomain("skipass-demo.vercel.app"), "skipass-demo.vercel.app")
         XCTAssertEqual(EmailDomains.registrableDomain("login.leumi.co.il"), "leumi.co.il")
         XCTAssertNil(EmailDomains.registrableDomain("  "))
     }
 
-    /// TRIAGE D6 / A2-11: every case in registrable-domain-parity.json was produced by the server's
+    /// Every case in registrable-domain-parity.json was produced by the server's
     /// rule (tldts, allowPrivateDomains: true) and must come out the same here.
     func testRegistrableDomainMatchesServerForParityCases() throws {
         let url = try XCTUnwrap(Bundle(for: EmailDomainsTests.self).url(forResource: "registrable-domain-parity",
@@ -64,7 +64,7 @@ final class EmailDomainsTests: XCTestCase {
     }
 
     func testDemoEmailYieldsTheDemoDomainFamily() {
-        // Text as rendered by demo-site/src/page.ts renderEmail.
+        // Layout of a demo verification email (links to the demo site on skipass-demo.vercel.app).
         let message = FetchedMessage(
             id: "m:2", mailboxAddress: "me@gmail.com",
             from: "SkiPass Demo <onboarding@resend.dev>", to: "me@gmail.com",
@@ -73,7 +73,7 @@ final class EmailDomainsTests: XCTestCase {
             bodyText: "Your SkiPass Demo verification code is 482913.\n\nIt expires in 10 minutes.\n\n"
                 + "Enter it at https://skipass-demo.vercel.app/"
         )
-        // resend.dev is the sending provider, not the site (TRIAGE D6 denylist).
+        // resend.dev is the sending provider, not the site (denylist).
         XCTAssertEqual(EmailDomains.domains(in: message), ["skipass-demo.vercel.app"])
     }
 
@@ -227,7 +227,7 @@ final class LocalFallbackJudgeTests: XCTestCase {
         XCTAssertEqual(none, .noMatch(scores: ["1": 0.1]))
     }
 
-    /// A2-06: a server reply naming a message that was not sent is a bad reply, so the local rule runs.
+    /// A server reply naming a message that was not sent is a bad reply, so the local rule runs.
     func testFallbackJudgeUsesLocalRuleWhenServerChoosesUnknownMessage() async throws {
         let m = message("1", body: "skipass-demo.vercel.app 123456", ageSeconds: 60)
         let judge = FallbackJudge(primary: StubJudge(result: .success(.chosen(messageID: "other:9", scores: [:]))))
@@ -254,7 +254,7 @@ final class LocalFallbackJudgeTests: XCTestCase {
         let resolved = await resolver.resolve(service: "skipass-demo.vercel.app")
 
         XCTAssertEqual(resolved, ResolvedCode(code: "482913", messageID: demo.id))
-        // A2-10: only the message that was actually used records its domains.
+        // Only the message that was actually used records its domains.
         XCTAssertEqual(observed.get(), [demo.id])
     }
 }

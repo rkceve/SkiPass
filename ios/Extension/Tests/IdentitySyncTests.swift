@@ -1,7 +1,7 @@
 import XCTest
 import SkiPassModels
 
-/// A2-12 / A2-13: identity registration never runs twice at once, always ends with the latest state,
+/// Identity registration never runs twice at once, always ends with the latest state,
 /// and a mailbox list that cannot be read does not wipe the registered identities.
 final class IdentitySyncTests: XCTestCase {
 

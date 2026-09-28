@@ -133,7 +133,7 @@ final class ServerClientTests: XCTestCase {
         }
     }
 
-    // MARK: judge reply validation (A2-06, TRIAGE D1/D3)
+    // MARK: judge reply validation
 
     func testJudgeAcceptsMockSource() async throws {
         StubURLProtocol.respond(status: 200, json: """
@@ -180,7 +180,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertTrue(ServerClientError.httpStatus(503).isTransient)
     }
 
-    /// CONTRACTS §5 (2026-09-27): a user RevenueCat does not know gets 401 unknown_user on every route.
+    /// docs/API.md: a user RevenueCat does not know gets 401 unknown_user on every route.
     /// It is not retried; the extension treats it like an unavailable server (local fallback).
     func testUnknownUserIsDistinctAndNotTransient() async throws {
         StubURLProtocol.respond(status: 401, json: #"{"error":"unknown_user"}"#)
@@ -193,7 +193,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertFalse(ServerClientError.unknownUser.isTransient)
     }
 
-    /// CONTRACTS §5 (2026-09-27): `remaining: 0` in a 200 means "not known" while RevenueCat is down,
+    /// docs/API.md: `remaining: 0` in a 200 means "not known" while RevenueCat is down,
     /// not "exhausted"; only 402 is quota exhaustion.
     func testRemainingZeroInA200IsNotQuotaExhaustion() async throws {
         StubURLProtocol.respond(status: 200, json: """
@@ -212,7 +212,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertEqual(usage.limit, 0)
     }
 
-    /// TRIAGE D10: without an app user ID the extension still asks the server to judge.
+    /// Without an app user ID the extension still asks the server to judge.
     func testJudgeWithoutAppUserIDUsesTheAnonymousJudgeUser() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":10,"source":"jev"}"#)
         let client = ServerClient(
@@ -240,7 +240,7 @@ final class ServerClientTests: XCTestCase {
         XCTAssertTrue(StubURLProtocol.requests.isEmpty)
     }
 
-    /// A2-08: the configured timeout bounds the whole request, not only idle time.
+    /// The configured timeout bounds the whole request, not only idle time.
     func testJudgeTimeoutBoundsTheWholeRequest() async throws {
         StubURLProtocol.respond(status: 200, json: #"{"chosenId":null,"scores":{},"remaining":1,"source":"jev"}"#,
                                 delay: 10)

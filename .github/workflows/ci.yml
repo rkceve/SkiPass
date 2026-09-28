@@ -161,7 +161,7 @@ jobs:
           npm ci
           npm test
           npm run typecheck
-      # The Cloudflare Worker entry must keep bundling (SYSTEM.md §1); no deploy, no credentials.
+      # The Cloudflare Worker entry must keep bundling (docs/ARCHITECTURE.md §1); no deploy, no credentials.
       - name: Worker bundle (wrangler deploy --dry-run)
         working-directory: server
         run: npx wrangler deploy --dry-run --outdir "$RUNNER_TEMP/worker"
@@ -177,22 +177,6 @@ jobs:
           node-version: 22
       - name: npm ci && npm test && npm run typecheck
         working-directory: demo-web
-        run: |
-          npm ci
-          npm test
-          npm run typecheck
-
-  demo-site:
-    name: demo-site (legacy; npm test + typecheck)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-      - name: npm ci && npm test && npm run typecheck
-        working-directory: demo-site
         run: |
           npm ci
           npm test

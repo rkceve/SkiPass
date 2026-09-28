@@ -1,6 +1,6 @@
 import Foundation
 
-// Fixed shared contract (docs/CONTRACTS.md §3). Owned by the orchestrator.
+// Shared model types used by the app and the extension (docs/ARCHITECTURE.md §1).
 
 public enum ProviderKind: String, Codable, Sendable, Hashable {
     case google
@@ -17,7 +17,7 @@ public enum ProviderKind: String, Codable, Sendable, Hashable {
     }
 }
 
-/// A registered mailbox. Contains no secrets; credentials live in the Keychain (CONTRACTS §4).
+/// A registered mailbox. Contains no secrets; credentials live in the Keychain (docs/ARCHITECTURE.md §5).
 public struct MailboxConfig: Codable, Sendable, Hashable, Identifiable {
     public let id: UUID
     public var address: String
@@ -58,7 +58,7 @@ public struct FetchedMessage: Codable, Sendable, Hashable, Identifiable {
         self.bodyText = bodyText
     }
 
-    /// Full message text as sent to the server/Jev (CONTRACTS §5).
+    /// Full message text as sent to the server/Jev (docs/API.md).
     public var judgeText: String {
         "From: \(from)\nTo: \(to)\nSubject: \(subject)\nDate: \(ISO8601DateFormatter().string(from: date))\n\n\(bodyText)"
     }

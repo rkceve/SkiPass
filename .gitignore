@@ -6,9 +6,20 @@ DerivedData/
 .build/
 .swiftpm/
 node_modules/
+dist/
+out/
+*.xcresult
 .wrangler/
+.vercel/
 .dev.vars
+.env
+.env.*
 *.env
 __pycache__/
 ios/Config/Secrets.xcconfig
 .claude/worktrees/
+worktrees/
+# Scratch files
+*.tmp
+.tmp*
+.f[0-9]*tmp

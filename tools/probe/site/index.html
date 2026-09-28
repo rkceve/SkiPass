@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkiPass probe</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px 16px; background: #fff; color: #111; }
+  h1 { font-size: 22px; margin: 0 0 16px; }
+  label { display: block; font-size: 15px; margin-bottom: 8px; }
+  input { font-size: 22px; padding: 10px 12px; width: 100%; box-sizing: border-box; border: 1px solid #999; border-radius: 8px; letter-spacing: 4px; }
+  #echo { margin-top: 16px; font-size: 17px; }
+</style>
+</head>
+<body>
+<!-- CI probe page (SkiPass): a single one-time-code field used by tools/probe/UITests/ProbeAutoFillTests.swift. -->
+<h1>SkiPass probe</h1>
+<form id="f" onsubmit="return false">
+  <label for="code">Verification code</label>
+  <input id="code" name="code" type="text" autocomplete="one-time-code" inputmode="numeric" aria-label="Verification code">
+</form>
+<p id="echo">Filled: (empty)</p>
+<script>
+  const input = document.getElementById('code');
+  const echo = document.getElementById('echo');
+  const update = () => { echo.textContent = 'Filled: ' + (input.value || '(empty)'); };
+  input.addEventListener('input', update);
+  input.addEventListener('change', update);
+</script>
+</body>
+</html>

@@ -9,8 +9,8 @@ import SkiPassStorage
 
 /// Wiring of the concrete SkiPassCore implementations into `OneTimeCodeResolver`.
 ///
-/// This is the only file that names concrete types from I2 (Storage/Mail/Auth),
-/// I3 (Extraction) and I5 (ServerClient). Symbols used (same as ios/App/LiveServices.swift):
+/// This is the only file that names concrete types from SkiPassStorage, SkiPassMail, SkiPassAuth,
+/// SkiPassExtraction and SkiPassServerClient. Symbols used (same as ios/App/LiveServices.swift):
 ///   - SkiPassStorage: `MailboxStore() throws`, `.list()`; `AppGroupState() throws`, `.revenueCatAppUserID`;
 ///                     `SharedStorageEnvironment.current.defaults` / `.appGroupID`
 ///   - SkiPassAuth:    `OAuthCredentialProvider()`: `CredentialProviding`
@@ -20,16 +20,16 @@ import SkiPassStorage
 ///     conforming to `CandidateJudging` and `UsageReporting`; `ServerBuildConfiguration(bundle:)` (Info.plist values)
 enum LiveDependencies {
 
-    /// `X-SkiPass-User` for judging when the App Group holds no app user ID (TRIAGE D10).
+    /// `X-SkiPass-User` for judging when the App Group holds no app user ID.
     static let anonymousJudgeUserID = "anonymous"
 
     /// Total time for one server request. Above the server's worst case (3 s upstream timeout plus a
     /// cold start), so the server's own answer (e.g. 402) normally arrives before the local fallback
-    /// takes over (A2-08); the mailbox budget (4 s) is separate.
+    /// takes over; the mailbox budget (4 s) is separate.
     static let serverTimeout: TimeInterval = 7
 
     /// The IMAP fetcher stops this long before the resolver's per-mailbox budget, so it hands over
-    /// the messages read so far instead of being cut off with nothing (A2-01, A2-05).
+    /// the messages read so far instead of being cut off with nothing.
     static let fetchMargin: TimeInterval = 0.4
 
     private static let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "Extension")
@@ -39,8 +39,8 @@ enum LiveDependencies {
     /// The server judges when it is configured and reachable; otherwise (no URL / token in this build,
     /// or any request error, including 429) the on-device copy of the server's fallback rule picks the
     /// code, so filling keeps working with the server down. Without an app user ID the server still
-    /// judges (anonymously) but nothing is counted (TRIAGE D10). Fill reports are retried up to 3 times
-    /// (TRIAGE D4); their final error is ignored.
+    /// judges (anonymously) but nothing is counted. Fill reports are retried up to 3 times;
+    /// their final error is ignored.
     static func makeResolver(bundle: Bundle = .main) -> OneTimeCodeResolver? {
         guard let mailboxStore = try? MailboxStore() else { return nil }
         let server = makeServerClient(bundle: bundle)
@@ -56,17 +56,17 @@ enum LiveDependencies {
             perMailboxBudget: budget,
             fillReportRetry: FillReportRetry(shouldRetry: isWorthRetrying),
             chosenObserver: { message in
-                // Domains of the email that was used become identities for the next visit (A2-10).
+                // Domains of the email that was used become identities for the next visit.
                 if seen.record(EmailDomains.domains(in: message)) { requestIdentitySync() }
             }
         )
     }
 
     /// Server client, or nil when this build lacks the server configuration. A missing app user ID
-    /// does not disable the server (TRIAGE D10): it is logged, judging uses `anonymousJudgeUserID`,
+    /// does not disable the server: it is logged, judging uses `anonymousJudgeUserID`,
     /// and fills are not reported until the app has written the ID.
     static func makeServerClient(bundle: Bundle) -> ServerClient? {
-        // Unset values and the Secrets.example placeholders mean "no server" (same rule as the app, A1-09).
+        // Unset values and the Secrets.example placeholders mean "no server" (same rule as the app).
         guard let config = ServerBuildConfiguration(bundle: bundle) else {
             logger.notice("No server configuration in this build; using the local fallback rule only")
             return nil
@@ -85,7 +85,7 @@ enum LiveDependencies {
         ))
     }
 
-    /// Fill reports are retried only for errors a later attempt can fix (TRIAGE D4).
+    /// Fill reports are retried only for errors a later attempt can fix.
     @Sendable static func isWorthRetrying(_ error: any Error) -> Bool {
         if let error = error as? ServerClientError {
             if error == .missingAppUserID {
@@ -102,7 +102,7 @@ enum LiveDependencies {
 
     // MARK: - Identity registration
 
-    /// One registration at a time; overlapping requests share one follow-up run (A2-13).
+    /// One registration at a time; overlapping requests share one follow-up run.
     private static let identitySync = IdentitySyncCoordinator { _ = await syncIdentities() }
 
     private static let identitySyncAtLaunch: Void = requestIdentitySync()
@@ -120,7 +120,7 @@ enum LiveDependencies {
 
     /// Re-registers the one-time-code identities (bundled + demo + seen domains) for the stored
     /// mailboxes. Runs in the background; the result is only logged. When the mailbox list cannot be
-    /// read (or this process has no App Group), the store is left as it is instead of being emptied (A2-12).
+    /// read (or this process has no App Group), the store is left as it is instead of being emptied.
     @discardableResult
     static func syncIdentities(bundle: Bundle = .main) async -> IdentityRegistrar.Result? {
         let input = IdentitySyncInput.decide(appGroupResolved: SharedStorageEnvironment.current.appGroupID != nil,

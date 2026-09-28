@@ -1,4 +1,4 @@
-// Server-side OTP state (TRIAGE D7): sessions, attempt counts and send rate limits.
+// Server-side OTP state: sessions, attempt counts and send rate limits.
 //
 // Upstash Redis REST API (https://upstash.com/docs/redis/features/restapi):
 //   POST <url> with the command as a JSON array, `Authorization: Bearer <token>` -> {"result": ...}

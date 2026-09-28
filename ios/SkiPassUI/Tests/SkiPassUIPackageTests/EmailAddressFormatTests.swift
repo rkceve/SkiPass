@@ -9,7 +9,7 @@ final class EmailAddressFormatTests: XCTestCase {
         }
     }
 
-    /// A1-16: IDNA top-level domains are written in punycode.
+    /// IDNA top-level domains are written in punycode.
     func testAcceptsPunycodeTopLevelDomains() {
         for address in ["user@example.xn--p1ai", "user@example.xn--wgv71a", "user@xn--80ak6aa92e.XN--P1AI"] {
             XCTAssertTrue(EmailAddressFormat.looksValid(address), address)

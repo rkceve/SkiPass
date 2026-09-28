@@ -242,7 +242,7 @@ struct ProviderDetectionTests {
         #expect(AppModel.oauthProvider(forEmail: email) == .microsoft)
     }
 
-    /// A1-05 / D9: Microsoft consumer domains under other TLDs.
+    /// Microsoft consumer domains under other TLDs.
     @Test(arguments: ["a@outlook.jp", "a@outlook.com.au", "a@hotmail.co.jp", "a@hotmail.co.uk", "a@hotmail.fr",
                       "a@live.jp", "a@live.co.uk", "a@msn.co.jp", "a@outlook.de"])
     func microsoftRegionalDomains(_ email: String) {
@@ -285,14 +285,14 @@ struct MappingTests {
         #expect(plans[2].systemImage == "crown.fill")
     }
 
-    /// A1-12: the Free row has its own name, tagline and price (not blank next to paid rows).
+    /// The Free row has its own name, tagline and price (not blank next to paid rows).
     @Test func freeRowIsNotBlank() {
         let free = AppModel.planOptions(packages: [standard], currentTier: .standard, entitlementProductIDs: [:])[0]
         #expect(free.id == "free")
         #expect(!free.name.isEmpty && !free.tagline.isEmpty && !free.priceText.isEmpty)
     }
 
-    /// A1-03 / D8: tier comes from the entitlement lookup key (pro > standard), never the price
+    /// Tier comes from the entitlement lookup key (pro > standard), never the price
     /// (annual Standard costs more than monthly Pro).
     @Test func tierIsNotInferredFromPrice() {
         let standardAnnual = StorePackageInfo(
@@ -306,7 +306,7 @@ struct MappingTests {
         #expect(plans.filter(\.isCurrent).map(\.id) == ["pro_monthly"])
     }
 
-    /// D8: the server's plan wins over the on-device entitlements; "unknown" falls back to them.
+    /// The server's plan wins over the on-device entitlements; "unknown" falls back to them.
     @Test func serverPlanIsTheSourceOfTruth() {
         #expect(AppModel.currentTier(serverPlan: .standard, activeEntitlements: ["pro"]) == .standard)
         #expect(AppModel.currentTier(serverPlan: PlanTier(rawValue: "unknown"), activeEntitlements: ["pro"]) == .pro)
@@ -345,7 +345,7 @@ struct MappingTests {
         #expect(plans.filter { !$0.isCurrent }.map(\.id) == ["free", "$rc_monthly"])
     }
 
-    /// A1-15: a cached month that has ended shows a fresh month.
+    /// A cached month that has ended shows a fresh month.
     @Test func endedMonthShowsFreshUsage() {
         let now = Date(timeIntervalSince1970: 1_791_000_000)  // 2026-10-03 UTC
         let lastMonth = UsageSnapshot(plan: "free", used: 7, limit: 10, resetsAt: Date(timeIntervalSince1970: 1_790_812_800))  // 2026-10-01
@@ -358,7 +358,7 @@ struct MappingTests {
         #expect(AppModel.usageInfo(from: current, now: now) == UsageInfo(used: 7, limit: 10, resetsAt: current.resetsAt))
     }
 
-    /// A1-04: closing the provider page is a cancellation, other failures are not.
+    /// Closing the provider page is a cancellation, other failures are not.
     @Test func userCancellationIsRecognised() {
         #expect(AppModel.isUserCancellation(NSError(domain: "org.openid.appauth.general", code: -3)))
         #expect(AppModel.isUserCancellation(NSError(domain: "com.apple.AuthenticationServices.WebAuthenticationSession", code: 1)))
@@ -366,7 +366,7 @@ struct MappingTests {
         #expect(!AppModel.isUserCancellation(Boom()))
     }
 
-    /// A1-09: the committed example placeholders mean "not configured".
+    /// The committed example placeholders mean "not configured".
     @Test func examplePlaceholdersAreNotConfiguration() {
         let placeholders = AppConfiguration(info: [
             "SkiPassServerURL": "https://skipass.example.invalid",
@@ -422,7 +422,7 @@ struct AppModelTests {
         #expect(model.usage == UsageInfo(used: 1, limit: 10, resetsAt: cached.resetsAt))
     }
 
-    /// A1-01 / D8: RevenueCat and the server unreachable at launch: a Pro subscriber still sees Pro
+    /// RevenueCat and the server unreachable at launch: a Pro subscriber still sees Pro
     /// (from the cached server usage), and no "unavailable" message (the build has a key).
     @Test func offlineLaunchKeepsTheLastKnownPlan() async {
         let h = Harness()
@@ -439,7 +439,7 @@ struct AppModelTests {
         #expect(model.usage?.limit == 1000)
     }
 
-    /// A1-01: a failed refresh keeps the plans that were already loaded.
+    /// A failed refresh keeps the plans that were already loaded.
     @Test func failedRefreshKeepsLoadedPlans() async {
         let h = Harness()
         h.billing.packages = [standard, pro]
@@ -457,7 +457,7 @@ struct AppModelTests {
         #expect(model.plans.filter(\.isCurrent).map(\.id) == ["$rc_monthly"])
     }
 
-    /// A1-02 / D8: the plan the server enforces is the plan shown, even if the device disagrees.
+    /// The plan the server enforces is the plan shown, even if the device disagrees.
     @Test func serverPlanDecidesTheCurrentPlan() async {
         let h = Harness()
         h.billing.packages = [standard, pro]
@@ -472,7 +472,7 @@ struct AppModelTests {
         #expect(model.usage?.limit == 10)
     }
 
-    /// D10: without a RevenueCat key the app writes a random `local:<uuid>` ID (kept across launches)
+    /// Without a RevenueCat key the app writes a random `local:<uuid>` ID (kept across launches)
     /// for the extension, and the Plan tab says plans are unavailable.
     @Test func withoutRevenueCatALocalUserIDIsWrittenAndKept() async {
         let h = Harness()
@@ -524,7 +524,7 @@ struct AppModelTests {
         #expect(!model.plansAvailable)
     }
 
-    /// D10: an ID left by an earlier RevenueCat build is replaced by a local one.
+    /// An ID left by an earlier RevenueCat build is replaced by a local one.
     @Test func localUserIDReplacesAStaleRevenueCatID() {
         #expect(AppModel.localAppUserID(existing: "local:abc") == "local:abc")
         #expect(AppModel.localAppUserID(existing: "$RCAnonymousID:old").hasPrefix("local:"))
@@ -647,7 +647,7 @@ struct AppModelTests {
         #expect(h.accounts.oauthStates.isEmpty)
     }
 
-    /// A1-04: cancelling the Google / Microsoft page (AppAuth -3) is silent: a CancellationError,
+    /// Cancelling the Google / Microsoft page (AppAuth -3) is silent: a CancellationError,
     /// which the sheet does not show.
     @Test func cancelledSignInIsSilent() async {
         let h = Harness()
@@ -660,7 +660,7 @@ struct AppModelTests {
         #expect(h.accounts.mailboxes.isEmpty)
     }
 
-    /// A1-11: a mailbox that switches from IMAP to Google loses its password, and back.
+    /// A mailbox that switches from IMAP to Google loses its password, and back.
     @Test func changingKindDeletesTheOtherSecret() async throws {
         let h = Harness()
         let model = h.makeModel()
@@ -683,7 +683,7 @@ struct AppModelTests {
         #expect(h.accounts.passwords[imap.id] == "pw2")
     }
 
-    /// A1-11 / A1-12: when the mailbox cannot be saved, no orphan secret stays and the UI gets a Copy error.
+    /// When the mailbox cannot be saved, no orphan secret stays and the UI gets a Copy error.
     @Test func failedMailboxSaveLeavesNoOrphanSecret() async {
         let h = Harness()
         h.accounts.saveMailboxError = Boom()
@@ -703,7 +703,7 @@ struct AppModelTests {
         #expect(h.accounts.mailboxes.isEmpty)
     }
 
-    /// A1-12: a storage error on delete reaches the UI as a Copy-backed error.
+    /// A storage error on delete reaches the UI as a Copy-backed error.
     @Test func failedDeleteReportsDeleteFailed() async throws {
         let h = Harness()
         let model = h.makeModel()
@@ -907,7 +907,7 @@ struct AppModelTests {
         #expect(h.identities.syncs.count == 3)
     }
 
-    /// A1-08: identity syncs run one at a time and each reads the mailbox list when it runs, so a
+    /// Identity syncs run one at a time and each reads the mailbox list when it runs, so a
     /// sync started before a delete cannot finish last with the deleted address.
     @Test func identitySyncsAreSerializedAndTheNewestListWins() async throws {
         let h = Harness()
@@ -929,7 +929,7 @@ struct AppModelTests {
         #expect(h.identities.syncs.last == [])
     }
 
-    /// A1-08: a foreground event during launch does not start a second full refresh.
+    /// A foreground event during launch does not start a second full refresh.
     @Test func foregroundDuringStartIsIgnored() async {
         let h = Harness()
         h.usage.hold = true
@@ -946,7 +946,7 @@ struct AppModelTests {
         #expect(h.identities.syncs.count == 1)
     }
 
-    /// A1-07: a refresh requested while another is in flight is re-run afterwards, not dropped,
+    /// A refresh requested while another is in flight is re-run afterwards, not dropped,
     /// so the post-purchase limit is shown.
     @Test func usageRefreshDuringAnInFlightOneIsNotDropped() async {
         let h = Harness()

@@ -25,11 +25,11 @@ export interface Bindings {
 export interface Deps {
   fetch: typeof fetch
   now: () => Date
-  /** Per-call timeout for upstream APIs (Jev: 2 s per docs/CONTRACTS.md §5). */
+  /** Per-call timeout for upstream APIs (Jev: 3 s, docs/API.md). */
   upstreamTimeoutMs: number
   /** Server state store (fill counter, rate limits, plan cache) for a request's bindings. */
   usageCounter: (env: Bindings) => UsageCounter
-  /** `/v1/judge` limits per fixed UTC hour (TRIAGE D1b). */
+  /** `/v1/judge` limits per fixed UTC hour. */
   judgeRateLimit: { perUser: number; perIp: number }
   /** Client IP for the per-IP limit; platform specific (Cloudflare: CF-Connecting-IP; Vercel: src/vercel.ts). */
   clientIp: (req: Request) => string
@@ -37,7 +37,7 @@ export interface Deps {
   log: (message: string) => void
 }
 
-/** TRIAGE D1b: `/v1/judge` requests per fixed UTC hour. */
+/** Rate limits: `/v1/judge` requests per fixed UTC hour. */
 export const JUDGE_LIMIT_PER_USER_PER_HOUR = 60
 export const JUDGE_LIMIT_PER_IP_PER_HOUR = 300
 

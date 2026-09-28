@@ -1,6 +1,6 @@
-// Jev (TypeSafe AI) System One call and candidate selection, per docs/CONTRACTS.md §5.
+// Jev (TypeSafe AI) System One call and candidate selection, per docs/API.md.
 //
-// HTTP API (not the Node SDK; its Workers compatibility is unverified — docs/facts/F3 §1.9):
+// HTTP API (not the Node SDK, whose Workers compatibility is unverified):
 //   POST https://api.typesafe.ai/v1/systemone, `Authorization: Bearer <API_KEY>`,
 //   body {state, model, questions: {<id>: {type: "noul", instructions, criteria?: {true, false}}}}
 //   response {model, answers: {<id>: {type: "noul", noul: number}}, usage}
@@ -24,7 +24,7 @@ export interface JudgeMessage {
 export interface JudgeResult {
   chosenId: string | null
   scores: Record<string, number>
-  /** `mock` only when JEV_MODE=mock (CONTRACTS §5 change log 2026-09-27, TRIAGE D3). */
+  /** `mock` only when JEV_MODE=mock (docs/API.md, Server configuration). */
   source: 'jev' | 'fallback' | 'mock'
 }
 
@@ -34,10 +34,10 @@ interface NoulQuestion {
   criteria?: { true: string; false: string }
 }
 
-/** The Noul question for `service`, with instructions/criteria exactly as CONTRACTS §5. */
+/** The Noul question for `service`, with instructions/criteria exactly as in docs/API.md. */
 export function buildQuestion(service: string | null): NoulQuestion {
   if (service === null) {
-    // CONTRACTS §5 gives no criteria for the service-null case; `criteria` is optional per
+    // docs/API.md gives no criteria for the service-null case; `criteria` is optional per
     // https://docs.typesafe.ai/primitives/noul.md ("criteria: Optional."), so it is omitted.
     return {
       type: 'noul',
@@ -71,7 +71,7 @@ export function buildRequestBody(service: string | null, text: string) {
 /**
  * Public Suffix List including its PRIVATE section, so hosting suffixes such as `vercel.app` and
  * `github.io` count as suffixes: `skipass-demo.vercel.app` -> `skipass-demo.vercel.app`, not
- * `vercel.app` (TRIAGE D6). tldts option `allowPrivateDomains` (default false):
+ * `vercel.app`. tldts option `allowPrivateDomains` (default false):
  * https://github.com/remusao/tldts#readme ("allowPrivateDomains").
  */
 const TLD_OPTIONS = { allowPrivateDomains: true } as const
@@ -230,7 +230,7 @@ export async function judgeMessages(
     messages.forEach((m, i) => (scores[m.id] = values[i]))
     return { chosenId: selectByScores(messages, scores), scores, source: 'jev' }
   } catch {
-    // Deliberately no logging: error objects could carry request content (SPEC: no email logging).
+    // Deliberately no logging: error objects could carry request content (docs/ARCHITECTURE.md §4: no content logging).
     return fallbackResult(service, messages)
   }
 }

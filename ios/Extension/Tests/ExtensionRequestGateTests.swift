@@ -1,6 +1,6 @@
 import XCTest
 
-/// TRIAGE D11: exactly one complete/cancel per credential request, across every path.
+/// Exactly one complete/cancel per credential request, across every path.
 @MainActor
 final class ExtensionRequestGateTests: XCTestCase {
 

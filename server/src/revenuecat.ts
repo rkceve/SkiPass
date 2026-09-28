@@ -55,7 +55,7 @@ export function planFromLookupKeys(activeLookupKeys: ReadonlySet<string>): Plan 
 }
 
 export interface RevenueCatConfig {
-  /** `unconfigured` = live mode without a secret key or project id (a config error, D2). */
+  /** `unconfigured` = live mode without a secret key or project id (a config error). */
   mode: 'live' | 'mock' | 'unconfigured'
   secretKey: string
   projectId: string
@@ -111,9 +111,9 @@ async function entitlementLookupKeys(
 /**
  * Result of a plan lookup:
  *   - `plan`: RevenueCat answered (mock mode: always the free plan);
- *   - `unknown_user`: RevenueCat does not know the customer (404 resource_missing) — TRIAGE D1a;
+ *   - `unknown_user`: RevenueCat does not know the customer (404 resource_missing);
  *   - `error`: RevenueCat failed, timed out, or is not configured — the caller falls back to the
- *     last known plan and never downgrades (TRIAGE D2).
+ *     last known plan and never downgrades.
  */
 export type PlanLookup = { kind: 'plan'; plan: Plan } | { kind: 'unknown_user' } | { kind: 'error' }
 

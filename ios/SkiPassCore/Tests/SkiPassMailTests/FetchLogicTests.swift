@@ -75,7 +75,7 @@ final class FetchLogicTests: XCTestCase {
         XCTAssertEqual(message.to, "recipient@example.com")
         XCTAssertEqual(message.subject, "Test Email")
         XCTAssertEqual(message.bodyText, "Your code is 123456")
-        // A2-09: the server receipt time (INTERNALDATE), not the sender-controlled Date header.
+        // The server receipt time (INTERNALDATE), not the sender-controlled Date header.
         XCTAssertEqual(message.date, date("2026-09-23T10:01:02Z"))
         XCTAssertNotEqual(message.date, sent)
     }

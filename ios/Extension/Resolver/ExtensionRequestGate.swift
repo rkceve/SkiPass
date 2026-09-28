@@ -1,7 +1,7 @@
 import Foundation
 
-/// Guarantees exactly one terminal call (complete or cancel) per credential request (TRIAGE D11,
-/// SYSTEM §3). Every entry point of the view controller goes through one gate:
+/// Guarantees exactly one terminal call (complete or cancel) per credential request
+/// (docs/ARCHITECTURE.md §3). Every entry point of the view controller goes through one gate:
 ///
 /// - `begin()` starts a request. A request still in flight is superseded: its work is cancelled and
 ///   it can no longer reach the extension context, so only the newest request finishes it.

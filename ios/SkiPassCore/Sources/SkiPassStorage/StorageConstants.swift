@@ -1,6 +1,6 @@
 import Foundation
 
-/// Identifiers fixed by docs/CONTRACTS.md §2 and §4.
+/// Identifiers fixed by docs/ARCHITECTURE.md §1 and §5.
 ///
 /// `appGroupID` and `keychainAccessGroup` are the canonical names of a normally signed build. A
 /// re-signed (sideloaded) build gets different ones, so storage uses the identifiers resolved at
@@ -8,19 +8,19 @@ import Foundation
 public enum StorageConstants {
     /// Canonical App Group shared by the app and the AutoFill extension.
     public static let appGroupID = "group.io.github.rkceve.skipass"
-    /// Canonical Keychain access group: same string as the App Group (CONTRACTS §2).
+    /// Canonical Keychain access group: same string as the App Group (docs/ARCHITECTURE.md §1).
     public static let keychainAccessGroup = appGroupID
-    /// Keychain generic-password service (CONTRACTS §4).
+    /// Keychain generic-password service (docs/ARCHITECTURE.md §5).
     public static let keychainService = "io.github.rkceve.skipass"
 
-    /// UserDefaults keys (CONTRACTS §4).
+    /// UserDefaults keys (docs/ARCHITECTURE.md §5).
     public enum DefaultsKey {
         public static let mailboxes = "mailboxes.v1"
         public static let rcAppUserID = "rc.appUserID"
         public static let usageSnapshot = "usage.snapshot.v1"
     }
 
-    /// Keychain account names (CONTRACTS §4).
+    /// Keychain account names (docs/ARCHITECTURE.md §5).
     public enum KeychainAccount {
         public static func password(_ mailboxID: UUID) -> String { "password.\(mailboxID.uuidString)" }
         public static func oauth(_ mailboxID: UUID) -> String { "oauth.\(mailboxID.uuidString)" }

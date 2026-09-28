@@ -1,4 +1,4 @@
-// SkiPass server HTTP API — docs/CONTRACTS.md §5 is the binding contract for paths, headers,
+// SkiPass server HTTP API — docs/API.md is the binding contract for paths, headers,
 // bodies and status codes. Bindings are read from `c.env` as in
 // https://hono.dev/docs/getting-started/cloudflare-workers ("Bindings"). The same app runs on
 // Vercel (src/vercel.ts), which passes its environment variables in as the bindings.
@@ -17,7 +17,7 @@ import { type PlanCacheEntry, formatInstant, resetsAt } from './usage.js'
 export const APP_TOKEN_HEADER = 'X-SkiPass-App-Token'
 export const USER_HEADER = 'X-SkiPass-User'
 
-/** Request limits (not in CONTRACTS; defensive bounds). */
+/** Request limits (not part of the API contract; defensive bounds). */
 export const MAX_MESSAGES = 50
 export const MAX_TEXT_LENGTH = 200_000
 export const MAX_ID_LENGTH = 512
@@ -25,11 +25,11 @@ export const MAX_ID_LENGTH = 512
 export const MAX_USER_ID_LENGTH = 256
 
 export { JUDGE_LIMIT_PER_IP_PER_HOUR, JUDGE_LIMIT_PER_USER_PER_HOUR } from './env.js'
-/** TRIAGE D1a: a user RevenueCat confirmed is not checked again for this long. */
+/** A user RevenueCat confirmed is not checked again for this long. */
 export const KNOWN_USER_CACHE_MS = 10 * 60 * 1000
-/** TRIAGE D2: how long the last known plan is kept for RevenueCat outages. */
+/** How long the last known plan is kept for RevenueCat outages. */
 export const PLAN_CACHE_TTL_S = 30 * 24 * 3600
-/** Fill limit used when no plan is known (fail-open, D2): effectively unlimited. */
+/** Fill limit used when no plan is known (fail-open): effectively unlimited. */
 const NO_LIMIT = Number.MAX_SAFE_INTEGER
 
 type Env = {
@@ -47,20 +47,20 @@ type Env = {
 type Ctx = Context<Env>
 
 const unauthorized = (c: Ctx) => c.json({ error: 'unauthorized' }, 401)
-// OPEN(api): CONTRACTS §5 defines no body for malformed requests; this shape is provisional.
+// Malformed header or body -> 400 (docs/API.md, "Errors on every route").
 const invalidRequest = (c: Ctx) => c.json({ error: 'invalid_request' }, 400)
 const quotaExhausted = (c: Ctx) => c.json({ error: 'quota_exhausted', remaining: 0 }, 402)
 const unknownUser = (c: Ctx) => c.json({ error: 'unknown_user' }, 401)
 const rateLimited = (c: Ctx) => c.json({ error: 'rate_limited' }, 429)
 
-/** Jev mode: mock only when JEV_MODE=mock; live without a key is `unconfigured` (TRIAGE D3). */
+/** Jev mode: mock only when JEV_MODE=mock; live without a key is `unconfigured`. */
 export function jevConfigFrom(env: Bindings): JevConfig {
   if (env.JEV_MODE === 'mock') return { mode: 'mock', apiKey: '' }
   const apiKey = env.JEV_API_KEY ?? ''
   return { mode: apiKey === '' ? 'unconfigured' : 'live', apiKey }
 }
 
-/** RevenueCat mode: mock only when REVENUECAT_MODE=mock (A3-05). */
+/** RevenueCat mode: mock only when REVENUECAT_MODE=mock. */
 export function rcConfigFrom(env: Bindings): RevenueCatConfig {
   const secretKey = env.REVENUECAT_SECRET_KEY ?? ''
   const projectId = env.REVENUECAT_PROJECT_ID ?? ''
@@ -129,10 +129,10 @@ export function createApp(overrides: Partial<Deps> = {}) {
   const app = new Hono<Env>()
   let configChecked = false
 
-  // Auth: CONTRACTS §5 — missing/invalid app token -> 401 {"error":"unauthorized"}.
+  // Auth: docs/API.md — missing/invalid app token -> 401 {"error":"unauthorized"}.
   app.use('/v1/*', async (c, next) => {
     if (!configChecked) {
-      // Once per instance: a missing live credential is a config error in the logs (D2, D3).
+      // Once per instance: a missing live credential is a config error in the logs.
       configChecked = true
       for (const problem of configProblems(c.env)) deps.log(problem)
     }
@@ -147,7 +147,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
 
   const store = (c: Ctx) => deps.usageCounter(c.env)
 
-  // Rate limit (D1b): per user and per client IP, fixed UTC hour windows, checked and counted in
+  // Rate limit: per user and per client IP, fixed UTC hour windows, checked and counted in
   // one atomic step. Runs before the known-user check, so random ids cannot drive RevenueCat calls.
   app.use('/v1/judge', async (c, next) => {
     const hour = Math.floor(deps.now().getTime() / 3_600_000)
@@ -174,9 +174,9 @@ export function createApp(overrides: Partial<Deps> = {}) {
     return r
   }
 
-  // Known-user check (D1a): an id RevenueCat does not know -> 401 unknown_user, before any Jev
+  // Known-user check: an id RevenueCat does not know -> 401 unknown_user, before any Jev
   // call or count. A positive answer is trusted for 10 minutes. When RevenueCat fails the request
-  // goes on (D2: never block or downgrade a user because RevenueCat is down).
+  // goes on (never block or downgrade a user because RevenueCat is down).
   app.use('/v1/*', async (c, next) => {
     if (rcConfigFrom(c.env).mode !== 'live') return next()
     const cached = await store(c).getPlan(c.get('appUserID'))
@@ -191,7 +191,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
 
   /**
    * The user's plan for this request: RevenueCat now, else the last known plan, else null
-   * (nothing known: the quota is not enforced, D2). `unknown_user` when RevenueCat does not know the id.
+   * (nothing known: the quota is not enforced). `unknown_user` when RevenueCat does not know the id.
    */
   const currentPlan = async (c: Ctx): Promise<Plan | null | 'unknown_user'> => {
     const fresh = c.get('freshPlan')
@@ -248,14 +248,14 @@ export function createApp(overrides: Partial<Deps> = {}) {
     const plan = await currentPlan(c)
     if (plan === 'unknown_user') return unknownUser(c)
     // The counter checks the limit and counts in one step (atomically on Redis). No known plan ->
-    // counted without a limit (D2 fail-open).
+    // counted without a limit (fail-open).
     const limit = plan === null ? NO_LIMIT : plan.monthlyFillLimit
     const r = await store(c).tryConsume(c.get('appUserID'), now, limit)
     if (!r.ok) return quotaExhausted(c)
     return c.json({ remaining: plan === null ? 0 : Math.max(0, limit - r.used) })
   })
 
-  // GET /v1/usage — plan "unknown" (limit 0) only when RevenueCat fails and nothing is known (D2).
+  // GET /v1/usage — plan "unknown" (limit 0) only when RevenueCat fails and nothing is known.
   app.get('/v1/usage', async (c) => {
     const now = deps.now()
     const q = await quota(c, now)

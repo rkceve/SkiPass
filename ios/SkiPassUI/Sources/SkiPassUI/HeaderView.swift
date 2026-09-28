@@ -23,20 +23,15 @@ struct HeaderView: View {
     }
 }
 
-/// App icon tile for "SkiPass" (SF Symbol artwork).
+/// The app icon artwork (same image as the app's AppIcon asset), shown as a rounded tile.
 private struct AppIconTile: View {
     var body: some View {
-        Image(systemName: "cloud.fill")
-            .font(.system(size: 30))
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [Theme.accentPink, Theme.accent, Theme.accentBlue],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+        Image("AppIconArtwork", bundle: .module)
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
             .frame(width: 60, height: 60)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .shadow(color: Theme.accent.opacity(0.10), radius: 10, x: 0, y: 4)
             .accessibilityHidden(true)
     }

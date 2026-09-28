@@ -3,7 +3,7 @@ import SkiPassModels
 import os
 
 /// Configuration for `ServerClient` (values come from Info.plist keys `SkiPassServerURL` /
-/// `SkiPassAppToken` and the App Group key `rc.appUserID`, CONTRACTS §2 and §4).
+/// `SkiPassAppToken` and the App Group key `rc.appUserID`, docs/ARCHITECTURE.md §1 and §5).
 public struct ServerClientConfiguration: Sendable {
     /// Worker base URL, e.g. `https://skipass-server.example.workers.dev`.
     public var baseURL: URL
@@ -13,8 +13,8 @@ public struct ServerClientConfiguration: Sendable {
     public var appUserID: @Sendable () -> String?
     /// Total time allowed for one request, in seconds (connection, server work and body).
     public var timeout: TimeInterval
-    /// Sent as `X-SkiPass-User` on `POST /v1/judge` only, when `appUserID` has no value (TRIAGE D10:
-    /// the extension still asks the server to judge without an app user ID, and counts nothing). Nil =
+    /// Sent as `X-SkiPass-User` on `POST /v1/judge` only, when `appUserID` has no value (the
+    /// extension still asks the server to judge without an app user ID, and counts nothing). Nil =
     /// no request is made without an app user ID. Fills and usage always need the real ID.
     public var anonymousJudgeUserID: String?
 
@@ -35,10 +35,10 @@ public enum ServerClientError: Error, Equatable, Sendable {
     case quotaExhausted
     /// 401 `{"error":"unauthorized"}`.
     case unauthorized
-    /// 401 `{"error":"unknown_user"}`: RevenueCat does not know `X-SkiPass-User` (TRIAGE D1; e.g. a
-    /// `local:<uuid>` ID from a build without RevenueCat, D10). Treated like an unavailable server.
+    /// 401 `{"error":"unknown_user"}`: RevenueCat does not know `X-SkiPass-User` (e.g. a
+    /// `local:<uuid>` ID from a build without RevenueCat). Treated like an unavailable server.
     case unknownUser
-    /// 429 `{"error":"rate_limited"}` (TRIAGE D1).
+    /// 429 `{"error":"rate_limited"}`.
     case rateLimited
     /// No RevenueCat app user ID available to send.
     case missingAppUserID
@@ -46,7 +46,7 @@ public enum ServerClientError: Error, Equatable, Sendable {
     case timedOut
     /// Any other non-success status.
     case httpStatus(Int)
-    /// The response was not HTTP or its body did not match CONTRACTS §5.
+    /// The response was not HTTP or its body did not match docs/API.md.
     case invalidResponse
 
     /// Worth retrying later (network trouble, timeouts, rate limiting, server errors). Answers that
@@ -60,12 +60,12 @@ public enum ServerClientError: Error, Equatable, Sendable {
     }
 }
 
-/// Client for the SkiPass server HTTP API (CONTRACTS §5).
+/// Client for the SkiPass server HTTP API (docs/API.md).
 public struct ServerClient: CandidateJudging, UsageReporting {
     public let configuration: ServerClientConfiguration
     private let session: URLSession
 
-    /// `source` values the server may report (CONTRACTS §5; `mock` added by TRIAGE D3).
+    /// `source` values the server may report (docs/API.md; `mock` when the server runs with JEV_MODE=mock).
     static let knownSources: Set<String> = ["jev", "fallback", "mock"]
 
     private static let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "ServerClient")
@@ -81,7 +81,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
     ///
     /// A 200 reply is accepted only when it names one of the messages sent (or none), reports a known
     /// `source`, and a non-negative `remaining`; anything else throws `.invalidResponse`, so the caller's
-    /// local fallback runs (A2-06, SYSTEM §3.4 "bad reply").
+    /// local fallback runs (docs/ARCHITECTURE.md §3 step 4).
     public func judge(service: String?, messages: [FetchedMessage]) async throws -> JudgeOutcome {
         // The server rejects an empty list; with nothing to judge there is no match.
         guard !messages.isEmpty else { return .noMatch(scores: [:]) }
@@ -160,7 +160,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
             request.httpBody = try JSONEncoder().encode(body)
         }
         // `timeoutInterval` only limits idle time between packets; the race below bounds the whole
-        // request, so a slow server hands over to the local fallback on time (A2-08).
+        // request, so a slow server hands over to the local fallback on time.
         let (data, status) = try await Self.withTotalTimeout(configuration.timeout) { [session, request] () async throws -> (Data, Int?) in
             let (data, response) = try await session.data(for: request)
             return (data, (response as? HTTPURLResponse)?.statusCode)
@@ -203,7 +203,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
         }
     }
 
-    /// Maps a non-success status and logs it (A2-07: a wrong server URL or rejected header is otherwise
+    /// Maps a non-success status and logs it (a wrong server URL or rejected header is otherwise
     /// invisible, because the extension silently falls back to the local rule).
     private func failure(status: Int, body: Data, path: String) -> ServerClientError {
         let errorCode = (try? JSONDecoder().decode(ErrorBody.self, from: body))?.error ?? "-"
@@ -221,7 +221,7 @@ public struct ServerClient: CandidateJudging, UsageReporting {
     }
 }
 
-// MARK: Wire types (CONTRACTS §5)
+// MARK: Wire types (docs/API.md)
 
 struct JudgeRequest: Encodable, Sendable {
     struct Message: Encodable, Sendable {

@@ -100,7 +100,7 @@ public struct SharedStorageEnvironment: Sendable {
     }
 
     /// One line per process with everything needed to compare the app's and the extension's view
-    /// from a device log (TRIAGE "Not fixed": keychain sharing cannot be verified off-device, so both
+    /// from a device log (keychain sharing cannot be verified off-device, so both
     /// processes log the groups they resolved). The app also checks the embedded extension's signed
     /// profile, when present, for the groups it chose.
     private static func logSummary(_ environment: SharedStorageEnvironment, bundle: Bundle, defaultGroup: String?) {

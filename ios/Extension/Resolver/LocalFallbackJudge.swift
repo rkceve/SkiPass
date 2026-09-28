@@ -1,7 +1,7 @@
 import Foundation
 import SkiPassModels
 
-/// On-device copy of the server's fallback rule (CONTRACTS §5; server/src/jev.ts `fallbackSelect`):
+/// On-device copy of the server's fallback rule (docs/API.md; server/src/jev.ts `fallbackSelect`):
 /// the newest message whose text contains the service's registrable domain, else the newest message.
 /// Used when the server cannot be reached, so a code is still filled (e.g. the demo with the server down).
 struct LocalFallbackJudge: CandidateJudging {
@@ -33,7 +33,7 @@ struct LocalFallbackJudge: CandidateJudging {
 
 /// Asks `primary` (the server) and falls back to `LocalFallbackJudge` when it throws
 /// (unreachable, timeout, 5xx, 401, 429 rate limit, malformed reply), when it chooses a message that
-/// was not sent (a bad reply, A2-06), or when there is no server in this build.
+/// was not sent (a bad reply), or when there is no server in this build.
 /// A valid server answer — including `.noMatch` and `.quotaExhausted` — is final.
 struct FallbackJudge: CandidateJudging {
     let primary: (any CandidateJudging)?

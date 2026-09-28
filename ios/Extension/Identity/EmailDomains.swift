@@ -11,7 +11,7 @@ enum EmailDomains {
     ///
     /// Hosts under a two-label public suffix (`PublicSuffixes.twoLabel`: ICANN second-level suffixes
     /// plus PaaS suffixes of the PSL private section) keep three labels, the rest keep two. The server
-    /// uses `tldts.getDomain` with `allowPrivateDomains: true` (TRIAGE D6), so `skipass-demo.vercel.app`
+    /// uses `tldts.getDomain` with `allowPrivateDomains: true`, so `skipass-demo.vercel.app`
     /// stays `skipass-demo.vercel.app` on both sides.
     static func registrableDomain(_ service: String) -> String? {
         guard let host = hostname(service) else { return nil }
@@ -25,8 +25,7 @@ enum EmailDomains {
     }
 
     /// Registrable domains of mail senders, mail providers and click-tracking hosts: they appear in
-    /// verification emails but are not the site the code is for, so they never become identities
-    /// (TRIAGE D6, A2-10).
+    /// verification emails but are not the site the code is for, so they never become identities.
     static let nonServiceDomains: Set<String> = [
         // Sending / email service providers.
         "resend.dev", "resend.com", "sendgrid.net", "sendgrid.com", "mailgun.org", "mailgun.net",

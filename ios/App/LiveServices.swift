@@ -10,12 +10,12 @@ import os
 
 // All concrete construction lives in this file.
 //
-// Symbols used from packages written in parallel (read from origin/wip/i2 b76d60d and origin/wip/i5 7a8a6bc):
+// Symbols used from the SkiPassCore packages:
 //   SkiPassStorage: MailboxStore(defaults:) list / add / update / remove(id:); KeychainStore.delete(account:)
 //                   CredentialStore() setIMAPPassword / imapPassword / setOAuthStateData / removeAll(for:)
 //                   AppGroupState(defaults:) revenueCatAppUserID / usageSnapshot() / setUsageSnapshot(_:) throws
 //   SkiPassAuth:    OAuthService() (client IDs from Info.plist)
-//   SkiPassAuthUI:  OAuthService.signIn (app-only split, CONTRACTS §8 2026-09-24)
+//   SkiPassAuthUI:  OAuthService.signIn (app-only split)
 //                   .signIn(kind:presenting:loginHint:) async throws -> (address: String, authStateData: Data)
 //   SkiPassServerClient: ServerClient(configuration: ServerClientConfiguration(baseURL:appToken:appUserID:))
 //                   currentUsage() async throws -> UsageSnapshot
@@ -34,7 +34,7 @@ enum LiveServices {
     }
 }
 
-/// Build-time values from Info.plist (CONTRACTS §2).
+/// Build-time values from Info.plist (docs/ARCHITECTURE.md §1).
 struct AppConfiguration: Sendable {
     var serverURL: URL?
     var appToken: String?

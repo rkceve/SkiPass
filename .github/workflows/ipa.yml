@@ -3,10 +3,10 @@ name: ipa
 # Builds a device (iphoneos) IPA for sideloading from Windows (e.g. Sideloadly with a free Apple ID).
 # The app and extension are ad-hoc signed ("-") so their entitlements are embedded in the binaries;
 # the sideloading tool re-signs them with the user's own certificate and provisioning profiles.
-# Always Debug (SYSTEM.md §1, A3-13): the app uses a RevenueCat Test Store key, and purchases-ios crashes
+# Always Debug (docs/DECISIONS.md §7): the app uses a RevenueCat Test Store key, and purchases-ios crashes
 # on purpose when a Test Store key is used in a Release build (Configuration.swift,
 # checkForSimulatedStoreAPIKeyInRelease), so there is no Release option.
-# The IPA embeds SkiPassAppToken; artifacts of this public repo are kept 3 days only (TRIAGE D1d).
+# The IPA embeds SkiPassAppToken; artifacts of this public repo are kept 3 days only.
 on:
   workflow_dispatch:
 

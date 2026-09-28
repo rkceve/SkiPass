@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "SkiPassUI", targets: ["SkiPassUI"])
     ],
     targets: [
-        .target(name: "SkiPassUI"),
+        .target(name: "SkiPassUI", resources: [.process("Resources")]),
         // Named apart from the app project's `SkiPassUITests` (UI test bundle) to avoid a clash.
         .testTarget(name: "SkiPassUIPackageTests", dependencies: ["SkiPassUI"]),
     ]

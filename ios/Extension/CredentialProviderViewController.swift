@@ -1,13 +1,13 @@
 import AuthenticationServices
 import Foundation
 
-/// SkiPass AutoFill credential provider (CONTRACTS §6).
+/// SkiPass AutoFill credential provider (docs/ARCHITECTURE.md §3).
 ///
 /// All paths are silent: a code is supplied when one is found, otherwise the request is
-/// cancelled without showing anything (decided: no UI on quota exhaustion / no match / errors).
+/// cancelled without showing anything (no UI on quota exhaustion / no match / errors).
 ///
 /// Every entry point ends in exactly one `complete…` or `cancelRequest` call through
-/// `ExtensionRequestGate` (TRIAGE D11): a request superseded by a newer one never reaches the
+/// `ExtensionRequestGate`: a request superseded by a newer one never reaches the
 /// context, and the work holds this controller until it finishes, so a released controller cannot
 /// leave a request without an answer.
 final class CredentialProviderViewController: ASCredentialProviderViewController {
@@ -21,7 +21,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     /// Keeps the one-time-code identities current whenever the extension runs, once per process, in
     /// the background (the app also registers them on launch and after a mailbox is added or removed).
     /// Every entry point touches it; the no-UI path does not necessarily load the view. Runs through
-    /// the same serialized coordinator as the syncs the resolver requests (A2-13).
+    /// the same serialized coordinator as the syncs the resolver requests.
     private func startIdentitySync() {
         LiveDependencies.syncIdentitiesOncePerProcess()
     }
@@ -40,12 +40,12 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
 
     // MARK: - Paths where the system presents the view controller
 
-    // OPEN(extension-ui): spec defines no extension UI. The three methods below run the same
-    // resolver and complete immediately, or cancel with .userCanceled, adding no views of their own.
+    // The extension has no UI of its own (docs/ARCHITECTURE.md §3 step 5). The three methods below run the same
+    // resolver and complete immediately, or cancel with .userCanceled, adding no views.
 
     override func prepareOneTimeCodeCredentialList(for serviceIdentifiers: [ASCredentialServiceIdentifier]) {
         startIdentitySync()
-        // Lower indices are the more specific identifiers (docs/facts/F1 §1).
+        // Lower indices are the more specific identifiers (ASCredentialProviderViewController documentation).
         resolveAndCompleteOneTimeCode(service: serviceIdentifiers.first?.identifier, failure: .userCanceled)
     }
 
@@ -60,8 +60,8 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     }
 
     /// iOS 18.4+ calls this instead of `prepareInterfaceToProvideCredential` for one-time-code
-    /// fields in some cases, and iOS 18 requires it to avoid "AutoFill Unavailable" (docs/facts/F1 §2).
-    /// No service identifier is available here, so the newest code email is used (spec §5.6).
+    /// fields in some cases, and iOS 18 requires it to avoid "AutoFill Unavailable" (seen in the feasibility probe, tools/probe/).
+    /// No service identifier is available here, so the newest code email is used (docs/ARCHITECTURE.md §3 step 5).
     override func prepareInterfaceForUserChoosingTextToInsert() {
         startIdentitySync()
         guard let resolver else {
@@ -103,17 +103,17 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
         )
     }
 
-    /// Completion handler that counts the fill (CONTRACTS §6: fire-and-forget after completion).
+    /// Completion handler that counts the fill (docs/ARCHITECTURE.md §3: fire-and-forget after completion).
     ///
     /// The system runs this handler after the request completes and passes `expired == true`
-    /// when it ends that time early (docs/facts/F1 §1). The handler itself never blocks: on the
+    /// when it ends that time early. The handler itself never blocks: on the
     /// first non-expired invocation it starts the fill report and returns at once.
     ///
     /// To keep the process from being suspended before the report is sent, the wait happens in a
     /// `ProcessInfo.performExpiringActivity` block instead, which runs on its own concurrent
     /// queue and holds a task assertion while it executes (Apple docs: "Performs the specified
     /// block asynchronously and notifies you if the process is about to be suspended"). That
-    /// block waits at most `reportWait` (room for the retries of TRIAGE D4) and stops as soon as
+    /// block waits at most `reportWait` (room for the fill-report retries) and stops as soon as
     /// the system reports expiry. The report result is ignored either way.
     private static func fillReporter(resolver: OneTimeCodeResolver,
                                      messageID: String) -> @Sendable (Bool) -> Void {

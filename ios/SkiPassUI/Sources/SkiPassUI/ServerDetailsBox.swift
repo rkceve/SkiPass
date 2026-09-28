@@ -30,29 +30,54 @@ private struct PasswordRowID: Hashable {
     let revision: Int
 }
 
-/// Label / value row with an optional "IMAP" chip.
+/// Label / value row with an optional "IMAP" chip. A value too long for the value column (a long
+/// host name or address) moves below the label, so it is shown in full instead of truncated.
 private struct DetailRow: View {
     let label: String
     let value: String
     var showsIMAPChip = false
 
     var body: some View {
-        HStack(spacing: 12) {
-            Text(label)
-                .foregroundStyle(.secondary)
-                .frame(width: 128, alignment: .leading)
-            Text(value)
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if showsIMAPChip {
-                ChipView(title: Copy.chipIMAP, color: Theme.chipIMAPForeground)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                labelText
+                    .frame(width: 128, alignment: .leading)
+                valueText
+                    .fixedSize()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                chip
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 12) {
+                    labelText
+                    Spacer(minLength: 0)
+                    chip
+                }
+                valueText
+                    .truncationMode(.middle)
+                    .minimumScaleFactor(0.8)
             }
         }
         .font(.subheadline)
         .padding(.vertical, 13)
         .accessibilityElement(children: .combine)
+    }
+
+    private var labelText: some View {
+        Text(label)
+            .foregroundStyle(.secondary)
+    }
+
+    private var valueText: some View {
+        Text(value)
+            .foregroundStyle(.primary)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder private var chip: some View {
+        if showsIMAPChip {
+            ChipView(title: Copy.chipIMAP, color: Theme.chipIMAPForeground)
+        }
     }
 }
 

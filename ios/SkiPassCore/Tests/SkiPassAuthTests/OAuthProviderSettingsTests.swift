@@ -10,7 +10,7 @@ final class GoogleRedirectURLTests: XCTestCase {
     func testRedirectUsesReversedClientIDScheme() throws {
         let url = try OAuthProviderSettings.googleRedirectURL(
             clientID: "123456789012-abcdefghijklmnop.apps.googleusercontent.com")
-        // CONTRACTS §2: com.googleusercontent.apps.<GOOGLE_CLIENT_ID_PREFIX>:/oauth2redirect
+        // docs/ARCHITECTURE.md §1: com.googleusercontent.apps.<GOOGLE_CLIENT_ID_PREFIX>:/oauth2redirect
         XCTAssertEqual(url.absoluteString,
                        "com.googleusercontent.apps.123456789012-abcdefghijklmnop:/oauth2redirect")
         XCTAssertEqual(url.scheme, "com.googleusercontent.apps.123456789012-abcdefghijklmnop")
@@ -51,7 +51,7 @@ final class ProviderSettingsTests: XCTestCase {
         XCTAssertEqual(s.issuer, URL(string: "https://login.microsoftonline.com/common/v2.0")!)
         XCTAssertEqual(s.scopes,
                        ["https://outlook.office.com/IMAP.AccessAsUser.All", "offline_access", "openid", "email"])
-        // CONTRACTS §2: msauth.io.github.rkceve.skipass://auth
+        // docs/ARCHITECTURE.md §1: msauth.io.github.rkceve.skipass://auth
         XCTAssertEqual(s.redirectURL.absoluteString, "msauth.io.github.rkceve.skipass://auth")
         XCTAssertTrue(s.omitIssuer)
     }
