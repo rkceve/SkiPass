@@ -26,9 +26,11 @@ enum FetchLogic {
         return received >= since
     }
 
-    /// `"<mailboxID>:<uid>"` (docs/ARCHITECTURE.md §1).
-    static func messageID(mailboxID: UUID, uid: UID) -> String {
-        "\(mailboxID.uuidString):\(uid.value)"
+    /// `"<mailboxID>:<folder>:<uid>"` (docs/API.md), e.g. `"…:inbox:123"` or `"…:junk:123"`.
+    /// UIDs are only unique within one folder (RFC 3501 §2.3.1.1), so the folder key keeps the ids
+    /// of one fetch unique; the server rejects a judge request with a repeated id.
+    static func messageID(mailboxID: UUID, folder: MailFolder, uid: UID) -> String {
+        "\(mailboxID.uuidString):\(folder.rawValue):\(uid.value)"
     }
 
     enum BodyKind: Equatable { case plain, html }
@@ -58,9 +60,10 @@ enum FetchLogic {
     /// `date` is the server receipt time (INTERNALDATE), the clock the recency cut uses; the
     /// sender-controlled `Date:` header is only a fallback (a future `Date:` header must not make
     /// a message look newest in the local fallback or in the server's tie-break).
-    static func makeMessage(info: MessageInfo, uid: UID, mailbox: MailboxConfig, bodyText: String) -> FetchedMessage {
+    static func makeMessage(info: MessageInfo, uid: UID, folder: MailFolder, mailbox: MailboxConfig,
+                            bodyText: String) -> FetchedMessage {
         FetchedMessage(
-            id: messageID(mailboxID: mailbox.id, uid: uid),
+            id: messageID(mailboxID: mailbox.id, folder: folder, uid: uid),
             mailboxAddress: mailbox.address,
             from: info.from ?? "",
             to: info.to.joined(separator: ", "),

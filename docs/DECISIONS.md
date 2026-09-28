@@ -20,7 +20,7 @@ Short records of the main choices, why they were made, and what they cost.
 
 **Decision.** Read every mailbox over IMAP with one fetcher (SwiftMail). Gmail and Outlook.com sign in through their official OAuth pages (AppAuth) and authenticate to IMAP with XOAUTH2; other providers use an IMAP password. Outlook.com no longer accepts passwords over IMAP, so OAuth is required there.
 
-**Why.** One protocol and one code path for all providers, one test suite, and the same read-only guarantees everywhere: INBOX is opened with `EXAMINE` and bodies are fetched with `BODY.PEEK`, so nothing is ever marked as read.
+**Why.** One protocol and one code path for all providers, one test suite, and the same read-only guarantees everywhere: INBOX and the junk/spam folder are opened with `EXAMINE` and bodies are fetched with `BODY.PEEK`, so nothing is ever marked as read or moved.
 
 **Consequences.**
 - Google's full-mail scope (`https://mail.google.com/`) is a restricted scope; a public release would need Google's OAuth app verification.
