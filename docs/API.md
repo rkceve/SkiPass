@@ -48,7 +48,7 @@ Request:
 {
   "service": "acme.example.com",
   "messages": [
-    { "id": "3F2A...:123", "text": "From: ...\nTo: ...\nSubject: ...\nDate: 2026-09-27T09:59:00Z\n\n<body text>" }
+    { "id": "3F2A...:inbox:123", "text": "From: ...\nTo: ...\nSubject: ...\nDate: 2026-09-27T09:59:00Z\n\n<body text>" }
   ]
 }
 ```
@@ -57,7 +57,7 @@ Request:
 |---|---|
 | `service` | Site domain or `null` (no site known). An empty string is treated as `null` |
 | `messages` | 1 to 50 items |
-| `messages[].id` | Unique, non-empty, at most 512 characters. The app uses `<mailboxID>:<IMAP UID>` |
+| `messages[].id` | Unique, non-empty, at most 512 characters. The app uses `<mailboxID>:<folder>:<IMAP UID>`, with folder `inbox` or `junk` (UIDs are only unique within one folder) |
 | `messages[].text` | At most 200,000 characters: header lines `From`, `To`, `Subject`, `Date` (ISO 8601), a blank line, then the body as plain text |
 
 Response 200:
@@ -117,7 +117,7 @@ Counts exactly one fill. Called by the extension after iOS accepted the code.
 Request:
 
 ```json
-{ "messageId": "3F2A...:123" }
+{ "messageId": "3F2A...:inbox:123" }
 ```
 
 | Status | Body | When |

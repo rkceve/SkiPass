@@ -98,7 +98,7 @@ enum Copy {
 
     static let infoChoiceTitle = "How the right code is chosen"
     static let infoChoiceLines = [
-        "SkiPass looks only at inbox emails from the last 10 minutes.",
+        "SkiPass looks only at emails from the last 10 minutes in your inbox and junk/spam folder.",
         "Codes are found on your device.",
         "Jev then picks the email that belongs to the site you are on.",
         "If the SkiPass server can't be reached, the newest email that mentions the site is used, or else the newest email.",
@@ -110,7 +110,7 @@ enum Copy {
         "Only emails from the last 10 minutes that contain a code are sent to the SkiPass server and Jev to be judged, with the site's address.",
         "The SkiPass server never stores or logs their text.",
         "Passwords and sign-in tokens stay in the Keychain on this device.",
-        "Messages are never marked as read.",
+        "Messages are never marked as read or moved.",
     ]
 
     static let infoPlansTitle = "Plans"

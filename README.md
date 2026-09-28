@@ -36,7 +36,7 @@ SkiPass reads the mailboxes directly (Gmail, Outlook and any IMAP account), so i
 1. You add your mailboxes in the SkiPass app. Gmail and Outlook.com addresses open the provider's official sign-in page (OAuth); any other address uses IMAP host, port and password.
 2. The app registers one-time-code identities with iOS for a bundled list of popular sign-in domains, the demo site, and domains seen in earlier code emails, so the suggestion appears even on your first visit.
 3. You focus a one-time-code field. iOS shows the SkiPass suggestion above the keyboard (subtitle `From <your mailbox>`).
-4. You tap it. The extension reads INBOX messages from the last 10 minutes from every mailbox in parallel (4 s budget per mailbox), without marking anything as read.
+4. You tap it. The extension reads the messages from the last 10 minutes in the inbox and the junk/spam folder of every mailbox (mailboxes in parallel, 4 s budget per mailbox, inbox first), without marking anything as read or moving it.
 5. The code is extracted on the device (a Swift port of the open-source 2FHey parser; subject first, then body). Emails without a code are dropped.
 6. The remaining emails go to the SkiPass server, which asks Jev one yes/no question per email: "is this the code email from this site?" The highest score of at least 0.5 wins.
 7. The extension fills that email's code, then reports one fill to the server.
@@ -61,7 +61,7 @@ sequenceDiagram
     U->>Q: Tap suggestion
     Q->>E: One-time-code request for the site domain
     par Every mailbox, 4 s budget each
-        E->>M: EXAMINE INBOX, fetch last 10 min with BODY.PEEK
+        E->>M: EXAMINE INBOX then the junk folder, fetch last 10 min with BODY.PEEK
         M-->>E: Recent messages
     end
     E->>E: Extract codes on device, keep emails with a code
@@ -139,7 +139,7 @@ How it fits together:
 |---|---|---|
 | Mailbox passwords and OAuth tokens | iOS Keychain on the device only (`AfterFirstUnlockThisDeviceOnly`, not synced to iCloud) | When you add an account |
 | Mailbox list (address, host, port, username), domains of code emails already filled | App Group storage on the device | When you add an account; after a fill |
-| Email contents | Read on the device. Only emails received in the **last 10 minutes** that **contain a code** are sent to the SkiPass server and to Jev, to be judged | Only when you tap the SkiPass suggestion |
+| Email contents (inbox and junk/spam folder) | Read on the device. Only emails received in the **last 10 minutes** that **contain a code** are sent to the SkiPass server and to Jev, to be judged | Only when you tap the SkiPass suggestion |
 | The requesting site's domain | SkiPass server and Jev, as part of the question | Same moment |
 | RevenueCat app user ID (anonymous) | SkiPass server and RevenueCat | Every server request |
 | Fill count per user per month, last known plan, hourly rate-limit counters | Upstash Redis | On fills and judge requests |
@@ -147,7 +147,7 @@ How it fits together:
 Guarantees in the code:
 
 - **No email text or metadata is stored or logged by the server.** Its only log lines are configuration errors, which name variables, never values or content. Jev and RevenueCat errors are deliberately not logged, because error objects could carry request data.
-- **Messages are never marked as read.** INBOX is opened with IMAP `EXAMINE` (read-only) and every fetch uses `BODY.PEEK`.
+- **Messages are never marked as read or moved.** The inbox and the junk/spam folder are opened with IMAP `EXAMINE` (read-only) and every fetch uses `BODY.PEEK`.
 - **Encrypted connections only.** IMAP uses implicit TLS on port 993 and STARTTLS on any other port, never plaintext.
 - **Mail is read only on demand**, when you tap the suggestion. There is no background mail polling.
 - **Abuse limits on the server.** Every request needs the app token and an `X-SkiPass-User` that RevenueCat knows; unknown IDs get 401 `unknown_user` before Jev is called or anything is counted. `/v1/judge` is limited to 60 requests per user and 300 per client IP per UTC hour (429). The app token ships inside the app, so it is treated as public; these checks are what actually limit abuse.
@@ -300,7 +300,8 @@ Other workflows: `ipa` (device IPA for sideloading), `tour` (screen recording of
 - **RevenueCat outage.** The server uses the last known plan; with none known, the quota is not enforced for that request and `/v1/usage` reports `plan: "unknown"`.
 - **Keychain sharing after re-signing is device-only.** Whether the app and extension still share Keychain items after a sideloading tool re-signs them can only be checked on a device; both log the App Group and Keychain group they resolved.
 - **Test Store only.** The hackathon build uses the RevenueCat Test Store, which requires a Debug build and has no in-app cancellation; there is no App Store release.
-- **Fixed look-back.** Only emails from the last 10 minutes are considered, and each mailbox gets 4 seconds.
+- **Fixed look-back.** Only emails from the last 10 minutes are considered, and each mailbox gets 4 seconds for its inbox and junk/spam folder together. The inbox is read first, so on a slow connection the junk/spam folder can be cut off.
+- **Junk/spam folder detection.** SkiPass reads the folder the server marks as junk (IMAP `\Junk`, RFC 6154), or else one named `[Gmail]/Spam`, `Junk`, `Junk E-mail`, `Junk Email`, `Spam` or `Bulk Mail`. A junk folder with any other unmarked name is not read. Its emails are judged like inbox emails.
 
 ## Tech stack and third-party licenses
 

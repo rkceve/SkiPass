@@ -58,6 +58,8 @@ final class InfoSheetTests: XCTestCase {
                     + Copy.infoChoiceLines + Copy.infoPrivacyLines + Copy.infoPlansLines)
             .joined(separator: "\n")
         XCTAssertTrue(Copy.infoChoiceLines.contains { $0.contains("last 10 minutes") })
+        // The extension reads the junk/spam folder too (IMAPMailFetcher), so the copy must say so.
+        XCTAssertTrue(Copy.infoChoiceLines.contains { $0.contains("inbox and junk/spam folder") })
         XCTAssertTrue(Copy.infoPrivacyLines.contains { $0.contains("last 10 minutes") })
         for brand in ["Gmail", "Outlook", "Google", "Microsoft", "Yahoo", "iCloud"] {
             XCTAssertFalse(text.contains(brand), brand)
