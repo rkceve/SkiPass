@@ -22,12 +22,38 @@ final class UITourTests: XCTestCase {
         continueAfterFailure = false
 
         let app = XCUIApplication(bundleIdentifier: "io.github.rkceve.skipass")
-        app.launchArguments = ["-SkiPassTourFixtures"]
+        // Start with AutoFill off: Home shows the "Turn on AutoFill" card.
+        app.launchArguments = ["-SkiPassTourFixtures", "-SkiPassTourAutoFillDisabled"]
         app.launch()
 
-        // Home list.
         let addButton = app.buttons["accounts.add"]
         XCTAssertTrue(addButton.waitForExistence(timeout: 30), "Home screen did not appear")
+        let cardTurnOn = app.buttons["autofill.turnOn"]
+        XCTAssertTrue(cardTurnOn.waitForExistence(timeout: 10), "AutoFill card did not appear")
+        pause("home-autofill-card")
+
+        // Information sheet: morphs out of the glass (i) button.
+        app.buttons["header.info"].tap()
+        let done = app.buttons["info.done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 10), "information sheet did not appear")
+        pause("info-sheet")
+
+        // Turn on from the setup step (the fixture stands in for the system prompt).
+        let sheetTurnOn = app.buttons["info.autofill.turnOn"]
+        XCTAssertTrue(sheetTurnOn.waitForExistence(timeout: 10))
+        sheetTurnOn.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["info.autofill.on"].firstMatch.waitForExistence(timeout: 10),
+                      "setup step did not show AutoFill as on")
+        pause("info-autofill-on")
+
+        app.swipeUp(velocity: .slow)
+        XCTAssertTrue(app.descendants(matching: .any)["info.version"].firstMatch.waitForExistence(timeout: 10), "version row missing")
+        pause("info-sheet-scrolled")
+
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 10), "information sheet did not close")
+        // AutoFill is on now, so the card has left Home.
+        XCTAssertTrue(cardTurnOn.waitForNonExistence(timeout: 10), "AutoFill card did not leave")
         pause("home")
 
         // Expand info@myshop.example and show the server rows.

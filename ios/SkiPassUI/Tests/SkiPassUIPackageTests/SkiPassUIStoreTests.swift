@@ -63,5 +63,8 @@ final class CopyErrorMessageTests: XCTestCase {
         XCTAssertEqual(PlanOption.paidPlanName(planID: "pro"), "Pro")
         XCTAssertEqual(PlanOption.paidPlanName(planID: "standard"), "Standard")
         XCTAssertNil(PlanOption.paidPlanName(planID: "free"))
+        XCTAssertEqual(PlanOption.paidPlanTagline(planID: "standard"), Copy.standardPlanTagline)
+        XCTAssertEqual(PlanOption.paidPlanTagline(planID: "pro"), Copy.proPlanTagline)
+        XCTAssertNil(PlanOption.paidPlanTagline(planID: "free"))
     }
 }

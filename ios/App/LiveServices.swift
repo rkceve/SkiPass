@@ -1,3 +1,4 @@
+import AuthenticationServices
 import Foundation
 import SkiPassAuth
 import SkiPassAuthUI
@@ -286,6 +287,50 @@ final class LiveSharedStateServices: SharedStateServices {
             try state.setUsageSnapshot(snapshot)
         } catch {
             logger.error("Caching usage failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+}
+
+// MARK: - AutoFill settings (AuthenticationServices)
+
+/// Apple documentation (developer.apple.com/documentation/authenticationservices/...):
+/// - `ascredentialidentitystore/getstate(_:)` (iOS 12+): "Gets the state of the credential identity
+///   store"; `ascredentialidentitystorestate/isenabled`: whether the store is enabled.
+/// - `assettingshelper/requesttoturnoncredentialproviderextension(completionhandler:)` (iOS 18+):
+///   "If the extension is not currently enabled, a prompt will be shown to allow it to be turned on.
+///   The completion handler is called with YES or NO depending on whether the credential provider is
+///   enabled. You need to wait 10 seconds in order to make additional request to this API."
+///   The 10 s wait is enforced by `AutoFillSetupModel`.
+/// - `assettingshelper/opencredentialproviderappsettings(completionhandler:)` (iOS 17+): "Open the
+///   Settings app and navigate to the AutoFill provider settings."
+/// Completion-handler forms, as in `IdentityRegistrar`, so nothing non-Sendable crosses actors.
+@MainActor
+final class LiveAutoFillSettings: AutoFillSettingsServices {
+    func isExtensionEnabled() async -> Bool {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            ASCredentialIdentityStore.shared.getState { state in
+                continuation.resume(returning: state.isEnabled)
+            }
+        }
+    }
+
+    func requestToTurnOnExtension() async -> Bool {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            ASSettingsHelper.requestToTurnOnCredentialProviderExtension { enabled in
+                continuation.resume(returning: enabled)
+            }
+        }
+    }
+
+    func openCredentialProviderSettings() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            ASSettingsHelper.openCredentialProviderAppSettings { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
         }
     }
 }

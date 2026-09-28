@@ -2,7 +2,8 @@ name: screenshots
 
 # Store screenshots of the SkiPass app (iPhone 16 simulator, 1179x2556, status bar 9:41) driven by
 # ios/UITests/ScreenshotTests.swift with the DEBUG-only in-memory fixtures (fictional addresses,
-# no network). Output artifact `screenshots`: 01-home.png, 02-imap-expanded.png, 03-plan.png.
+# no network). Output artifact `screenshots`: 01-home.png, 02-imap-expanded.png, 03-plan.png,
+# 04-autofill-card.png, 05-info-sheet.png.
 on:
   workflow_dispatch:
 
@@ -114,7 +115,7 @@ jobs:
       - name: Check screenshots
         run: |
           fail=0
-          for n in 01-home 02-imap-expanded 03-plan; do
+          for n in 01-home 02-imap-expanded 03-plan 04-autofill-card 05-info-sheet; do
             f="screenshots/$n.png"
             if [ ! -s "$f" ]; then echo "::error::$f missing"; fail=1; continue; fi
             w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')

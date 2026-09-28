@@ -317,8 +317,11 @@ final class AppModel: SkiPassUIActions {
         await refreshUsage()
     }
 
-    // Note: the app does not guide the user to turn on the AutoFill extension; it is enabled in
-    // Settings > General > AutoFill & Passwords.
+    /// The AutoFill extension was just turned on (`AutoFillSetupModel.onTurnedOn`): the identity
+    /// store only accepts identities while it is on, so register them now.
+    func autoFillDidTurnOn() async {
+        await syncIdentities()
+    }
 
     private func existingMailbox(address: String) -> MailboxConfig? {
         let mailboxes = (try? services.accounts.loadMailboxes()) ?? []
@@ -496,7 +499,8 @@ extension AppModel {
             PlanOption(
                 id: package.id,
                 name: package.title,
-                tagline: package.description,
+                // Copy's tagline for the tier; the store description only for an unknown tier.
+                tagline: tier.flatMap { PlanOption.paidPlanTagline(planID: $0.rawValue) } ?? package.description,
                 priceText: package.priceString,
                 isCurrent: package.id == currentID,
                 systemImage: systemImage(for: tier)
@@ -506,7 +510,7 @@ extension AppModel {
             paid.insert(PlanOption(
                 id: "plan.\(currentTier.rawValue)",
                 name: name,
-                tagline: "",
+                tagline: PlanOption.paidPlanTagline(planID: currentTier.rawValue) ?? "",
                 priceText: "",
                 isCurrent: true,
                 systemImage: systemImage(for: currentTier)

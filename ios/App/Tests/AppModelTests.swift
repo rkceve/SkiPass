@@ -279,7 +279,9 @@ struct MappingTests {
         #expect(plans.map(\.id) == ["free", "$rc_monthly", "pro_monthly"])
         #expect(plans.filter(\.isCurrent).map(\.id) == ["free"])
         #expect(plans[1].name == "Standard")
-        #expect(plans[1].tagline == "More fills")
+        // Taglines come from Copy by tier, not from the store's product descriptions.
+        #expect(plans[1].tagline == PlanOption.paidPlanTagline(planID: "standard"))
+        #expect(plans[2].tagline == PlanOption.paidPlanTagline(planID: "pro"))
         #expect(plans[1].priceText == "$2.99")
         #expect(plans[1].systemImage == "square.stack.3d.up.fill")
         #expect(plans[2].systemImage == "crown.fill")

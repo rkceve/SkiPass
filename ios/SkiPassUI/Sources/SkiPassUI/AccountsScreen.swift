@@ -10,10 +10,10 @@ struct AccountsScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Add is the header's glass control (no settings gear, docs/ARCHITECTURE.md §2); the
-                // container gives it one sampling region with the header.
+                // The header's (i) button and Add are the glass controls; the container gives
+                // them one sampling region.
                 VStack(alignment: .leading, spacing: 24) {
-                    HeaderView()
+                    HeaderView(store: store)
 
                     AccountsSectionHeader(sheetNamespace: sheetNamespace) {
                         store.accountSheet = .add
@@ -22,6 +22,12 @@ struct AccountsScreen: View {
                 .glassGroup()
 
                 VStack(spacing: 16) {
+                    // Shown only while the AutoFill extension is off; leaves with a spring.
+                    if !store.autoFillEnabled {
+                        AutoFillCard(store: store)
+                            .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .top)))
+                    }
+
                     ForEach(store.accounts) { account in
                         AccountCard(
                             account: account,
@@ -40,6 +46,7 @@ struct AccountsScreen: View {
                         )
                     }
                 }
+                .animation(CardMotion.toggle, value: store.autoFillEnabled)
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)
@@ -115,6 +122,10 @@ private struct AccountsSectionHeader: View {
 
 #Preview("Accounts – expanded IMAP") {
     AccountsScreen(store: PreviewData.makeStore(expanded: PreviewData.infoAccountID))
+}
+
+#Preview("Accounts – AutoFill off") {
+    AccountsScreen(store: PreviewData.makeStore(autoFillEnabled: false))
 }
 
 #Preview("Accounts – expanded Google") {

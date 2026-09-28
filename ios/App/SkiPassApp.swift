@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct SkiPassApp: App {
     @State private var model = AppModel(services: LiveServices.make())
+    @State private var autoFill = AutoFillSetupModel(services: LiveAutoFillSettings())
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -26,12 +27,22 @@ struct SkiPassApp: App {
             plans: model.plans,
             usage: model.usage,
             plansAvailable: model.plansAvailable,
+            autoFillEnabled: autoFill.isEnabledForUI,
+            onTurnOnAutoFill: { await autoFill.requestTurnOn() },
+            onOpenAutoFillSettings: { await autoFill.openSettings() },
             actions: model
         )
-        .task { await model.start() }
+        .task {
+            autoFill.onTurnedOn = { [model] in await model.autoFillDidTurnOn() }
+            await autoFill.refresh()
+            await model.start()
+        }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
-            Task { await model.didBecomeActive() }
+            Task {
+                await autoFill.refresh()
+                await model.didBecomeActive()
+            }
         }
     }
 }
@@ -46,6 +57,9 @@ private struct TourRootView: View {
             accounts: fixtures.accounts,
             plans: fixtures.plans,
             usage: fixtures.usage,
+            autoFillEnabled: fixtures.autoFillEnabled,
+            onTurnOnAutoFill: { fixtures.turnOnAutoFill() },
+            onOpenAutoFillSettings: {},
             actions: fixtures
         )
     }

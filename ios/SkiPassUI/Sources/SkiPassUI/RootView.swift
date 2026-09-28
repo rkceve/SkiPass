@@ -15,23 +15,36 @@ public struct RootView: View {
     private let plans: [PlanOption]
     private let usage: UsageInfo?
     private let plansAvailable: Bool
+    private let autoFillEnabled: Bool
 
-    /// - Parameter plansAvailable: false when the build has no billing (no RevenueCat key).
+    /// - Parameters:
+    ///   - plansAvailable: false when the build has no billing (no RevenueCat key).
+    ///   - autoFillEnabled: false while the SkiPass AutoFill extension is turned off; Home then
+    ///     shows the "Turn on AutoFill" card. Pass true while the state is still unknown.
+    ///   - onTurnOnAutoFill: shows the system prompt to turn on the extension; returns whether
+    ///     it is on afterwards. False makes the controls offer `onOpenAutoFillSettings` too.
+    ///   - onOpenAutoFillSettings: opens the AutoFill provider settings.
     public init(
         accounts: [MailAccount],
         plans: [PlanOption],
         usage: UsageInfo?,
         plansAvailable: Bool = true,
+        autoFillEnabled: Bool = true,
+        onTurnOnAutoFill: @escaping @MainActor () async -> Bool = { true },
+        onOpenAutoFillSettings: @escaping @MainActor () async -> Void = {},
         actions: SkiPassUIActions
     ) {
         self.accounts = accounts
         self.plans = plans
         self.usage = usage
         self.plansAvailable = plansAvailable
+        self.autoFillEnabled = autoFillEnabled
         // One-time seed of view-owned state; later input changes are pushed
         // into the store by the `.onChange` handlers in `body`.
         self.store = SkiPassUIStore(
-            accounts: accounts, plans: plans, usage: usage, plansAvailable: plansAvailable, actions: actions)
+            accounts: accounts, plans: plans, usage: usage, plansAvailable: plansAvailable, actions: actions,
+            autoFillEnabled: autoFillEnabled, onTurnOnAutoFill: onTurnOnAutoFill,
+            onOpenAutoFillSettings: onOpenAutoFillSettings)
         self.selectedTab = .home
     }
 
@@ -41,6 +54,7 @@ public struct RootView: View {
         self.plans = store.plans
         self.usage = store.usage
         self.plansAvailable = store.plansAvailable
+        self.autoFillEnabled = store.autoFillEnabled
         self.store = store
         self.selectedTab = initialTab
     }
@@ -59,6 +73,7 @@ public struct RootView: View {
         .onChange(of: plans) { store.plans = plans }
         .onChange(of: usage) { store.usage = usage }
         .onChange(of: plansAvailable) { store.plansAvailable = plansAvailable }
+        .onChange(of: autoFillEnabled) { store.autoFillEnabled = autoFillEnabled }
     }
 }
 

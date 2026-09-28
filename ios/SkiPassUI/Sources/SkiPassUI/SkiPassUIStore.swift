@@ -28,7 +28,17 @@ final class SkiPassUIStore {
     /// "Now" used for the reset countdown; injectable so previews match the mockup.
     var referenceDate: Date
 
+    /// Whether the SkiPass AutoFill extension is turned on (from the host app). False shows the
+    /// "Turn on AutoFill" card on Home and the enable controls in the information sheet.
+    var autoFillEnabled: Bool
+    /// The last turn-on request did not enable AutoFill (declined, or the system prompt could not
+    /// be shown): the controls also offer opening Settings.
+    private(set) var autoFillSettingsOffered = false
+    private(set) var isRequestingAutoFill = false
+
     let actions: any SkiPassUIActions
+    private let turnOnAutoFill: @MainActor () async -> Bool
+    private let openAutoFillSettingsAction: @MainActor () async -> Void
 
     init(
         accounts: [MailAccount],
@@ -36,7 +46,10 @@ final class SkiPassUIStore {
         usage: UsageInfo?,
         plansAvailable: Bool = true,
         actions: any SkiPassUIActions,
-        referenceDate: Date = .now
+        referenceDate: Date = .now,
+        autoFillEnabled: Bool = true,
+        onTurnOnAutoFill: @escaping @MainActor () async -> Bool = { true },
+        onOpenAutoFillSettings: @escaping @MainActor () async -> Void = {}
     ) {
         self.accounts = accounts
         self.plans = plans
@@ -44,6 +57,9 @@ final class SkiPassUIStore {
         self.plansAvailable = plansAvailable
         self.actions = actions
         self.referenceDate = referenceDate
+        self.autoFillEnabled = autoFillEnabled
+        self.turnOnAutoFill = onTurnOnAutoFill
+        self.openAutoFillSettingsAction = onOpenAutoFillSettings
     }
 
     // MARK: Accounts
@@ -86,6 +102,23 @@ final class SkiPassUIStore {
         } else {
             accounts.append(account)
         }
+    }
+
+    // MARK: AutoFill
+
+    /// Asks the host to show the system's turn-on prompt. The host pushes the new
+    /// `autoFillEnabled`; a request that does not enable AutoFill makes Settings the next step.
+    func requestAutoFill() async {
+        guard !isRequestingAutoFill else { return }
+        isRequestingAutoFill = true
+        defer { isRequestingAutoFill = false }
+        if !(await turnOnAutoFill()) {
+            autoFillSettingsOffered = true
+        }
+    }
+
+    func openAutoFillSettings() async {
+        await openAutoFillSettingsAction()
     }
 
     // MARK: Plans

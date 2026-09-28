@@ -34,7 +34,7 @@ struct CurrentPlanCard: View {
     }
 }
 
-/// "Remaining sends", "N of M left", progress bar, reset countdown and date.
+/// "Remaining fills", "N of M left", progress bar, reset countdown and date.
 private struct UsageBox: View {
     let usage: UsageInfo
     let referenceDate: Date
@@ -42,7 +42,7 @@ private struct UsageBox: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text(Copy.remainingSends)
+                Text(Copy.remainingFills)
                     .foregroundStyle(.secondary)
                 Spacer()
                 Text(remainingText)
