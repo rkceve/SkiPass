@@ -3,7 +3,8 @@
 // `.example` addresses, no accounts, keychain or network.
 //
 // Runs only when the test runner has SKIPASS_SCREENSHOTS=1 (the workflow sets
-// TEST_RUNNER_SKIPASS_SCREENSHOTS=1). At each screen (`01-home`, `02-imap-expanded`, `03-plan`)
+// TEST_RUNNER_SKIPASS_SCREENSHOTS=1). At each screen (`01-home`, `02-imap-expanded`, `03-plan`,
+// and with `-SkiPassTourAutoFillDisabled` `04-autofill-card` and `05-info-sheet`)
 // the test writes `<name>.ready` into SKIPASS_SHOT_DIR and waits for `<name>.done`: the workflow
 // takes the image with `simctl io screenshot`, which keeps the native 1179x2556 pixels
 // (XCUIScreen rounds the 393 pt width to 1178 px). An XCUIScreen attachment is kept for diagnosis.
@@ -46,6 +47,19 @@ final class ScreenshotTests: XCTestCase {
         // Not scrolled: scrolling moves the header under the status bar.
         XCTAssertTrue(app.buttons["plan.pro"].waitForExistence(timeout: 10), "Plan screen did not appear")
         capture("03-plan")
+
+        // 4. Home with AutoFill off: the "Turn on AutoFill" card above the accounts.
+        app.terminate()
+        app.launchArguments = ["-SkiPassTourFixtures", "-SkiPassTourAutoFillDisabled"]
+        app.launch()
+        XCTAssertTrue(app.buttons["autofill.turnOn"].waitForExistence(timeout: 30), "AutoFill card did not appear")
+        capture("04-autofill-card")
+
+        // 5. The information sheet from the header's (i) button.
+        app.buttons["header.info"].tap()
+        XCTAssertTrue(app.buttons["info.autofill.turnOn"].waitForExistence(timeout: 10),
+                      "information sheet did not appear")
+        capture("05-info-sheet")
     }
 
     private func capture(_ name: String) {
