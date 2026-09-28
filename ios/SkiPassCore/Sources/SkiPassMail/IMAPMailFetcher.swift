@@ -2,26 +2,37 @@ import Foundation
 import SkiPassModels
 import SwiftMail
 
-/// Reads recent INBOX messages over IMAP (SwiftMail 1.12.0) without changing mailbox state.
+/// Reads recent INBOX and junk-folder messages over IMAP (SwiftMail 1.12.0) without changing mailbox state.
 ///
 /// Read-only guarantees:
-/// - INBOX is opened with EXAMINE (`IMAPServer.examineMailbox`), so the server rejects STORE and
-///   does not set `\Seen` (RFC 3501 §6.3.2).
+/// - Both folders are opened with EXAMINE (`IMAPServer.examineMailbox`), so the server rejects STORE and
+///   does not set `\Seen` (RFC 3501 §6.3.2). `MailSession` has no command that selects read-write,
+///   stores flags, copies, moves or expunges.
 /// - Every SwiftMail body/header fetch uses `BODY.PEEK` (FetchCommands.swift L75, L78, L155), including
 ///   the pipelined part fetch, which sends the same `FetchMessagePartCommand`
 ///   (IMAPConnection+PipelinedFetch.swift L243).
+///
+/// Folders:
+/// - INBOX first, then the junk folder (RFC 6154 `\Junk`, else a known name; see `JunkFolder`), on the
+///   same connection and within the same time budget and recency window. The junk folder is found with
+///   one IMAP LIST per mailbox and process (`JunkFolderCache`).
+/// - Message ids carry the folder (`"<mailboxID>:<folder>:<uid>"`, `FetchLogic.messageID`), because
+///   UIDs are only unique within a folder.
 ///
 /// Order and budget:
 /// - Envelopes are fetched newest UID first, in batches, and the exact recency cut (INTERNALDATE) is
 ///   applied before anything is capped; fetching stops once a batch reaches messages older than `since`.
 /// - Bodies are fetched newest first, several messages per pipelined burst
 ///   (`IMAPServer.fetchPartsPipelined`, IMAPServer+Fetch.swift L94), and every finished message is kept.
-/// - When the time budget ends, the messages read so far are returned instead of nothing, and the
-///   connection is dropped. The same cleanup runs when the caller cancels first (Deadline.swift).
+/// - The result is both folders merged, newest (server receipt time) first.
+/// - When the time budget ends, the messages read so far (from INBOX, then from the junk folder) are
+///   returned instead of nothing, and the connection is dropped. The same cleanup runs when the caller
+///   cancels first (Deadline.swift).
 public struct IMAPMailFetcher: MailFetching {
     private let credentials: any CredentialProviding
     private let timeout: TimeInterval
     private let maxMessages: Int
+    private let junkFolders: JunkFolderCache
     private let makeSession: @Sendable (MailboxConfig) -> any MailSession
 
     /// Envelopes requested per UID FETCH while walking back from the newest UID.
@@ -32,11 +43,13 @@ public struct IMAPMailFetcher: MailFetching {
     /// - Parameters:
     ///   - credentials: Supplies the password or OAuth access token per mailbox.
     ///   - timeout: Wall-clock budget in seconds for one `recentMessages` call (credential lookup,
-    ///     connect, login, search, fetch). On expiry the connection is dropped and the messages read so
+    ///     connect, login, both folders). On expiry the connection is dropped and the messages read so
     ///     far are returned; with none read yet, `MailFetchError.timedOut` is thrown.
-    ///   - maxMessages: Upper bound on messages read per call (newest first).
+    ///   - maxMessages: Upper bound on messages read per call, across both folders: the newest INBOX
+    ///     messages first, then the newest junk-folder messages up to what is left.
     public init(credentials: any CredentialProviding, timeout: TimeInterval, maxMessages: Int = 50) {
-        self.init(credentials: credentials, timeout: timeout, maxMessages: maxMessages) { mailbox in
+        self.init(credentials: credentials, timeout: timeout, maxMessages: maxMessages,
+                  junkFolders: .shared) { mailbox in
             SwiftMailSession(server: IMAPServer(
                 host: mailbox.imapHost,
                 port: mailbox.imapPort,
@@ -46,12 +59,15 @@ public struct IMAPMailFetcher: MailFetching {
         }
     }
 
-    /// Test seam: `makeSession` supplies the IMAP session for a mailbox.
+    /// Test seam: `makeSession` supplies the IMAP session for a mailbox; `junkFolders` defaults to a
+    /// fresh cache so tests do not share discovered folders.
     init(credentials: any CredentialProviding, timeout: TimeInterval, maxMessages: Int = 50,
+         junkFolders: JunkFolderCache = JunkFolderCache(),
          makeSession: @escaping @Sendable (MailboxConfig) -> any MailSession) {
         self.credentials = credentials
         self.timeout = timeout
         self.maxMessages = maxMessages
+        self.junkFolders = junkFolders
         self.makeSession = makeSession
     }
 
@@ -60,12 +76,14 @@ public struct IMAPMailFetcher: MailFetching {
         let collected = CollectedMessages()
         let credentials = self.credentials
         let maxMessages = self.maxMessages
+        let junkFolders = self.junkFolders
         do {
             try await Deadline.run(
                 seconds: timeout,
                 operation: {
                     try await Self.fetch(session: session, mailbox: mailbox, since: since,
-                                         credentials: credentials, maxMessages: maxMessages, into: collected)
+                                         credentials: credentials, maxMessages: maxMessages,
+                                         junkFolders: junkFolders, into: collected)
                 },
                 onTimeout: { await session.disconnect() }
             )
@@ -84,18 +102,63 @@ public struct IMAPMailFetcher: MailFetching {
 
     private static func fetch(session: any MailSession, mailbox: MailboxConfig, since: Date,
                               credentials: any CredentialProviding, maxMessages: Int,
-                              into collected: CollectedMessages) async throws {
+                              junkFolders: JunkFolderCache, into collected: CollectedMessages) async throws {
         do {
             let credential = try await credentials.credential(for: mailbox)
             try await session.open(username: mailbox.username, credential: credential)
-            let found = try await session.searchUIDs(since: FetchLogic.searchDay(for: since))
-            let infos = try await recentInfos(session: session, uids: found, since: since, limit: maxMessages)
-            try await readBodies(session: session, infos: infos, mailbox: mailbox, into: collected)
+            try await session.examine("INBOX")
+            try await readRecent(.inbox, session: session, mailbox: mailbox, since: since,
+                                 limit: maxMessages, into: collected)
+            let room = maxMessages - collected.count
+            if room > 0, let junk = try await junkFolder(session: session, mailbox: mailbox, cache: junkFolders) {
+                do {
+                    try await session.examine(junk.name)
+                } catch {
+                    // A remembered folder may have been renamed or deleted: look it up again next time.
+                    if junk.fromCache, !(error is CancellationError) { junkFolders.remove(for: mailbox) }
+                    throw error
+                }
+                try await readRecent(.junk, session: session, mailbox: mailbox, since: since,
+                                     limit: room, into: collected)
+            }
             await session.logout()
         } catch {
             await session.disconnect()
             throw error
         }
+    }
+
+    /// The junk folder to read: the remembered one, else the result of one IMAP LIST, which is then
+    /// remembered (including "none") for this mailbox until the process ends.
+    static func junkFolder(session: any MailSession, mailbox: MailboxConfig,
+                           cache: JunkFolderCache) async throws -> (name: String, fromCache: Bool)? {
+        switch cache.entry(for: mailbox) {
+        case .found(let name)?:
+            return (name, true)
+        case .notFound?:
+            return nil
+        case nil:
+            try Task.checkCancellation()
+            let listed = try await session.listFolders()
+            // A reply that arrives after the budget ended belongs to an abandoned fetch: remember nothing.
+            try Task.checkCancellation()
+            guard let name = JunkFolder.name(in: listed.mailboxes, namespaces: listed.namespaces) else {
+                cache.store(.notFound, for: mailbox)
+                return nil
+            }
+            cache.store(.found(name), for: mailbox)
+            return (name, false)
+        }
+    }
+
+    /// Reads the messages of the examined folder received at or after `since`, at most `limit`,
+    /// newest first, into `collected`.
+    static func readRecent(_ folder: MailFolder, session: any MailSession, mailbox: MailboxConfig, since: Date,
+                           limit: Int, into collected: CollectedMessages) async throws {
+        try Task.checkCancellation()
+        let found = try await session.searchUIDs(since: FetchLogic.searchDay(for: since))
+        let infos = try await recentInfos(session: session, uids: found, since: since, limit: limit)
+        try await readBodies(session: session, infos: infos, folder: folder, mailbox: mailbox, into: collected)
     }
 
     /// Envelopes of the messages received at or after `since`, newest UID first, at most `limit`.
@@ -129,7 +192,7 @@ public struct IMAPMailFetcher: MailFetching {
 
     /// Reads bodies newest first, `bodyBatchSize` messages per pipelined burst: text/plain when present
     /// and non-empty, else text/html converted to text. Each finished message goes into `collected`.
-    static func readBodies(session: any MailSession, infos: [(uid: UID, info: MessageInfo)],
+    static func readBodies(session: any MailSession, infos: [(uid: UID, info: MessageInfo)], folder: MailFolder,
                            mailbox: MailboxConfig, into collected: CollectedMessages) async throws {
         var start = 0
         while start < infos.count {
@@ -157,7 +220,8 @@ public struct IMAPMailFetcher: MailFetching {
                 pending = next
             }
             for (uid, info) in batch {
-                collected.append(FetchLogic.makeMessage(info: info, uid: uid, mailbox: mailbox, bodyText: texts[uid] ?? ""))
+                collected.append(FetchLogic.makeMessage(info: info, uid: uid, folder: folder, mailbox: mailbox,
+                                                        bodyText: texts[uid] ?? ""))
             }
         }
     }
@@ -174,7 +238,13 @@ final class CollectedMessages: @unchecked Sendable {
         lock.unlock()
     }
 
-    /// Newest (server receipt time) first.
+    var count: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return messages.count
+    }
+
+    /// Both folders merged, newest (server receipt time) first.
     func newestFirst() -> [FetchedMessage] {
         lock.lock()
         defer { lock.unlock() }
@@ -185,11 +255,16 @@ final class CollectedMessages: @unchecked Sendable {
 // MARK: - IMAP session
 
 /// The IMAP commands `IMAPMailFetcher` uses, so the fetch order and budget handling can be tested
-/// without a server. `SwiftMailSession` is the live implementation.
+/// without a server. `SwiftMailSession` is the live implementation. There is deliberately no command
+/// that opens a folder read-write or changes flags or folders (SELECT, STORE, COPY, MOVE, EXPUNGE).
 protocol MailSession: Sendable {
-    /// Connects, authenticates and opens INBOX read-only (EXAMINE).
+    /// Connects and authenticates.
     func open(username: String, credential: MailCredential) async throws
-    /// UIDs matching `SEARCH SINCE <day>`.
+    /// Opens `folder` read-only (EXAMINE); later searches and fetches read from it.
+    func examine(_ folder: String) async throws
+    /// Every folder with its attributes (`LIST "" "*"`), and the namespaces learned at login.
+    func listFolders() async throws -> FolderList
+    /// UIDs in the examined folder matching `SEARCH SINCE <day>`.
     func searchUIDs(since day: Date) async throws -> [UID]
     /// Envelope, INTERNALDATE and body structure of `uids`, in one UID FETCH.
     func fetchInfos(_ uids: [UID]) async throws -> [MessageInfo]
@@ -199,6 +274,12 @@ protocol MailSession: Sendable {
     func logout() async
     /// Drops the connection; errors are ignored.
     func disconnect() async
+}
+
+/// A LIST reply: `Mailbox.Info` as SwiftMail 1.12.0 builds it (Models/Mailbox.swift L109-L113).
+struct FolderList: Sendable {
+    var mailboxes: [Mailbox.Info]
+    var namespaces: NamespaceResponse?
 }
 
 /// `MailSession` on SwiftMail 1.12.0's `IMAPServer`.
@@ -213,7 +294,17 @@ struct SwiftMailSession: MailSession {
         case .xoauth2(let accessToken):
             try await server.authenticateXOAUTH2(email: username, accessToken: accessToken)
         }
-        try await server.examineMailbox("INBOX")
+    }
+
+    func examine(_ folder: String) async throws {
+        // EXAMINE, never SELECT (IMAPServer+Mailbox.swift L59-L63, ExamineMailboxCommand.swift L26).
+        try await server.examineMailbox(folder)
+    }
+
+    func listFolders() async throws -> FolderList {
+        // Plain LIST (IMAPServer+Namespace.swift L32-L56); `JunkFolder` explains why not the SPECIAL-USE variant.
+        let mailboxes = try await server.listMailboxes()
+        return FolderList(mailboxes: mailboxes, namespaces: await server.namespaces)
     }
 
     func searchUIDs(since day: Date) async throws -> [UID] {

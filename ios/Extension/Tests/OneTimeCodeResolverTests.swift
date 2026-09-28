@@ -61,6 +61,29 @@ final class OneTimeCodeResolverTests: XCTestCase {
         XCTAssertEqual(calls.first?.service, "acme.example.com")
     }
 
+    /// INBOX and the junk folder number their messages independently. The folder in the id
+    /// ("<mailboxID>:<folder>:<uid>", docs/API.md) keeps a junk-folder code distinct from an INBOX
+    /// message with the same UID, from judging through the fill report.
+    func testSameUIDInInboxAndJunkStayDistinctThroughJudgeAndFillReport() async throws {
+        let a = mailbox("a@example.com")
+        let inbox = message("\(a.id.uuidString):inbox:7", a, body: "CODE:111111", ageSeconds: 30)
+        let junk = message("\(a.id.uuidString):junk:7", a, body: "CODE:222222", ageSeconds: 60)
+        let fetcher = FakeFetcher(results: [a.id: .messages([inbox, junk])])
+        let judge = FakeJudge(outcome: .chosen(messageID: junk.id, scores: [:]))
+        let usage = FakeUsage()
+        let resolver = makeResolver(mailboxes: [a], fetcher: fetcher, judge: judge, usage: usage)
+
+        let result = await resolver.resolve(service: "acme.example.com")
+        let resolved = try XCTUnwrap(result)
+        XCTAssertEqual(resolved, ResolvedCode(code: "222222", messageID: junk.id))
+        let calls = await judge.calls
+        XCTAssertEqual(calls.first?.messageIDs, [inbox.id, junk.id])
+
+        await resolver.reportFill(messageID: resolved.messageID)
+        let reported = await usage.reported
+        XCTAssertEqual(reported, [junk.id])
+    }
+
     func testFetchUsesTenMinuteWindow() async {
         let a = mailbox("a@example.com")
         let fetcher = FakeFetcher(results: [a.id: .messages([])])

@@ -58,8 +58,25 @@ final class FetchLogicTests: XCTestCase {
 
     func testMessageIDFormat() {
         let id = UUID(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F")!
-        XCTAssertEqual(FetchLogic.messageID(mailboxID: id, uid: UID(123)),
-                       "E621E1F8-C36C-495A-93FC-0C247A3E6E5F:123")
+        XCTAssertEqual(FetchLogic.messageID(mailboxID: id, folder: .inbox, uid: UID(123)),
+                       "E621E1F8-C36C-495A-93FC-0C247A3E6E5F:inbox:123")
+        XCTAssertEqual(FetchLogic.messageID(mailboxID: id, folder: .junk, uid: UID(123)),
+                       "E621E1F8-C36C-495A-93FC-0C247A3E6E5F:junk:123")
+    }
+
+    /// The same UID in INBOX and in the junk folder are different messages (UIDs are per folder).
+    func testMessageIDsDifferAcrossFoldersForTheSameUID() {
+        let id = UUID()
+        XCTAssertNotEqual(FetchLogic.messageID(mailboxID: id, folder: .inbox, uid: UID(7)),
+                          FetchLogic.messageID(mailboxID: id, folder: .junk, uid: UID(7)))
+    }
+
+    /// The id never carries the server's folder name, so it stays short and ASCII (docs/API.md: at most
+    /// 512 characters) whatever the junk folder is called.
+    func testMessageIDIsShortASCII() {
+        let id = FetchLogic.messageID(mailboxID: UUID(), folder: .junk, uid: UID(UInt32.max))
+        XCTAssertLessThanOrEqual(id.count, 512)
+        XCTAssertTrue(id.allSatisfy(\.isASCII), id)
     }
 
     func testMakeMessage() {
@@ -68,8 +85,8 @@ final class FetchLogicTests: XCTestCase {
         let sent = date("2026-09-23T10:01:00Z")
         let message = FetchLogic.makeMessage(
             info: info(uid: 42, internalDate: date("2026-09-23T10:01:02Z"), date: sent),
-            uid: UID(42), mailbox: mailbox, bodyText: "Your code is 123456")
-        XCTAssertEqual(message.id, "\(mailbox.id.uuidString):42")
+            uid: UID(42), folder: .inbox, mailbox: mailbox, bodyText: "Your code is 123456")
+        XCTAssertEqual(message.id, "\(mailbox.id.uuidString):inbox:42")
         XCTAssertEqual(message.mailboxAddress, "a@gmail.com")
         XCTAssertEqual(message.from, "test@example.com")
         XCTAssertEqual(message.to, "recipient@example.com")
@@ -86,7 +103,7 @@ final class FetchLogicTests: XCTestCase {
         let received = date("2026-09-23T10:01:02Z")
         let message = FetchLogic.makeMessage(
             info: info(uid: 7, internalDate: received, date: date("2026-09-24T10:00:00Z")),
-            uid: UID(7), mailbox: mailbox, bodyText: "Save with code 1234")
+            uid: UID(7), folder: .junk, mailbox: mailbox, bodyText: "Save with code 1234")
         XCTAssertEqual(message.date, received)
     }
 
@@ -94,7 +111,8 @@ final class FetchLogicTests: XCTestCase {
         let mailbox = MailboxConfig(address: "a@gmail.com", kind: .google, imapHost: "imap.gmail.com",
                                     imapPort: 993, username: "a@gmail.com")
         let sent = date("2026-09-23T10:01:00Z")
-        let message = FetchLogic.makeMessage(info: info(uid: 8, date: sent), uid: UID(8), mailbox: mailbox, bodyText: "")
+        let message = FetchLogic.makeMessage(info: info(uid: 8, date: sent), uid: UID(8), folder: .inbox,
+                                             mailbox: mailbox, bodyText: "")
         XCTAssertEqual(message.date, sent)
     }
 

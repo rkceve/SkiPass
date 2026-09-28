@@ -37,7 +37,8 @@ public struct MailboxConfig: Codable, Sendable, Hashable, Identifiable {
     }
 }
 
-/// One email reduced to text. `id` is "<mailboxID>:<uid>".
+/// One email reduced to text. `id` is "<mailboxID>:<folder>:<uid>" with folder `inbox` or `junk`
+/// (docs/API.md); nothing parses it, it only has to be unique within one lookup.
 public struct FetchedMessage: Codable, Sendable, Hashable, Identifiable {
     public let id: String
     public var mailboxAddress: String
@@ -95,7 +96,8 @@ public struct UsageSnapshot: Codable, Sendable, Hashable {
 }
 
 public protocol MailFetching: Sendable {
-    /// Messages received at or after `since` in INBOX. Must not mark messages as read.
+    /// Messages received at or after `since` in INBOX and the junk (spam) folder, newest first.
+    /// Must not mark messages as read or move them.
     func recentMessages(for mailbox: MailboxConfig, since: Date) async throws -> [FetchedMessage]
 }
 
