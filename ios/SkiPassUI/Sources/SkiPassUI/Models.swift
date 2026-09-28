@@ -135,4 +135,14 @@ extension PlanOption {
         default: nil
         }
     }
+
+    /// Tagline of a paid server plan id ("standard" / "pro"); nil for anything else.
+    /// Shown instead of the store's product description, so every build shows the same copy.
+    public static func paidPlanTagline(planID: String) -> String? {
+        switch planID {
+        case "standard": Copy.standardPlanTagline
+        case "pro": Copy.proPlanTagline
+        default: nil
+        }
+    }
 }

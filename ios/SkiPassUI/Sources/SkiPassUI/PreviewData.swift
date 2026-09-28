@@ -70,7 +70,7 @@ enum PreviewData {
     static let standardPlan = PlanOption(
         id: "standard",
         name: "Standard",
-        tagline: "For growing projects and teams.",
+        tagline: Copy.standardPlanTagline,
         priceText: "",  // not shown in the mockup
         isCurrent: true,
         systemImage: "square.stack.3d.up.fill"
@@ -79,7 +79,7 @@ enum PreviewData {
     static let proPlan = PlanOption(
         id: "pro",
         name: "Pro",
-        tagline: "Higher limits for power users.",
+        tagline: Copy.proPlanTagline,
         priceText: "$24.99/mo",
         isCurrent: false,
         systemImage: "crown.fill"

@@ -7,7 +7,7 @@ import Foundation
 enum Copy {
     // MARK: Header (mockup)
     static let appName = "SkiPass"
-    static let appSubtitle = "Manage email accounts across domains."
+    static let appSubtitle = "One-time codes from any inbox."
 
     // MARK: Tabs (mockup)
     static let tabHome = "Home"
@@ -64,16 +64,19 @@ enum Copy {
     // MARK: Plan screen (mockup)
     static let planTitle = "Plan"
     static let currentChip = "Current"
-    static let remainingSends = "Remaining sends"  // one count = one code fill
+    static let remainingFills = "Remaining fills"  // one count = one code filled
     static let otherPlansTitle = "Other plans"
     static let plansUnavailable = "Plans are unavailable in this build."  // not in mockups
 
     // MARK: Plan names (mockup)
     static let freePlanName = "Free"
-    static let freePlanTagline = "A simple start for personal use."
+    static let freePlanTagline = "A few codes a month."
     static let freePlanPrice = "$0/mo"
     static let standardPlanName = "Standard"
     static let proPlanName = "Pro"
+    // Taglines by plan tier, shown instead of the store product descriptions.
+    static let standardPlanTagline = "For everyday sign-ins."
+    static let proPlanTagline = "For heavy daily use."
 
     // MARK: Turn-on-AutoFill card (Home) and setup controls (not in mockups)
     static let autoFillCardTitle = "Turn on AutoFill"

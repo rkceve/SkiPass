@@ -74,7 +74,7 @@ final class TourFixtureModel: SkiPassUIActions {
             PlanOption(
                 id: "standard",
                 name: "Standard",
-                tagline: "For growing projects and teams.",
+                tagline: PlanOption.paidPlanTagline(planID: "standard") ?? "",
                 priceText: "",
                 isCurrent: true,
                 systemImage: "square.stack.3d.up.fill"
@@ -83,7 +83,7 @@ final class TourFixtureModel: SkiPassUIActions {
             PlanOption(
                 id: "pro",
                 name: "Pro",
-                tagline: "Higher limits for power users.",
+                tagline: PlanOption.paidPlanTagline(planID: "pro") ?? "",
                 priceText: "$24.99/mo",
                 isCurrent: false,
                 systemImage: "crown.fill"
