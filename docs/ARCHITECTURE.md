@@ -13,7 +13,6 @@ See also: [API.md](API.md) for the server HTTP API and [DECISIONS.md](DECISIONS.
 | Shared core | `ios/SkiPassCore` | App and extension (`SkiPassAuthUI` in the app only) |
 | Server | `server/` (Hono) | Vercel project `skipass-server` (https://skipass-server.vercel.app) with Upstash Redis; a Cloudflare Workers entry with Workers KV is kept buildable |
 | Demo site | `demo-web/` | Vercel project `skipass-demo` (https://skipass-demo.vercel.app), email via Resend |
-| Earlier demo site | `demo-site/` | Not deployed; kept for reference, still built and tested in CI |
 | CI and packaging | `.github/workflows` | GitHub Actions (`macos-15`, `ubuntu-latest`) |
 
 ### SkiPassCore modules

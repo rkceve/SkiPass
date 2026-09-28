@@ -211,7 +211,6 @@ More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (components and flows)
 | `ios/Probe/`, `ios/UITests/` | CI-only probe app that checks one-time-code AutoFill from a third-party provider in the Simulator; UI tour test |
 | `server/` | Hono server: `src/api.ts` (routes), `src/jev.ts`, `src/revenuecat.ts`, `src/plans.ts`, `src/usage.ts`, tests |
 | `demo-web/` | Demo sign-up site used in the video (Vercel functions + static pages) |
-| `demo-site/` | Earlier Cloudflare version of the demo site, kept for reference only; not deployed |
 | `probe-site/` | Static one-time-code page used by the CI probe (GitHub Pages) |
 | `design/` | Screen mockups |
 | `project.yml` | XcodeGen spec for the Xcode project (the `.xcodeproj` is generated, not committed) |
@@ -285,7 +284,7 @@ Deployment steps for Vercel and Cloudflare are in [server/README.md](server/READ
 | `app` | XcodeGen project, app build, `SkiPassAppTests` (plan selection, entitlements, usage) |
 | `extension` | `SkiPassExtensionTests` (resolver, fallback rule, identity registration, request gate) |
 | `server` | `npm test` (Vitest in the Workers runtime, both Vercel and Cloudflare entries), `npm run typecheck`, Worker bundle dry run |
-| `demo-web`, `demo-site` | `npm test` and `npm run typecheck` |
+| `demo-web` | `npm test` and `npm run typecheck` |
 
 Other workflows: `ipa` (device IPA for sideloading), `tour` (screen recording of every screen with in-memory fixtures), `probe` (checks one-time-code AutoFill from a third-party provider in the Simulator), `pages` (publishes the probe page), `live-sim` (a browser-streamed Simulator for manual checks from a non-Mac machine).
 

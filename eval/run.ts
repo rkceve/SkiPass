@@ -26,7 +26,7 @@ import { CATEGORIES, CATEGORY_NOTES, type Category, type Scenario } from './type
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const DRY = process.argv.includes('--dry')
-/** Jev input price: $0.042 per million input tokens; output tokens are free (docs/facts/F3 §1.5). */
+/** Jev input price: $0.042 per million input tokens; output tokens are free (https://docs.typesafe.ai/models). */
 const USD_PER_MTOK = 0.042
 /** Production per-call timeout (server/src/env.ts defaultDeps.upstreamTimeoutMs). Not enforced here; only counted. */
 const PROD_TIMEOUT_MS = 3000
