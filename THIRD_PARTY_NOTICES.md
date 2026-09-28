@@ -56,7 +56,7 @@ Packages that SwiftMail's library target depends on:
 | [hono](https://github.com/honojs/hono) | 4.13.8 | MIT |
 | [tldts](https://github.com/remusao/tldts) (with tldts-core) | 7.4.15 | MIT |
 
-Development-only npm packages (TypeScript, Vitest, Wrangler and their dependencies) are listed with their licenses in `server/package-lock.json`, `demo-web/package-lock.json` and `demo-site/package-lock.json`.
+Development-only npm packages (TypeScript, Vitest, Wrangler and their dependencies) are listed with their licenses in `server/package-lock.json`, `demo-web/package-lock.json` and `eval/package-lock.json`.
 
 ### Loaded at runtime, not bundled
 

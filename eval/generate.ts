@@ -90,7 +90,7 @@ const B = {
   kotonohaJp: { name: 'ことのは書店', mail: 'kotonoha-books.co.jp', web: 'login.kotonoha-books.co.jp', lang: 'ja' },
   tallyfin: { name: 'Tallyfin', mail: 'relaykit.example', web: 'tallyfin-app.vercel.app' },
   pebbledash: { name: 'Pebbledash', mail: 'relaykit.example', web: 'pebbledash.vercel.app' },
-  // The project's demo site: brand "Acme" (demo-site/wrangler.jsonc SERVICE_NAME), sent through a
+  // The project's demo site host with the fictional brand "Acme", sent through a
   // provider. Real sender onboarding@resend.dev substituted by a fictional relay domain.
   demo: { name: 'Acme', mail: 'mailer-relay.example', web: 'skipass-demo.vercel.app' },
 } satisfies Record<string, Brand>
@@ -207,7 +207,7 @@ function render(spec: MailSpec, r: Rand, providerIdx: number): Rendered {
       }
     }
     switch (spec.v % 5) {
-      case 0: // demo-site/src/page.ts renderEmail layout
+      case 0: // demo-style code email layout
         return {
           from,
           code,
