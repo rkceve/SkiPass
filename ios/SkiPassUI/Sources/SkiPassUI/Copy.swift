@@ -122,6 +122,23 @@ enum Copy {
     static let infoVersionTitle = "Version"
     static let infoVersionUnknown = "Unknown"
 
+    static let infoDiagnosticsTitle = "Diagnostics"
+    static let diagnosticsIntro = "What happened the last times SkiPass was asked for a code on this device. No email text, codes, passwords or tokens are kept."
+    static let diagnosticsBundleID = "App bundle ID"
+    static let diagnosticsAppGroup = "App Group (app)"
+    static let diagnosticsKeychainGroup = "Keychain group (app)"
+    static let diagnosticsRegistrationApp = "Identity registration (app)"
+    static let diagnosticsRegistrationExtension = "Identity registration (AutoFill)"
+    static let diagnosticsNone = "none"
+    static let diagnosticsDefaultGroup = "default (not shared)"
+    static let diagnosticsNotYet = "not yet"
+    static let diagnosticsRequestsTitle = "Last AutoFill requests"
+    static let diagnosticsNoRequests = "No AutoFill request has reached SkiPass yet"
+    static let diagnosticsNoRequestsHint = "If you already tapped the SkiPass suggestion in a code field, the AutoFill extension did not run, or it runs without sharing storage with this app."
+    static let diagnosticsCopy = "Copy diagnostics"
+    static let diagnosticsCopied = "Copied"
+    static let diagnosticsTextHeader = "SkiPass diagnostics"
+
     static func remainingOfLimit(_ remaining: String, _ limit: String) -> String {
         "\(remaining) of \(limit) left"
     }

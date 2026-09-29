@@ -24,6 +24,7 @@ import os
 @MainActor
 enum LiveServices {
     static func make(bundle: Bundle = .main) -> AppServicesBundle {
+        LiveDiagnostics.recordAppStorage(bundle: bundle)
         let config = AppConfiguration(bundle: bundle)
         return AppServicesBundle(
             accounts: LiveAccountServices(),
@@ -259,7 +260,15 @@ final class LiveIdentityServices: IdentityServices {
         let seen = SeenDomainStore(defaults: SharedStorageEnvironment.current.defaults)
         let registrar = IdentityRegistrar(domainSource: CompositeDomainSource.standard(bundle: bundle, seen: seen))
         let result = await registrar.register(mailboxAddresses: mailboxAddresses)
-        logger.notice("Identity sync: \(String(describing: result), privacy: .public)")
+        let record = result.record(process: "app", at: Date())
+        logger.notice("Identity sync: \(record.summary, privacy: .public)")
+        LiveDiagnostics.store().setRegistration(record)
+    }
+
+    func syncSkipped(reason: String) {
+        logger.error("Identity sync skipped: \(reason, privacy: .public)")
+        LiveDiagnostics.store().setRegistration(RegistrationRecord(process: "app", at: Date(), outcome: "skipped",
+                                                                   detail: reason))
     }
 }
 

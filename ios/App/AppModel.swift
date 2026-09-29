@@ -47,12 +47,17 @@ final class AppModel: SkiPassUIActions {
 
     // MARK: Lifecycle
 
-    /// Loads local state, configures RevenueCat and fetches plans and usage. Runs once.
+    /// Loads local state, registers the one-time-code identities, configures RevenueCat and fetches
+    /// plans and usage. Runs once.
+    ///
+    /// Identities are registered first: they are what makes iOS offer SkiPass in a code field, and
+    /// billing / usage requests on a slow network must not hold them back.
     func start() async {
         guard !didStart else { return }
         didStart = true
 
         reloadAccounts()
+        await syncIdentities()
         if let cached = services.sharedState.cachedUsage() {
             usage = Self.usageInfo(from: cached, now: now())
             serverPlan = PlanTier(rawValue: cached.plan)
@@ -73,18 +78,18 @@ final class AppModel: SkiPassUIActions {
 
         await refreshPlans()
         await refreshUsage()
-        await syncIdentities()
         didFinishStart = true
     }
 
     /// Called when the app returns to the foreground (e.g. from subscription management or from
     /// Settings after enabling AutoFill, which is when the identity store becomes writable).
     /// Ignored until `start()` has finished (at cold launch `start()` already refreshes everything).
+    /// Identities first, before any network request.
     func didBecomeActive() async {
         guard didFinishStart else { return }
+        await syncIdentities()
         await refreshPlans()
         await refreshUsage()
-        await syncIdentities()
     }
 
     func refreshUsage() async {
@@ -136,10 +141,20 @@ final class AppModel: SkiPassUIActions {
         rebuildPlans()
     }
 
-    /// Reads the mailbox list right before writing, so the newest list always wins.
+    /// Reads the mailbox list right before writing, so the newest list always wins. A list that
+    /// cannot be read leaves the registered identities as they are: "no mailboxes" is not known,
+    /// and registering an empty set would remove every suggestion.
     private func performIdentitySync() async {
-        let addresses = ((try? services.accounts.loadMailboxes()) ?? []).map(\.address)
-        await services.identities.syncIdentities(mailboxAddresses: addresses)
+        let mailboxes: [MailboxConfig]
+        do {
+            mailboxes = try services.accounts.loadMailboxes()
+        } catch {
+            let reason = "mailbox list unreadable: \(type(of: error))"
+            logger.error("Identity sync skipped, keeping the registered identities: \(reason, privacy: .public)")
+            services.identities.syncSkipped(reason: reason)
+            return
+        }
+        await services.identities.syncIdentities(mailboxAddresses: mailboxes.map(\.address))
     }
 
     private var currentTier: PlanTier {

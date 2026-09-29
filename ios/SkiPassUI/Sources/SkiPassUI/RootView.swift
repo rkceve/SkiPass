@@ -24,6 +24,8 @@ public struct RootView: View {
     ///   - onTurnOnAutoFill: shows the system prompt to turn on the extension; returns whether
     ///     it is on afterwards. False makes the controls offer `onOpenAutoFillSettings` too.
     ///   - onOpenAutoFillSettings: opens the AutoFill provider settings.
+    ///   - loadDiagnostics: reads the on-device diagnostics for the Diagnostics card of "How SkiPass
+    ///     works" (called each time the sheet opens); nil hides the card.
     public init(
         accounts: [MailAccount],
         plans: [PlanOption],
@@ -32,6 +34,7 @@ public struct RootView: View {
         autoFillEnabled: Bool = true,
         onTurnOnAutoFill: @escaping @MainActor () async -> Bool = { true },
         onOpenAutoFillSettings: @escaping @MainActor () async -> Void = {},
+        loadDiagnostics: (@MainActor () -> DiagnosticsInfo)? = nil,
         actions: SkiPassUIActions
     ) {
         self.accounts = accounts
@@ -44,7 +47,7 @@ public struct RootView: View {
         self.store = SkiPassUIStore(
             accounts: accounts, plans: plans, usage: usage, plansAvailable: plansAvailable, actions: actions,
             autoFillEnabled: autoFillEnabled, onTurnOnAutoFill: onTurnOnAutoFill,
-            onOpenAutoFillSettings: onOpenAutoFillSettings)
+            onOpenAutoFillSettings: onOpenAutoFillSettings, loadDiagnostics: loadDiagnostics)
         self.selectedTab = .home
     }
 

@@ -41,17 +41,31 @@ struct FallbackJudge: CandidateJudging {
 
     func judge(service: String?, messages: [FetchedMessage]) async throws -> JudgeOutcome {
         guard let primary else {
+            Self.note(source: "local", serverError: "no server in this build")
             return try await fallback.judge(service: service, messages: messages)
         }
         let outcome: JudgeOutcome
         do {
             outcome = try await primary.judge(service: service, messages: messages)
         } catch {
+            Self.note(source: "local", serverError: Diagnostics.errorSummary(error))
             return try await fallback.judge(service: service, messages: messages)
         }
         if case .chosen(let id, _) = outcome, !messages.contains(where: { $0.id == id }) {
+            Self.note(source: "local", serverError: "server chose a message that was not sent")
             return try await fallback.judge(service: service, messages: messages)
         }
+        Self.note(source: "server", serverError: nil)
         return outcome
+    }
+
+    /// Records in the request's trace which judge decided (diagnostics; no-op outside a request).
+    private static func note(source: String, serverError: String?) {
+        AutoFillTraceRecorder.current?.update { trace in
+            var judge = trace.judge ?? JudgeTrace()
+            judge.source = source
+            judge.serverError = serverError
+            trace.judge = judge
+        }
     }
 }

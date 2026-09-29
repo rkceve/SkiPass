@@ -7,6 +7,8 @@ enum InfoSection: String, CaseIterable, Identifiable {
     case privacy
     case plans
     case version
+    /// Shown only when the host supplies diagnostics (the live app does; the UI tour does not).
+    case diagnostics
 
     var id: String { rawValue }
 
@@ -17,6 +19,7 @@ enum InfoSection: String, CaseIterable, Identifiable {
         case .privacy: Copy.infoPrivacyTitle
         case .plans: Copy.infoPlansTitle
         case .version: Copy.infoVersionTitle
+        case .diagnostics: Copy.infoDiagnosticsTitle
         }
     }
 
@@ -27,16 +30,17 @@ enum InfoSection: String, CaseIterable, Identifiable {
         case .privacy: "lock.fill"
         case .plans: "crown.fill"
         case .version: "info"
+        case .diagnostics: "stethoscope"
         }
     }
 
-    /// Bullet lines of the text-only sections (setup and version have their own layout).
+    /// Bullet lines of the text-only sections (setup, version and diagnostics have their own layout).
     var lines: [String] {
         switch self {
         case .choice: Copy.infoChoiceLines
         case .privacy: Copy.infoPrivacyLines
         case .plans: Copy.infoPlansLines
-        case .setup, .version: []
+        case .setup, .version, .diagnostics: []
         }
     }
 
@@ -92,14 +96,22 @@ struct InfoSheet: View {
     let store: SkiPassUIStore
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var diagnostics: DiagnosticsInfo?
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                InfoSheetContent(store: store, versionText: AppVersion.current)
+                InfoSheetContent(store: store, versionText: AppVersion.current, diagnostics: diagnostics)
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 24)
+            }
+            // Read the records each time the sheet opens and when the app returns to the foreground
+            // (the AutoFill extension writes them while the app is in the background).
+            .onAppear { diagnostics = store.loadDiagnostics?() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { diagnostics = store.loadDiagnostics?() }
             }
             .scrollIndicators(.hidden)
             .modifier(InfoSheetBackground())
@@ -119,6 +131,8 @@ struct InfoSheet: View {
 struct InfoSheetContent: View {
     let store: SkiPassUIStore
     let versionText: String?
+    /// nil hides the Diagnostics card.
+    var diagnostics: DiagnosticsInfo? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -132,6 +146,12 @@ struct InfoSheetContent: View {
                             .font(.body.monospacedDigit())
                             .foregroundStyle(.secondary)
                             .accessibilityIdentifier("info.version")
+                    }
+                case .diagnostics:
+                    if let diagnostics {
+                        InfoCard(section: section) {
+                            DiagnosticsContent(info: diagnostics, versionText: versionText)
+                        }
                     }
                 case .choice, .privacy, .plans:
                     InfoCard(section: section) { BulletLines(lines: section.lines) }

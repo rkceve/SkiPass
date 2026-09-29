@@ -13,9 +13,12 @@ import SwiftMail
 ///   (IMAPConnection+PipelinedFetch.swift L243).
 ///
 /// Folders:
-/// - INBOX first, then the junk folder (RFC 6154 `\Junk`, else a known name; see `JunkFolder`), on the
-///   same connection and within the same time budget and recency window. The junk folder is found with
-///   one IMAP LIST per mailbox and process (`JunkFolderCache`).
+/// - The credential is resolved once (one OAuth token refresh), then INBOX and the junk folder
+///   (RFC 6154 `\Junk`, else a known name; see `JunkFolder`) are read at the same time on two separate
+///   connections (two `IMAPServer`s), within the same time budget and recency window. A folder that
+///   fails does not stop the other one. The junk folder is found with one IMAP LIST per mailbox and
+///   process (`JunkFolderCache`), on the junk connection.
+/// - Each folder has its own message cap, so a busy INBOX cannot leave no room for the junk folder.
 /// - Message ids carry the folder (`"<mailboxID>:<folder>:<uid>"`, `FetchLogic.messageID`), because
 ///   UIDs are only unique within a folder.
 ///
@@ -25,13 +28,16 @@ import SwiftMail
 /// - Bodies are fetched newest first, several messages per pipelined burst
 ///   (`IMAPServer.fetchPartsPipelined`, IMAPServer+Fetch.swift L94), and every finished message is kept.
 /// - The result is both folders merged, newest (server receipt time) first.
-/// - When the time budget ends, the messages read so far (from INBOX, then from the junk folder) are
-///   returned instead of nothing, and the connection is dropped. The same cleanup runs when the caller
-///   cancels first (Deadline.swift).
+/// - When the time budget ends (the fetcher's own `timeout`, or the caller's earlier
+///   `MailFetchContext.deadline`), the messages read so far from either folder are returned instead of
+///   nothing, and both connections are dropped. The same cleanup runs when the caller cancels first
+///   (Deadline.swift).
+/// - Each step is recorded in `MailboxTraceRecorder.current` when the caller set one (diagnostics).
 public struct IMAPMailFetcher: MailFetching {
     private let credentials: any CredentialProviding
     private let timeout: TimeInterval
-    private let maxMessages: Int
+    private let maxInboxMessages: Int
+    private let maxJunkMessages: Int
     private let junkFolders: JunkFolderCache
     private let makeSession: @Sendable (MailboxConfig) -> any MailSession
 
@@ -39,17 +45,22 @@ public struct IMAPMailFetcher: MailFetching {
     static let envelopeBatchSize = 25
     /// Messages whose bodies are requested in one pipelined burst.
     static let bodyBatchSize = 5
+    /// Default caps: recent INBOX messages and recent junk-folder messages read per call.
+    public static let defaultMaxInboxMessages = 50
+    public static let defaultMaxJunkMessages = 20
 
     /// - Parameters:
     ///   - credentials: Supplies the password or OAuth access token per mailbox.
     ///   - timeout: Wall-clock budget in seconds for one `recentMessages` call (credential lookup,
-    ///     connect, login, both folders). On expiry the connection is dropped and the messages read so
+    ///     connect, login, both folders). On expiry the connections are dropped and the messages read so
     ///     far are returned; with none read yet, `MailFetchError.timedOut` is thrown.
-    ///   - maxMessages: Upper bound on messages read per call, across both folders: the newest INBOX
-    ///     messages first, then the newest junk-folder messages up to what is left.
-    public init(credentials: any CredentialProviding, timeout: TimeInterval, maxMessages: Int = 50) {
-        self.init(credentials: credentials, timeout: timeout, maxMessages: maxMessages,
-                  junkFolders: .shared) { mailbox in
+    ///   - maxInboxMessages / maxJunkMessages: Upper bound on the newest recent messages read from
+    ///     each folder.
+    public init(credentials: any CredentialProviding, timeout: TimeInterval,
+                maxInboxMessages: Int = IMAPMailFetcher.defaultMaxInboxMessages,
+                maxJunkMessages: Int = IMAPMailFetcher.defaultMaxJunkMessages) {
+        self.init(credentials: credentials, timeout: timeout, maxInboxMessages: maxInboxMessages,
+                  maxJunkMessages: maxJunkMessages, junkFolders: .shared) { mailbox in
             SwiftMailSession(server: IMAPServer(
                 host: mailbox.imapHost,
                 port: mailbox.imapPort,
@@ -59,38 +70,60 @@ public struct IMAPMailFetcher: MailFetching {
         }
     }
 
-    /// Test seam: `makeSession` supplies the IMAP session for a mailbox; `junkFolders` defaults to a
-    /// fresh cache so tests do not share discovered folders.
-    init(credentials: any CredentialProviding, timeout: TimeInterval, maxMessages: Int = 50,
+    /// Test seam: `makeSession` supplies one IMAP connection per call (called twice per fetch: INBOX
+    /// and junk folder); `junkFolders` defaults to a fresh cache so tests do not share discovered folders.
+    init(credentials: any CredentialProviding, timeout: TimeInterval,
+         maxInboxMessages: Int = IMAPMailFetcher.defaultMaxInboxMessages,
+         maxJunkMessages: Int = IMAPMailFetcher.defaultMaxJunkMessages,
          junkFolders: JunkFolderCache = JunkFolderCache(),
          makeSession: @escaping @Sendable (MailboxConfig) -> any MailSession) {
         self.credentials = credentials
         self.timeout = timeout
-        self.maxMessages = maxMessages
+        self.maxInboxMessages = maxInboxMessages
+        self.maxJunkMessages = maxJunkMessages
         self.junkFolders = junkFolders
         self.makeSession = makeSession
     }
 
+    /// Seconds this call may take: `timeout`, or less when the caller's deadline comes first.
+    func effectiveTimeout(now: ContinuousClock.Instant = .now) -> TimeInterval {
+        guard let deadline = MailFetchContext.deadline else { return timeout }
+        let remaining = deadline - now
+        let seconds = Double(remaining.components.seconds) + Double(remaining.components.attoseconds) / 1e18
+        return max(0.1, min(timeout, seconds))
+    }
+
     public func recentMessages(for mailbox: MailboxConfig, since: Date) async throws -> [FetchedMessage] {
-        let session = makeSession(mailbox)
+        let inboxSession = makeSession(mailbox)
+        let junkSession = makeSession(mailbox)
         let collected = CollectedMessages()
         let credentials = self.credentials
-        let maxMessages = self.maxMessages
+        let limits = FolderLimits(inbox: maxInboxMessages, junk: maxJunkMessages)
         let junkFolders = self.junkFolders
+        let trace = MailboxTraceRecorder.current
+        let seconds = effectiveTimeout()
         do {
             try await Deadline.run(
-                seconds: timeout,
+                seconds: seconds,
                 operation: {
-                    try await Self.fetch(session: session, mailbox: mailbox, since: since,
-                                         credentials: credentials, maxMessages: maxMessages,
+                    try await Self.fetch(inboxSession: inboxSession, junkSession: junkSession, mailbox: mailbox,
+                                         since: since, credentials: credentials, limits: limits,
                                          junkFolders: junkFolders, into: collected)
                 },
-                onTimeout: { await session.disconnect() }
+                onTimeout: {
+                    await Self.disconnect(inboxSession, junkSession)
+                }
             )
             return collected.newestFirst()
         } catch is CancellationError {
             throw CancellationError()
         } catch {
+            if error as? MailFetchError == .timedOut {
+                let ms = Int(seconds * 1_000)
+                let kept = collected.count
+                trace?.update { $0.error = "fetch deadline reached after \(ms) ms" }
+                trace?.log("fetch deadline reached after \(ms) ms, \(kept) msgs kept")
+            }
             // Budget over or a later command failed: keep what was already read.
             let partial = collected.newestFirst()
             if partial.isEmpty { throw error }
@@ -100,31 +133,103 @@ public struct IMAPMailFetcher: MailFetching {
 
     // MARK: - Fetch steps
 
-    private static func fetch(session: any MailSession, mailbox: MailboxConfig, since: Date,
-                              credentials: any CredentialProviding, maxMessages: Int,
+    struct FolderLimits: Sendable {
+        var inbox: Int
+        var junk: Int
+    }
+
+    private static func disconnect(_ first: any MailSession, _ second: any MailSession) async {
+        async let one: Void = first.disconnect()
+        async let two: Void = second.disconnect()
+        _ = await (one, two)
+    }
+
+    private static func fetch(inboxSession: any MailSession, junkSession: any MailSession, mailbox: MailboxConfig,
+                              since: Date, credentials: any CredentialProviding, limits: FolderLimits,
                               junkFolders: JunkFolderCache, into collected: CollectedMessages) async throws {
+        let trace = MailboxTraceRecorder.current
+        let credentialStart = ContinuousClock.now
+        let credential: MailCredential
         do {
-            let credential = try await credentials.credential(for: mailbox)
-            try await session.open(username: mailbox.username, credential: credential)
-            try await session.examine("INBOX")
-            try await readRecent(.inbox, session: session, mailbox: mailbox, since: since,
-                                 limit: maxMessages, into: collected)
-            let room = maxMessages - collected.count
-            if room > 0, let junk = try await junkFolder(session: session, mailbox: mailbox, cache: junkFolders) {
-                do {
-                    try await session.examine(junk.name)
-                } catch {
-                    // A remembered folder may have been renamed or deleted: look it up again next time.
-                    if junk.fromCache, !(error is CancellationError) { junkFolders.remove(for: mailbox) }
-                    throw error
-                }
-                try await readRecent(.junk, session: session, mailbox: mailbox, since: since,
-                                     limit: room, into: collected)
-            }
-            await session.logout()
+            credential = try await credentials.credential(for: mailbox)
+            let result = StageResult(ok: true, ms: Diagnostics.milliseconds(since: credentialStart))
+            trace?.update { $0.credential = result }
+            trace?.log("credential \(result.summary)")
         } catch {
-            await session.disconnect()
+            let result = StageResult(ok: false, ms: Diagnostics.milliseconds(since: credentialStart),
+                                     error: Diagnostics.errorSummary(error))
+            trace?.update { $0.credential = result }
+            trace?.log("credential \(result.summary)")
+            await disconnect(inboxSession, junkSession)
             throw error
+        }
+
+        async let inboxError = readInbox(session: inboxSession, mailbox: mailbox, credential: credential,
+                                         since: since, limit: limits.inbox, into: collected)
+        async let junkError = readJunk(session: junkSession, mailbox: mailbox, credential: credential,
+                                       since: since, limit: limits.junk, cache: junkFolders, into: collected)
+        let errors = await (inboxError, junkError)
+        // One folder failing still returns the other's messages.
+        if let error = errors.0 ?? errors.1, collected.count == 0 {
+            throw error
+        }
+    }
+
+    /// Reads INBOX on its own connection. Returns the error instead of throwing, so the junk folder
+    /// keeps going.
+    static func readInbox(session: any MailSession, mailbox: MailboxConfig, credential: MailCredential,
+                          since: Date, limit: Int, into collected: CollectedMessages) async -> (any Error)? {
+        let folder = FolderProgress(kind: .inbox)
+        do {
+            try await folder.connect(session: session, mailbox: mailbox, credential: credential)
+            folder.stage("examining", name: "INBOX")
+            try await session.examine("INBOX")
+            try await readRecent(.inbox, session: session, mailbox: mailbox, since: since, limit: limit,
+                                 progress: folder, into: collected)
+            folder.finish()
+            await session.logout()
+            return nil
+        } catch {
+            folder.fail(error)
+            await session.disconnect()
+            return error
+        }
+    }
+
+    /// Finds and reads the junk folder on its own connection. Returns the error instead of throwing.
+    static func readJunk(session: any MailSession, mailbox: MailboxConfig, credential: MailCredential,
+                         since: Date, limit: Int, cache: JunkFolderCache,
+                         into collected: CollectedMessages) async -> (any Error)? {
+        let folder = FolderProgress(kind: .junk)
+        guard limit > 0 else {
+            folder.finish()
+            return nil
+        }
+        do {
+            try await folder.connect(session: session, mailbox: mailbox, credential: credential)
+            folder.stage("listing")
+            guard let junk = try await junkFolder(session: session, mailbox: mailbox, cache: cache) else {
+                folder.notFound()
+                await session.logout()
+                return nil
+            }
+            folder.stage("examining", name: junk.name)
+            do {
+                try await session.examine(junk.name)
+            } catch {
+                // A remembered folder may have been renamed or deleted: look it up again next time.
+                if junk.fromCache, !(error is CancellationError) { cache.remove(for: mailbox) }
+                throw error
+            }
+            try await readRecent(.junk, session: session, mailbox: mailbox, since: since, limit: limit,
+                                 progress: folder, into: collected)
+            folder.finish()
+            await session.logout()
+            return nil
+        } catch {
+            folder.fail(error)
+            await session.disconnect()
+            return error
         }
     }
 
@@ -154,11 +259,15 @@ public struct IMAPMailFetcher: MailFetching {
     /// Reads the messages of the examined folder received at or after `since`, at most `limit`,
     /// newest first, into `collected`.
     static func readRecent(_ folder: MailFolder, session: any MailSession, mailbox: MailboxConfig, since: Date,
-                           limit: Int, into collected: CollectedMessages) async throws {
+                           limit: Int, progress: FolderProgress? = nil, into collected: CollectedMessages) async throws {
         try Task.checkCancellation()
+        progress?.stage("searching")
         let found = try await session.searchUIDs(since: FetchLogic.searchDay(for: since))
+        progress?.stage("envelopes")
         let infos = try await recentInfos(session: session, uids: found, since: since, limit: limit)
-        try await readBodies(session: session, infos: infos, folder: folder, mailbox: mailbox, into: collected)
+        progress?.stage("bodies")
+        try await readBodies(session: session, infos: infos, folder: folder, mailbox: mailbox,
+                             progress: progress, into: collected)
     }
 
     /// Envelopes of the messages received at or after `since`, newest UID first, at most `limit`.
@@ -193,7 +302,8 @@ public struct IMAPMailFetcher: MailFetching {
     /// Reads bodies newest first, `bodyBatchSize` messages per pipelined burst: text/plain when present
     /// and non-empty, else text/html converted to text. Each finished message goes into `collected`.
     static func readBodies(session: any MailSession, infos: [(uid: UID, info: MessageInfo)], folder: MailFolder,
-                           mailbox: MailboxConfig, into collected: CollectedMessages) async throws {
+                           mailbox: MailboxConfig, progress: FolderProgress? = nil,
+                           into collected: CollectedMessages) async throws {
         var start = 0
         while start < infos.count {
             try Task.checkCancellation()
@@ -223,7 +333,102 @@ public struct IMAPMailFetcher: MailFetching {
                 collected.append(FetchLogic.makeMessage(info: info, uid: uid, folder: folder, mailbox: mailbox,
                                                         bodyText: texts[uid] ?? ""))
             }
+            progress?.add(messages: batch.count)
         }
+    }
+}
+
+/// Writes one folder's progress into `MailboxTraceRecorder.current` (no-op without a recorder), so a
+/// trace shows the step a folder was on when the budget ended.
+final class FolderProgress: @unchecked Sendable {
+    private let kind: MailFolder
+    private let trace: MailboxTraceRecorder?
+    private let start = ContinuousClock.now
+
+    init(kind: MailFolder, trace: MailboxTraceRecorder? = MailboxTraceRecorder.current) {
+        self.kind = kind
+        self.trace = trace
+        update { $0.stage = "connecting" }
+    }
+
+    private var label: String { kind == .inbox ? "INBOX" : "junk" }
+
+    private func update(_ body: (inout FolderTrace) -> Void) {
+        guard let trace else { return }
+        let kind = self.kind
+        trace.update { mailbox in
+            var folder = (kind == .inbox ? mailbox.inbox : mailbox.junk) ?? FolderTrace()
+            body(&folder)
+            if kind == .inbox {
+                mailbox.inbox = folder
+            } else {
+                mailbox.junk = folder
+            }
+        }
+    }
+
+    /// Connects and authenticates, recording the result.
+    func connect(session: any MailSession, mailbox: MailboxConfig, credential: MailCredential) async throws {
+        let connectStart = ContinuousClock.now
+        do {
+            try await session.open(username: mailbox.username, credential: credential)
+            let result = StageResult(ok: true, ms: Diagnostics.milliseconds(since: connectStart))
+            update { $0.connect = result }
+            trace?.log("\(label) connect+auth \(result.summary)")
+        } catch {
+            let result = StageResult(ok: false, ms: Diagnostics.milliseconds(since: connectStart),
+                                     error: Diagnostics.errorSummary(error))
+            update { $0.connect = result }
+            trace?.log("\(label) connect+auth \(result.summary)")
+            throw error
+        }
+    }
+
+    func stage(_ stage: String, name: String? = nil) {
+        update { folder in
+            folder.stage = stage
+            if let name {
+                folder.name = name
+                folder.found = true
+            }
+        }
+    }
+
+    func add(messages: Int) {
+        update { $0.messages += messages }
+    }
+
+    func notFound() {
+        let ms = Diagnostics.milliseconds(since: start)
+        update { folder in
+            folder.found = false
+            folder.stage = "done"
+            folder.ms = ms
+        }
+        trace?.log("\(label) folder not found (\(ms) ms)")
+    }
+
+    func finish() {
+        let ms = Diagnostics.milliseconds(since: start)
+        update { folder in
+            folder.stage = "done"
+            folder.ms = ms
+        }
+        if let trace {
+            let snapshot = trace.snapshot
+            let folder = kind == .inbox ? snapshot.inbox : snapshot.junk
+            trace.log("\(label) \(folder?.summary ?? "done")")
+        }
+    }
+
+    func fail(_ error: any Error) {
+        let ms = Diagnostics.milliseconds(since: start)
+        let summary = Diagnostics.errorSummary(error)
+        update { folder in
+            folder.error = summary
+            folder.ms = ms
+        }
+        trace?.log("\(label) failed after \(ms) ms: \(summary)")
     }
 }
 

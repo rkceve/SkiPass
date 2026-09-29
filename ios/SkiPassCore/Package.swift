@@ -36,6 +36,7 @@ let package = Package(
         ]),
         .target(name: "SkiPassExtraction", dependencies: ["SkiPassModels"], resources: [.process("Resources")]),
         .target(name: "SkiPassServerClient", dependencies: ["SkiPassModels"]),
+        .testTarget(name: "SkiPassModelsTests", dependencies: ["SkiPassModels"]),
         .testTarget(name: "SkiPassStorageTests", dependencies: ["SkiPassStorage"]),
         .testTarget(name: "SkiPassMailTests", dependencies: ["SkiPassMail"]),
         .testTarget(name: "SkiPassExtractionTests", dependencies: ["SkiPassExtraction"], resources: [.copy("Fixtures")]),

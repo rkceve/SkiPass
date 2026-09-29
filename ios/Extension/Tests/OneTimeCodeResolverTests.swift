@@ -28,8 +28,10 @@ final class OneTimeCodeResolverTests: XCTestCase {
                               judge: FakeJudge,
                               usage: FakeUsage = FakeUsage(),
                               budget: Duration = .seconds(4),
+                              fetchRetry: FetchRetry = OneTimeCodeResolverTests.quickRetry,
                               retry: FillReportRetry = FillReportRetry(delays: [.milliseconds(10)]),
-                              chosenObserver: (@Sendable (FetchedMessage) -> Void)? = nil) -> OneTimeCodeResolver {
+                              chosenObserver: (@Sendable (FetchedMessage) -> Void)? = nil,
+                              sink: TraceSink? = nil) -> OneTimeCodeResolver {
         OneTimeCodeResolver(
             mailboxes: { mailboxes },
             fetcher: fetcher,
@@ -37,11 +39,16 @@ final class OneTimeCodeResolverTests: XCTestCase {
             judge: judge,
             usage: usage,
             perMailboxBudget: budget,
+            retry: fetchRetry,
             now: { OneTimeCodeResolverTests.fixedNow },
             fillReportRetry: retry,
-            chosenObserver: chosenObserver
+            chosenObserver: chosenObserver,
+            diagnostics: sink.map { sink in ResolverDiagnostics(finish: { sink.add($0) }) }
         )
     }
+
+    /// The retry of the production schedule, with a short delay so tests stay fast.
+    static let quickRetry = FetchRetry(delay: .milliseconds(20), mailDeadline: .seconds(10), minimumBudget: .milliseconds(100))
 
     // MARK: - Tests
 
@@ -90,7 +97,8 @@ final class OneTimeCodeResolverTests: XCTestCase {
         _ = await makeResolver(mailboxes: [a], fetcher: fetcher, judge: FakeJudge(outcome: .quotaExhausted))
             .resolve(service: nil)
         let sinces = await fetcher.sinces
-        XCTAssertEqual(sinces, [now.addingTimeInterval(-600)])
+        // No code in the first read, so the mailbox is read a second time, with the same window.
+        XCTAssertEqual(sinces, [now.addingTimeInterval(-600), now.addingTimeInterval(-600)])
     }
 
     func testOnlyMessagesWithCodeGoToJudge() async {
@@ -302,6 +310,180 @@ final class OneTimeCodeResolverTests: XCTestCase {
         XCTAssertEqual(reported, ["box:42", "box:42"])
     }
 
+    // MARK: - Budget and retry
+
+    func testDefaultBudgetAndRetryStayWithinTheRequestBound() {
+        XCTAssertEqual(OneTimeCodeResolver.defaultPerMailboxBudget, .seconds(8))
+        let retry = FetchRetry()
+        XCTAssertEqual(retry.delay, .milliseconds(2_500))
+        // A fast first read leaves the full per-mailbox budget for the second.
+        XCTAssertEqual(retry.secondBudget(elapsed: .seconds(1), perMailboxBudget: .seconds(8)), .seconds(8))
+        // A first read that used its whole budget leaves what is left of the 13 s mail deadline.
+        XCTAssertEqual(retry.secondBudget(elapsed: .seconds(8), perMailboxBudget: .seconds(8)), .milliseconds(2_500))
+        // Too little left: no second read.
+        XCTAssertNil(retry.secondBudget(elapsed: .seconds(9), perMailboxBudget: .seconds(8)))
+        // Worst case of all mail reading: first read + delay + second read <= mail deadline (13 s);
+        // the judge (7 s server timeout) comes on top, about 20 s in all.
+        for elapsedSeconds in 0...8 {
+            let elapsed = Duration.seconds(elapsedSeconds)
+            if let second = retry.secondBudget(elapsed: elapsed, perMailboxBudget: .seconds(8)) {
+                XCTAssertLessThanOrEqual(elapsed + retry.delay + second, .seconds(13))
+            }
+        }
+    }
+
+    /// The code email arrives after the first read: the second read, after the delay, finds it.
+    func testSecondReadAfterTheDelayFindsALateCode() async {
+        let a = mailbox("a@example.com")
+        let late = message("\(a.id):inbox:9", a, body: "CODE:424242", ageSeconds: 5)
+        let fetcher = FakeFetcher(results: [a.id: .sequence([[], [late]])])
+        let judge = FakeJudge(outcome: .chosen(messageID: late.id, scores: [:]))
+        let sink = TraceSink()
+        let retry = FetchRetry(delay: .milliseconds(300), mailDeadline: .seconds(10), minimumBudget: .milliseconds(100))
+
+        let start = ContinuousClock.now
+        let result = await makeResolver(mailboxes: [a], fetcher: fetcher, judge: judge, fetchRetry: retry, sink: sink)
+            .resolve(service: "acme.example.com")
+        let elapsed = ContinuousClock.now - start
+
+        XCTAssertEqual(result?.code, "424242")
+        XCTAssertGreaterThanOrEqual(elapsed, .milliseconds(300), "the second read waits for the delay")
+        let calls = await fetcher.sinces
+        XCTAssertEqual(calls.count, 2)
+        let trace = sink.all.first
+        XCTAssertEqual(trace?.rounds, 2)
+        XCTAssertEqual(trace?.mailboxes.map(\.round), [1, 2])
+        XCTAssertEqual(trace?.outcome, "filled")
+    }
+
+    /// Only one extra read: with no code in either read the request ends.
+    func testAtMostOneSecondRead() async {
+        let a = mailbox("a@example.com")
+        let fetcher = FakeFetcher(results: [a.id: .messages([])])
+        let judge = FakeJudge(outcome: .quotaExhausted)
+        _ = await makeResolver(mailboxes: [a], fetcher: fetcher, judge: judge).resolve(service: nil)
+        let calls = await fetcher.sinces
+        XCTAssertEqual(calls.count, 2)
+        let judged = await judge.calls
+        XCTAssertTrue(judged.isEmpty)
+    }
+
+    /// When the first read used up the mail deadline, there is no second read.
+    func testNoSecondReadWhenNoTimeIsLeft() async {
+        let a = mailbox("a@example.com")
+        let fetcher = FakeFetcher(results: [a.id: .messages([])])
+        let noTime = FetchRetry(delay: .milliseconds(20), mailDeadline: .milliseconds(50), minimumBudget: .milliseconds(100))
+        let sink = TraceSink()
+        _ = await makeResolver(mailboxes: [a], fetcher: fetcher, judge: FakeJudge(outcome: .quotaExhausted),
+                               fetchRetry: noTime, sink: sink).resolve(service: nil)
+        let calls = await fetcher.sinces
+        XCTAssertEqual(calls.count, 1)
+        XCTAssertEqual(sink.all.first?.reason, "no code email found")
+    }
+
+    /// A found code never triggers the second read.
+    func testNoSecondReadWhenACodeWasFound() async {
+        let a = mailbox("a@example.com")
+        let m = message("\(a.id):1", a, body: "CODE:123456")
+        let fetcher = FakeFetcher(results: [a.id: .messages([m])])
+        _ = await makeResolver(mailboxes: [a], fetcher: fetcher, judge: FakeJudge(outcome: .noMatch(scores: [:])))
+            .resolve(service: nil)
+        let calls = await fetcher.sinces
+        XCTAssertEqual(calls.count, 1)
+    }
+
+    // MARK: - Trace
+
+    func testTraceOfAFilledRequest() async throws {
+        let a = mailbox("robert@gmail.com")
+        let m = message("\(a.id.uuidString):junk:4", a, body: "CODE:654321 secret body")
+        let sink = TraceSink()
+        let resolver = makeResolver(mailboxes: [a], fetcher: FakeFetcher(results: [a.id: .messages([m])]),
+                                    judge: FakeJudge(outcome: .chosen(messageID: m.id, scores: [:])), sink: sink)
+
+        _ = await resolver.resolve(service: "skipass-demo.vercel.app", entryPoint: "noUI")
+
+        XCTAssertEqual(sink.all.count, 1)
+        let trace = try XCTUnwrap(sink.all.first)
+        XCTAssertEqual(trace.entryPoint, "noUI")
+        XCTAssertEqual(trace.service, "skipass-demo.vercel.app")
+        XCTAssertEqual(trace.mailboxCount, 1)
+        XCTAssertEqual(trace.mailboxes.first?.mailbox, "r***@gmail.com")
+        XCTAssertEqual(trace.mailboxes.first?.messages, 1)
+        XCTAssertEqual(trace.candidateCount, 1)
+        XCTAssertEqual(trace.judge?.outcome, "chosen")
+        XCTAssertEqual(trace.judge?.chosenID, m.id)
+        XCTAssertEqual(trace.outcome, "filled")
+        XCTAssertNil(trace.reason)
+        XCTAssertNotNil(trace.totalMs)
+
+        let json = String(decoding: try JSONEncoder().encode(trace), as: UTF8.self)
+        XCTAssertFalse(json.contains("654321"), "no code in the trace")
+        XCTAssertFalse(json.contains("secret body"), "no email text in the trace")
+        XCTAssertFalse(json.contains("robert@gmail.com"), "addresses are masked")
+    }
+
+    func testTraceNamesWhyNothingWasFilled() async {
+        let a = mailbox("a@example.com")
+        let m = message("\(a.id):1", a, body: "CODE:123456")
+        let cases: [(OneTimeCodeResolver.MailboxSource, FakeFetcher, FakeJudge, String)] = [
+            ({ [] }, FakeFetcher(results: [:]), FakeJudge(outcome: nil), "no mailboxes visible to the extension"),
+            ({ throw FakeError.failed }, FakeFetcher(results: [:]), FakeJudge(outcome: nil), "mailbox list unreadable"),
+            ({ [a] }, FakeFetcher(results: [a.id: .failure]), FakeJudge(outcome: nil), "no code email found"),
+            ({ [a] }, FakeFetcher(results: [a.id: .messages([m])]), FakeJudge(outcome: nil), "judge failed"),
+            ({ [a] }, FakeFetcher(results: [a.id: .messages([m])]), FakeJudge(outcome: .noMatch(scores: [:])), "judge found no match"),
+            ({ [a] }, FakeFetcher(results: [a.id: .messages([m])]), FakeJudge(outcome: .quotaExhausted), "monthly fills used up"),
+        ]
+        for (source, fetcher, judge, reason) in cases {
+            let sink = TraceSink()
+            let resolver = OneTimeCodeResolver(
+                mailboxes: source, fetcher: fetcher, extractor: FakeExtractor(), judge: judge, usage: FakeUsage(),
+                retry: Self.quickRetry, now: { OneTimeCodeResolverTests.fixedNow },
+                diagnostics: ResolverDiagnostics(finish: { sink.add($0) }))
+            let result = await resolver.resolve(service: "acme.example.com")
+            XCTAssertNil(result)
+            XCTAssertEqual(sink.all.first?.outcome, "cancelled", reason)
+            XCTAssertEqual(sink.all.first?.reason, reason)
+        }
+    }
+
+    func testTraceRecordsAMailboxThatExceededItsBudget() async {
+        let slow = mailbox("slow@example.com")
+        let fetcher = FakeFetcher(results: [slow.id: .uncancellableDelay(.seconds(2), [])])
+        let sink = TraceSink()
+        _ = await makeResolver(mailboxes: [slow], fetcher: fetcher, judge: FakeJudge(outcome: nil),
+                               budget: .milliseconds(200), fetchRetry: .never, sink: sink).resolve(service: nil)
+        let mailboxTrace = sink.all.first?.mailboxes.first
+        XCTAssertEqual(mailboxTrace?.mailbox, "s***@example.com")
+        XCTAssertEqual(mailboxTrace?.error, "budget of 200 ms exceeded")
+    }
+
+    func testDiagnosticsPrepareAndLogRun() async {
+        let a = mailbox("a@example.com")
+        let lines = TraceSink()
+        let storage = StorageSnapshot(bundleID: "x.autofill", appGroup: "group.x", keychainGroup: "group.x",
+                                      recordedAt: now)
+        let resolver = OneTimeCodeResolver(
+            mailboxes: { [a] }, fetcher: FakeFetcher(results: [a.id: .messages([])]), extractor: FakeExtractor(),
+            judge: FakeJudge(outcome: nil), usage: FakeUsage(), retry: .never,
+            now: { OneTimeCodeResolverTests.fixedNow },
+            diagnostics: ResolverDiagnostics(
+                log: { lines.addLine($0) },
+                prepare: { trace in
+                    trace.storage = storage
+                    trace.groupsMatchApp = false
+                },
+                finish: { lines.add($0) }))
+        _ = await resolver.resolve(service: nil, entryPoint: "textToInsert")
+
+        XCTAssertEqual(lines.all.first?.storage, storage)
+        XCTAssertEqual(lines.all.first?.groupsMatchApp, false)
+        XCTAssertTrue(lines.lines.contains { $0.contains("request textToInsert") })
+        XCTAssertTrue(lines.lines.contains { $0.contains("DIFFERENT from app") })
+        XCTAssertTrue(lines.lines.contains { $0.contains("outcome cancelled") })
+        XCTAssertFalse(lines.lines.contains { $0.contains("a@example.com") }, "log lines mask addresses")
+    }
+
     func testResolveDoesNotReportFill() async {
         let a = mailbox("a@example.com")
         let m = message("\(a.id):1", a, body: "CODE:123456")
@@ -317,6 +499,37 @@ final class OneTimeCodeResolverTests: XCTestCase {
 // MARK: - Fakes
 
 private enum FakeError: Error { case failed }
+
+/// Collects finished traces and log lines.
+final class TraceSink: @unchecked Sendable {
+    private let lock = NSLock()
+    private var traces: [AutoFillTrace] = []
+    private var logLines: [String] = []
+
+    func add(_ trace: AutoFillTrace) {
+        lock.lock()
+        traces.append(trace)
+        lock.unlock()
+    }
+
+    func addLine(_ line: String) {
+        lock.lock()
+        logLines.append(line)
+        lock.unlock()
+    }
+
+    var all: [AutoFillTrace] {
+        lock.lock()
+        defer { lock.unlock() }
+        return traces
+    }
+
+    var lines: [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return logLines
+    }
+}
 
 private final class SeenIDs: @unchecked Sendable {
     private let lock = NSLock()
@@ -346,12 +559,15 @@ private struct FakeExtractor: CodeExtracting {
 private actor FakeFetcher: MailFetching {
     enum Result: Sendable {
         case messages([FetchedMessage])
+        /// The n-th call gets the n-th list (the last one repeats).
+        case sequence([[FetchedMessage]])
         case delayed(Duration, [FetchedMessage])
         case uncancellableDelay(Duration, [FetchedMessage])
         case failure
     }
 
     private let results: [UUID: Result]
+    private var callsPerMailbox: [UUID: Int] = [:]
     private(set) var sinces: [Date] = []
     private var inFlight = 0
     private(set) var peakConcurrency = 0
@@ -363,9 +579,13 @@ private actor FakeFetcher: MailFetching {
         inFlight += 1
         peakConcurrency = max(peakConcurrency, inFlight)
         defer { inFlight -= 1 }
+        let call = callsPerMailbox[mailbox.id, default: 0]
+        callsPerMailbox[mailbox.id] = call + 1
         switch results[mailbox.id] ?? .messages([]) {
         case .messages(let list):
             return list
+        case .sequence(let lists):
+            return lists.isEmpty ? [] : lists[min(call, lists.count - 1)]
         case .delayed(let delay, let list):
             try await Task.sleep(for: delay)
             return list

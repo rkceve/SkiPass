@@ -1,5 +1,6 @@
 import AuthenticationServices
 import Foundation
+import SkiPassModels
 
 /// Supplies the site domains for which one-time-code identities are registered (docs/ARCHITECTURE.md §3 step 6).
 /// Concrete sources: `DomainSources.swift` (bundled popular domains, demo site, domains seen in
@@ -18,7 +19,24 @@ struct IdentityRegistrar: Sendable {
         case registered(count: Int)
         case removedAll
         case storeDisabled
-        case failed
+        /// The identity store refused the write; `error` is its reason when it gave one.
+        case failed(error: String?)
+
+        /// The diagnostics record of this result (shown in the app's Diagnostics section).
+        func record(process: String, at date: Date) -> RegistrationRecord {
+            switch self {
+            case .registered(let count):
+                return RegistrationRecord(process: process, at: date, outcome: "registered", count: count, storeEnabled: true)
+            case .removedAll:
+                return RegistrationRecord(process: process, at: date, outcome: "removedAll", count: 0, storeEnabled: true,
+                                          detail: "no mailbox")
+            case .storeDisabled:
+                return RegistrationRecord(process: process, at: date, outcome: "storeDisabled", storeEnabled: false,
+                                          detail: "SkiPass is not turned on in AutoFill settings")
+            case .failed(let error):
+                return RegistrationRecord(process: process, at: date, outcome: "failed", storeEnabled: true, detail: error)
+            }
+        }
     }
 
     /// The identities for `domains` and `mailboxAddresses`; empty when there is no mailbox
@@ -47,10 +65,12 @@ struct IdentityRegistrar: Sendable {
         // "When the user disables your extension, the system clears and disables your shared store."
         guard await Self.storeIsEnabled() else { return .storeDisabled }
         if identities.isEmpty {
-            return await Self.removeAll() ? .removedAll : .failed
+            let removed = await Self.removeAll()
+            return removed.ok ? .removedAll : .failed(error: removed.error)
         }
         let all = identities.map { $0 as any ASCredentialIdentity }
-        return await Self.replace(all) ? .registered(count: all.count) : .failed
+        let replaced = await Self.replace(all)
+        return replaced.ok ? .registered(count: all.count) : .failed(error: replaced.error)
     }
 
     /// The QuickType label for an identity (docs/ARCHITECTURE.md §3: `From <mailbox address>`).
@@ -81,18 +101,24 @@ struct IdentityRegistrar: Sendable {
         }
     }
 
-    private static func replace(_ identities: [any ASCredentialIdentity]) async -> Bool {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
-            ASCredentialIdentityStore.shared.replaceCredentialIdentities(identities) { ok, _ in
-                continuation.resume(returning: ok)
+    /// Store write outcome; `error` summarizes the store's error (no identities in it).
+    private struct WriteResult: Sendable {
+        var ok: Bool
+        var error: String?
+    }
+
+    private static func replace(_ identities: [any ASCredentialIdentity]) async -> WriteResult {
+        await withCheckedContinuation { (continuation: CheckedContinuation<WriteResult, Never>) in
+            ASCredentialIdentityStore.shared.replaceCredentialIdentities(identities) { ok, error in
+                continuation.resume(returning: WriteResult(ok: ok, error: error.map { Diagnostics.errorSummary($0) }))
             }
         }
     }
 
-    private static func removeAll() async -> Bool {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
-            ASCredentialIdentityStore.shared.removeAllCredentialIdentities { ok, _ in
-                continuation.resume(returning: ok)
+    private static func removeAll() async -> WriteResult {
+        await withCheckedContinuation { (continuation: CheckedContinuation<WriteResult, Never>) in
+            ASCredentialIdentityStore.shared.removeAllCredentialIdentities { ok, error in
+                continuation.resume(returning: WriteResult(ok: ok, error: error.map { Diagnostics.errorSummary($0) }))
             }
         }
     }
