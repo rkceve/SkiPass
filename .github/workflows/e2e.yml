@@ -1,0 +1,188 @@
+name: e2e
+
+# Screen recording of the real end-to-end flow on the iOS Simulator (ios/UITests/EndToEndTests.swift):
+# SkiPass (Debug) adds the demo IMAP mailbox, AutoFill is turned on, Safari requests a code on the
+# demo site, and the SkiPass suggestion fills it (extension reads the mailbox, the live server judges).
+# The Simulator does not enforce the AutoFill entitlement that free Apple ID signing strips on devices.
+#
+# Secrets: DEMO_MAILBOX_ADDRESS, DEMO_IMAP_APP_PASSWORD (+ the build secrets). The password only
+# reaches the app's launch environment. Artifact `e2e` holds only e2e.mp4 and the test's screenshots
+# (the password is never on screen); no .xcresult or raw logs are uploaded.
+on:
+  workflow_dispatch:
+  # Development branch of this workflow (workflow_dispatch needs the file on the default branch).
+  push:
+    branches: [wip/p7]
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check demo mailbox secrets are set
+        env:
+          DEMO_MAILBOX_ADDRESS: ${{ secrets.DEMO_MAILBOX_ADDRESS }}
+          DEMO_IMAP_APP_PASSWORD: ${{ secrets.DEMO_IMAP_APP_PASSWORD }}
+        run: |
+          [ -n "$DEMO_MAILBOX_ADDRESS" ] || { echo "::error::DEMO_MAILBOX_ADDRESS is not set"; exit 1; }
+          [ -n "$DEMO_IMAP_APP_PASSWORD" ] || { echo "::error::DEMO_IMAP_APP_PASSWORD is not set"; exit 1; }
+          echo "demo mailbox secrets present"
+
+      - name: Select Xcode and simulator
+        run: bash .github/workflows/scripts/select-sim.sh
+
+      - name: Write Secrets.xcconfig
+        env:
+          SKIPASS_SERVER_URL: ${{ secrets.SKIPASS_SERVER_URL }}
+          SKIPASS_APP_TOKEN: ${{ secrets.SKIPASS_APP_TOKEN }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+        run: bash .github/workflows/scripts/write-secrets.sh
+
+      - name: Install XcodeGen and generate
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Disable hardware keyboard for this simulator
+        run: |
+          plist="$HOME/Library/Preferences/com.apple.iphonesimulator.plist"
+          defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
+          /usr/libexec/PlistBuddy -c "add :DevicePreferences dict" "$plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "add :DevicePreferences:$SIM_UDID dict" "$plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "add :DevicePreferences:$SIM_UDID:ConnectHardwareKeyboard bool false" "$plist" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "set :DevicePreferences:$SIM_UDID:ConnectHardwareKeyboard false" "$plist"
+
+      - name: Boot simulator and override status bar
+        run: |
+          xcrun simctl boot "$SIM_UDID" || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          # The hardware-keyboard preference is applied by Simulator.app, so run it attached to this device.
+          open -a Simulator --args -CurrentDeviceUDID "$SIM_UDID"
+          sleep 10
+          xcrun simctl status_bar "$SIM_UDID" override --time 9:41 \
+            --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            --batteryState charged --batteryLevel 100
+
+      - name: Check demo site is reachable
+        run: curl -fsS https://skipass-demo.vercel.app/verify | grep -q 'one-time-code'
+
+      - name: Build for testing
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -skipMacroValidation -skipPackagePluginValidation \
+            > build-e2e.log 2>&1 || { tail -60 build-e2e.log; exit 1; }
+          tail -5 build-e2e.log
+          app=build/dd/Build/Products/Debug-iphonesimulator/SkiPass.app
+          for key in SkiPassServerURL SkiPassAppToken RevenueCatAPIKey; do
+            value=$(/usr/libexec/PlistBuddy -c "Print :$key" "$app/Info.plist" 2>/dev/null || true)
+            case "$value" in
+              ""|'$('*|*example*) echo "  $key: NOT configured";;
+              *) echo "  $key: configured";;
+            esac
+          done
+
+      - name: Install SkiPass app
+        run: xcrun simctl install "$SIM_UDID" build/dd/Build/Products/Debug-iphonesimulator/SkiPass.app
+
+      - name: Run end-to-end test with screen recording
+        id: test
+        continue-on-error: true
+        env:
+          TEST_RUNNER_DEMO_MAILBOX_ADDRESS: ${{ secrets.DEMO_MAILBOX_ADDRESS }}
+          TEST_RUNNER_DEMO_IMAP_APP_PASSWORD: ${{ secrets.DEMO_IMAP_APP_PASSWORD }}
+          TEST_RUNNER_SKIPASS_E2E: "1"
+        run: |
+          mkdir -p out/shots "$RUNNER_TEMP/private"
+          export TEST_RUNNER_SKIPASS_E2E_SHOT_DIR="$PWD/out/shots"
+          xcrun simctl io "$SIM_UDID" recordVideo --codec h264 --force "$RUNNER_TEMP/private/e2e.mov" &
+          rec=$!
+          sleep 3
+          set +e
+          # The raw log stays in RUNNER_TEMP (never uploaded); only matching lines are printed.
+          xcodebuild test-without-building \
+            -project SkiPass.xcodeproj -scheme SkiPassTour \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/dd \
+            -only-testing:SkiPassUITests/EndToEndTests \
+            -resultBundlePath "$RUNNER_TEMP/private/e2e.xcresult" \
+            > "$RUNNER_TEMP/private/test.log" 2>&1
+          status=$?
+          set -e
+          sleep 2
+          kill -INT "$rec"
+          wait "$rec" || true
+          grep -E "E2E\[|error:|Test Case|passed|failed|skipped" "$RUNNER_TEMP/private/test.log" | head -120 || true
+          # A skipped test (runner env not passed) must not count as success.
+          if grep -q "' skipped" "$RUNNER_TEMP/private/test.log"; then
+            echo "e2e test was skipped"; exit 1
+          fi
+          exit $status
+
+      - name: AutoFill diagnostics (extension traces, no secrets)
+        if: always()
+        run: |
+          group=$(xcrun simctl get_app_container "$SIM_UDID" io.github.rkceve.skipass groups 2>/dev/null | awk '/group.io.github.rkceve.skipass/ {print $2}' | head -1)
+          echo "App Group container: ${group:-none}"
+          plist="$group/Library/Preferences/group.io.github.rkceve.skipass.plist"
+          if [ -n "$group" ] && [ -f "$plist" ]; then
+            python3 - "$plist" <<'PY'
+          import json, plistlib, sys
+          data = plistlib.load(open(sys.argv[1], "rb"))
+          for key in sorted(data):
+              if not key.startswith("diagnostics"):
+                  continue
+              value = data[key]
+              if isinstance(value, bytes):
+                  try:
+                      value = json.loads(value)
+                  except Exception:
+                      value = f"<{len(value)} bytes>"
+              print(f"== {key}")
+              print(json.dumps(value, indent=1, default=str)[:12000])
+          PY
+          else
+            echo "no shared defaults plist"
+          fi
+          xcrun simctl spawn "$SIM_UDID" log show --last 30m --style compact \
+            --predicate 'category == "autofill" OR category == "Identities" OR category == "E2E" OR category == "Storage"' 2>/dev/null | tail -150 || true
+
+      - name: Transcode to constant 60 fps MP4
+        if: always()
+        run: |
+          command -v ffmpeg >/dev/null || brew install ffmpeg
+          test -s "$RUNNER_TEMP/private/e2e.mov"
+          # Variable-frame-rate simulator video -> constant 60 fps by frame duplication (no interpolation).
+          ffmpeg -hide_banner -loglevel error -y -i "$RUNNER_TEMP/private/e2e.mov" \
+            -vf "fps=60,pad=ceil(iw/2)*2:ceil(ih/2)*2" \
+            -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -movflags +faststart -an \
+            out/e2e.mp4
+          ffprobe -hide_banner -v error -show_entries stream=codec_name,width,height,pix_fmt,r_frame_rate,nb_frames:format=duration \
+            -of default=noprint_wrappers=1 out/e2e.mp4
+          ls -la out out/shots
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e
+          retention-days: 1
+          path: |
+            out/e2e.mp4
+            out/shots/*.png
+
+      - name: Fail if e2e test failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1
