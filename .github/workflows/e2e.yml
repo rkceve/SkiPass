@@ -157,7 +157,7 @@ jobs:
             echo "no shared defaults plist"
           fi
           xcrun simctl spawn "$SIM_UDID" log show --last 30m --style compact \
-            --predicate 'category == "autofill" OR category == "Identities" OR category == "E2E" OR category == "Storage"' 2>/dev/null | tail -150 || true
+            --predicate 'subsystem BEGINSWITH "io.github.rkceve.skipass"' 2>/dev/null | tail -150 || true
 
       - name: Transcode to constant 60 fps MP4
         if: always()

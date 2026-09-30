@@ -61,9 +61,9 @@ final class EndToEndTests: XCTestCase {
         }
         try require(email.waitForExistence(timeout: 60), "demo page email field not found")
         pause(1)
+        dismissSafariTips()
         snap("demo-page")
-        email.tap()
-        _ = safari.keyboards.firstMatch.waitForExistence(timeout: 5)
+        try require(focus(email), "email field did not take keyboard focus")
         email.typeText(address)
         pause(1)
         snap("email-typed")
@@ -86,9 +86,10 @@ final class EndToEndTests: XCTestCase {
         pause(6)  // give the email a moment to arrive
         while Date() < deadline, !verified {
             attempt += 1
-            codeField.tap()
-            if !safari.keyboards.firstMatch.waitForExistence(timeout: 5) {
-                codeField.tap()
+            dismissSafariTips()
+            if !focus(codeField) {
+                snap("code-field-no-focus-\(attempt)")
+                log("attempt \(attempt): code field did not take focus")
             }
             guard let suggestion = waitForSuggestion(timeout: 8) else {
                 snap("no-suggestion-\(attempt)")
@@ -194,6 +195,38 @@ final class EndToEndTests: XCTestCase {
         }
     }
 
+    /// Safari's first-run tip popovers ("View Bookmarks, Share Menu, and Open Tabs") cover the page
+    /// and swallow taps: close them with their X button (only in the lower part of the screen, so the
+    /// address bar's stop-loading button is never hit).
+    private func dismissSafariTips() {
+        for _ in 0..<3 {
+            let close = safari.buttons.matching(NSPredicate(format: "label ==[c] 'Close' OR label ==[c] 'Dismiss'"))
+                .allElementsBoundByIndex.first { $0.exists && $0.isHittable && $0.frame.minY > 250 }
+            guard let close else { return }
+            snap("safari-tip")
+            log("closing Safari tip")
+            close.tap()
+            Thread.sleep(forTimeInterval: 1)
+        }
+    }
+
+    /// Taps a web text field until the keyboard is up (bounded), by coordinate as a last resort.
+    private func focus(_ field: XCUIElement) -> Bool {
+        for attempt in 0..<4 {
+            if attempt == 3 {
+                field.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            } else {
+                field.tap()
+            }
+            if safari.keyboards.firstMatch.waitForExistence(timeout: 4),
+               (field.value(forKey: "hasKeyboardFocus") as? Bool) ?? true {
+                return true
+            }
+            dismissSafariTips()
+        }
+        return safari.keyboards.firstMatch.exists
+    }
+
     /// The SkiPass QuickType suggestion ("From <address>") above the keyboard.
     private func waitForSuggestion(timeout: TimeInterval) -> XCUIElement? {
         let predicate = NSPredicate(format: "label BEGINSWITH 'From ' OR label CONTAINS[c] 'SkiPass'")
@@ -257,9 +290,6 @@ final class EndToEndTests: XCTestCase {
         app.swipeUp()
         pause(1)
         snap("diagnostics-\(name)-2")
-        app.swipeUp()
-        pause(1)
-        snap("diagnostics-\(name)-3")
         done.tap()
         _ = done.waitForNonExistence(timeout: 10)
     }
