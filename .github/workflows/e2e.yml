@@ -10,9 +10,6 @@ name: e2e
 # (the password is never on screen); no .xcresult or raw logs are uploaded.
 on:
   workflow_dispatch:
-  # Development branch of this workflow (workflow_dispatch needs the file on the default branch).
-  push:
-    branches: [wip/p7]
 
 concurrency:
   group: e2e-${{ github.ref }}
