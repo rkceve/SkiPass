@@ -91,9 +91,13 @@ final class EndToEndTests: XCTestCase {
                 snap("code-field-no-focus-\(attempt)")
                 log("attempt \(attempt): code field did not take focus")
             }
-            guard let suggestion = waitForSuggestion(timeout: 8) else {
+            pause(2)  // the QuickType bar fills in shortly after the keyboard appears
+            guard let suggestion = waitForSuggestion(timeout: 10) else {
                 snap("no-suggestion-\(attempt)")
                 log("attempt \(attempt): no suggestion")
+                if attempt == 1 {
+                    log("keyboard tree:\n\(safari.keyboards.firstMatch.debugDescription.prefix(4000))")
+                }
                 dismissKeyboard()
                 pause(3)
                 continue
@@ -227,23 +231,22 @@ final class EndToEndTests: XCTestCase {
         return safari.keyboards.firstMatch.exists
     }
 
-    /// The SkiPass QuickType suggestion ("From <address>") above the keyboard.
+    /// The SkiPass QuickType suggestion. In the Simulator it is an "Other" element in Safari labelled
+    /// "verification code for this website — SkiPass\nFrom <address>" (feasibility probe, tools/probe/).
+    /// Page text is excluded: the demo page's footer also mentions SkiPass.
     private func waitForSuggestion(timeout: TimeInterval) -> XCUIElement? {
-        let predicate = NSPredicate(format: "label BEGINSWITH 'From ' OR label CONTAINS[c] 'SkiPass'")
+        let predicate = NSPredicate(
+            format: "label CONTAINS[c] 'verification code for this website' OR label CONTAINS[c] %@",
+            "From \(address)"
+        )
         let deadline = Date().addingTimeInterval(timeout)
         repeat {
-            let keyboard = safari.keyboards.firstMatch
-            let keyboardTop = keyboard.exists ? keyboard.frame.minY : 400
-            for (_, query) in [("keyboard", safari.keyboards.descendants(matching: .any)),
-                               ("safari", safari.descendants(matching: .any)),
-                               ("springboard", springboard.descendants(matching: .any))] {
+            for query in [safari.descendants(matching: .any), springboard.descendants(matching: .any)] {
                 let matches = query.matching(predicate)
                 for index in 0..<min(matches.count, 12) {
                     let element = matches.element(boundBy: index)
                     guard element.exists, element.isHittable else { continue }
-                    if element.label.hasPrefix("Return to") { continue }
-                    // The QuickType bar sits at (or just above) the top of the keyboard.
-                    if element.frame.maxY < keyboardTop - 80 { continue }
+                    if [.staticText, .link, .textField].contains(element.elementType) { continue }
                     return element
                 }
             }
