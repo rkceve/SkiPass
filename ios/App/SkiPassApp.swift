@@ -36,6 +36,9 @@ struct SkiPassApp: App {
         .task {
             autoFill.onTurnedOn = { [model] in await model.autoFillDidTurnOn() }
             await autoFill.refresh()
+            #if DEBUG
+            await E2EMailbox.addIfRequested(to: model)
+            #endif
             await model.start()
         }
         .onChange(of: scenePhase) { _, phase in
