@@ -21,8 +21,13 @@ private final class FakeAccounts: AccountServices {
     var signedInAddress: String?
     var saveMailboxError: Error?
     var deleteError: Error?
+    /// When set, reading the mailbox list fails (e.g. unreadable shared defaults).
+    var loadError: Error?
 
-    func loadMailboxes() throws -> [MailboxConfig] { mailboxes }
+    func loadMailboxes() throws -> [MailboxConfig] {
+        if let loadError { throw loadError }
+        return mailboxes
+    }
 
     func saveMailbox(_ mailbox: MailboxConfig) throws {
         if let saveMailboxError { throw saveMailboxError }
@@ -86,7 +91,12 @@ private final class FakeBilling: BillingServices {
     private var held: [CheckedContinuation<Void, Never>] = []
     var heldCount: Int { held.count }
 
-    func configure() -> String? { appUserID }
+    var configureCalls = 0
+
+    func configure() -> String? {
+        configureCalls += 1
+        return appUserID
+    }
     func currentPackages() async throws -> [StorePackageInfo] {
         if let offeringsError { throw offeringsError }
         return packages
@@ -141,6 +151,7 @@ private final class FakeBilling: BillingServices {
 private final class FakeIdentities: IdentityServices {
     /// Address lists in the order the syncs finished (the last one is what the system keeps).
     var syncs: [[String]] = []
+    var skips: [String] = []
     var hold = false
     private var held: [CheckedContinuation<Void, Never>] = []
     var heldCount: Int { held.count }
@@ -150,6 +161,10 @@ private final class FakeIdentities: IdentityServices {
             await withCheckedContinuation { held.append($0) }
         }
         syncs.append(mailboxAddresses)
+    }
+
+    func syncSkipped(reason: String) {
+        skips.append(reason)
     }
 
     func release() {
@@ -907,6 +922,40 @@ struct AppModelTests {
         try await model.deleteAccount(id: account.id)
         #expect(h.identities.syncs.last == [])
         #expect(h.identities.syncs.count == 3)
+    }
+
+    /// Registration comes first at launch: no billing setup or usage request runs before it.
+    @Test func identitiesAreRegisteredBeforeBillingAndUsage() async {
+        let h = Harness()
+        h.identities.hold = true
+        let model = h.makeModel()
+
+        let launch = Task { await model.start() }
+        while h.identities.heldCount == 0 { await Task.yield() }
+        #expect(h.billing.configureCalls == 0)
+        #expect(h.usage.calls.isEmpty)
+        h.identities.hold = false
+        h.identities.release()
+        await launch.value
+
+        #expect(h.identities.syncs == [[]])
+        #expect(h.billing.configureCalls == 1)
+        #expect(h.usage.calls.count == 1)
+    }
+
+    /// A mailbox list that cannot be read never registers an empty set (which would remove every
+    /// suggestion); the skip is recorded instead.
+    @Test func unreadableMailboxListKeepsTheRegisteredIdentities() async {
+        let h = Harness()
+        h.accounts.loadError = Boom()
+        let model = h.makeModel()
+
+        await model.start()
+        await model.autoFillDidTurnOn()
+
+        #expect(h.identities.syncs.isEmpty)
+        #expect(h.identities.skips.count == 2)
+        #expect(h.identities.skips.first?.hasPrefix("mailbox list unreadable") == true)
     }
 
     /// Identity syncs run one at a time and each reads the mailbox list when it runs, so a

@@ -25,14 +25,16 @@ enum LiveDependencies {
 
     /// Total time for one server request. Above the server's worst case (3 s upstream timeout plus a
     /// cold start), so the server's own answer (e.g. 402) normally arrives before the local fallback
-    /// takes over; the mailbox budget (4 s) is separate.
+    /// takes over; the mailbox budget (8 s) is separate.
     static let serverTimeout: TimeInterval = 7
 
-    /// The IMAP fetcher stops this long before the resolver's per-mailbox budget, so it hands over
-    /// the messages read so far instead of being cut off with nothing.
-    static let fetchMargin: TimeInterval = 0.4
-
     private static let logger = Logger(subsystem: "io.github.rkceve.skipass", category: "Extension")
+
+    /// One line per AutoFill stage (subsystem = this bundle's id, category "autofill"). Lines are built
+    /// only from non-secret values (masked addresses, counts, folder names, error summaries), so they
+    /// are public: `log stream --predicate 'category == "autofill"'` or Console.app shows them.
+    private static let autofillLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "io.github.rkceve.skipass",
+                                               category: "autofill")
 
     /// Returns nil only when the mailbox store is unavailable (the extension then cancels silently).
     ///
@@ -49,7 +51,7 @@ enum LiveDependencies {
         return OneTimeCodeResolver(
             mailboxes: { try mailboxStore.list() },
             fetcher: IMAPMailFetcher(credentials: OAuthCredentialProvider(),
-                                     timeout: max(0.5, seconds(budget) - fetchMargin)),
+                                     timeout: max(0.5, seconds(budget - OneTimeCodeResolver.fetchMargin))),
             extractor: OTPCodeExtractor(),
             judge: FallbackJudge(primary: server),
             usage: server.map { $0 as any UsageReporting } ?? NoServerUsage(),
@@ -58,8 +60,50 @@ enum LiveDependencies {
             chosenObserver: { message in
                 // Domains of the email that was used become identities for the next visit.
                 if seen.record(EmailDomains.domains(in: message)) { requestIdentitySync() }
-            }
+            },
+            diagnostics: resolverDiagnostics
         )
+    }
+
+    // MARK: - Diagnostics
+
+    /// The diagnostics records in this process's shared defaults (the app reads the same ones when
+    /// both processes resolved the same App Group).
+    static func diagnosticsStore() -> DiagnosticsStore {
+        DiagnosticsStore(defaults: SharedStorageEnvironment.current.defaults)
+    }
+
+    /// Logs every stage, adds this process's groups (and whether they equal the app's) at the start,
+    /// and keeps the finished trace in the shared defaults.
+    static let resolverDiagnostics = ResolverDiagnostics(
+        log: { line in autofillLogger.notice("\(line, privacy: .public)") },
+        prepare: { trace in
+            let (storage, match) = storageComparison()
+            trace.storage = storage
+            trace.groupsMatchApp = match
+        },
+        finish: { trace in diagnosticsStore().append(trace) }
+    )
+
+    /// This process's groups and whether the app recorded the same ones (nil: no app record visible,
+    /// e.g. because this process has no App Group and reads its private defaults).
+    static func storageComparison() -> (StorageSnapshot, Bool?) {
+        let environment = SharedStorageEnvironment.current
+        let storage = StorageSnapshot(bundleID: Bundle.main.bundleIdentifier, appGroup: environment.appGroupID,
+                                      keychainGroup: environment.keychainAccessGroup, recordedAt: Date())
+        let match = diagnosticsStore().appStorage().map { $0.sharesGroups(with: storage) }
+        return (storage, match)
+    }
+
+    /// Records a request that ends before the resolver runs (not a one-time-code request).
+    static func recordImmediateCancel(entryPoint: String, reason: String) {
+        var trace = AutoFillTrace(startedAt: Date(), entryPoint: entryPoint, service: nil)
+        resolverDiagnostics.prepare(&trace)
+        trace.outcome = "cancelled"
+        trace.reason = reason
+        trace.totalMs = 0
+        resolverDiagnostics.log("[\(trace.id.uuidString.prefix(8))] request \(entryPoint) cancelled at once: \(reason)")
+        resolverDiagnostics.finish(trace)
     }
 
     /// Server client, or nil when this build lacks the server configuration. A missing app user ID
@@ -128,11 +172,17 @@ enum LiveDependencies {
         switch input {
         case .keepExisting(let reason):
             logger.error("Identity sync skipped: \(reason, privacy: .public)")
+            autofillLogger.notice("identity registration (extension) skipped: \(reason, privacy: .public)")
+            diagnosticsStore().setRegistration(RegistrationRecord(process: "extension", at: Date(), outcome: "skipped",
+                                                                  detail: reason))
             return nil
         case .register(let addresses):
             let registrar = IdentityRegistrar(domainSource: CompositeDomainSource.standard(bundle: bundle, seen: seenDomains()))
             let result = await registrar.register(mailboxAddresses: addresses)
+            let record = result.record(process: "extension", at: Date())
             logger.notice("Identity sync: \(String(describing: result), privacy: .public)")
+            autofillLogger.notice("identity registration (extension): \(record.summary, privacy: .public)")
+            diagnosticsStore().setRegistration(record)
             return result
         }
     }

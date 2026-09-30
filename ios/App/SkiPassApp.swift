@@ -30,6 +30,7 @@ struct SkiPassApp: App {
             autoFillEnabled: autoFill.isEnabledForUI,
             onTurnOnAutoFill: { await autoFill.requestTurnOn() },
             onOpenAutoFillSettings: { await autoFill.openSettings() },
+            loadDiagnostics: { LiveDiagnostics.load() },
             actions: model
         )
         .task {

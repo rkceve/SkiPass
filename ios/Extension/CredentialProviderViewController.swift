@@ -31,11 +31,12 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func provideCredentialWithoutUserInteraction(for credentialRequest: any ASCredentialRequest) {
         startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
+            LiveDependencies.recordImmediateCancel(entryPoint: "noUI", reason: "not a one-time-code request")
             cancelNow(.credentialIdentityNotFound)
             return
         }
         let service = request.credentialIdentity.serviceIdentifier.identifier
-        resolveAndCompleteOneTimeCode(service: service, failure: .failed)
+        resolveAndCompleteOneTimeCode(service: service, entryPoint: "noUI", failure: .failed)
     }
 
     // MARK: - Paths where the system presents the view controller
@@ -46,17 +47,19 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func prepareOneTimeCodeCredentialList(for serviceIdentifiers: [ASCredentialServiceIdentifier]) {
         startIdentitySync()
         // Lower indices are the more specific identifiers (ASCredentialProviderViewController documentation).
-        resolveAndCompleteOneTimeCode(service: serviceIdentifiers.first?.identifier, failure: .userCanceled)
+        resolveAndCompleteOneTimeCode(service: serviceIdentifiers.first?.identifier, entryPoint: "credentialList",
+                                      failure: .userCanceled)
     }
 
     override func prepareInterfaceToProvideCredential(for credentialRequest: any ASCredentialRequest) {
         startIdentitySync()
         guard let request = credentialRequest as? ASOneTimeCodeCredentialRequest else {
+            LiveDependencies.recordImmediateCancel(entryPoint: "interface", reason: "not a one-time-code request")
             cancelNow(.credentialIdentityNotFound)
             return
         }
         let service = request.credentialIdentity.serviceIdentifier.identifier
-        resolveAndCompleteOneTimeCode(service: service, failure: .userCanceled)
+        resolveAndCompleteOneTimeCode(service: service, entryPoint: "interface", failure: .userCanceled)
     }
 
     /// iOS 18.4+ calls this instead of `prepareInterfaceToProvideCredential` for one-time-code
@@ -65,11 +68,12 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     override func prepareInterfaceForUserChoosingTextToInsert() {
         startIdentitySync()
         guard let resolver else {
+            LiveDependencies.recordImmediateCancel(entryPoint: "textToInsert", reason: "mailbox store unavailable")
             cancelNow(.userCanceled)
             return
         }
         gate.run(
-            resolve: { await resolver.resolve(service: nil) },
+            resolve: { await resolver.resolve(service: nil, entryPoint: "textToInsert") },
             complete: { resolved in
                 self.extensionContext.completeRequest(
                     withTextToInsert: resolved.code,
@@ -86,13 +90,15 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
         gate.finishNow { extensionContext.cancelRequest(withError: ASExtensionError(code)) }
     }
 
-    private func resolveAndCompleteOneTimeCode(service: String?, failure: ASExtensionError.Code) {
+    /// `entryPoint` names the system call for the diagnostics trace.
+    private func resolveAndCompleteOneTimeCode(service: String?, entryPoint: String, failure: ASExtensionError.Code) {
         guard let resolver else {
+            LiveDependencies.recordImmediateCancel(entryPoint: entryPoint, reason: "mailbox store unavailable")
             cancelNow(failure)
             return
         }
         gate.run(
-            resolve: { await resolver.resolve(service: service) },
+            resolve: { await resolver.resolve(service: service, entryPoint: entryPoint) },
             complete: { resolved in
                 self.extensionContext.completeOneTimeCodeRequest(
                     using: ASOneTimeCodeCredential(code: resolved.code),

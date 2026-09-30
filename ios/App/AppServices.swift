@@ -81,8 +81,11 @@ protocol BillingServices: AnyObject {
 @MainActor
 protocol IdentityServices: AnyObject {
     /// Registers identities for the popular / demo / seen domains, labelled with the first mailbox;
-    /// removes them all when there is no mailbox. Background work, errors are only logged.
+    /// removes them all when there is no mailbox. Background work, errors are only logged (and
+    /// recorded for the Diagnostics section).
     func syncIdentities(mailboxAddresses: [String]) async
+    /// A registration was left out (the identities stay as they are); recorded for Diagnostics.
+    func syncSkipped(reason: String)
 }
 
 /// SkiPass server usage endpoint (docs/API.md `GET /v1/usage`).

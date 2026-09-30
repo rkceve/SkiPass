@@ -37,6 +37,8 @@ final class SkiPassUIStore {
     private(set) var isRequestingAutoFill = false
 
     let actions: any SkiPassUIActions
+    /// Reads the host's diagnostics records (the info sheet's Diagnostics card); nil hides the card.
+    let loadDiagnostics: (@MainActor () -> DiagnosticsInfo)?
     private let turnOnAutoFill: @MainActor () async -> Bool
     private let openAutoFillSettingsAction: @MainActor () async -> Void
 
@@ -49,7 +51,8 @@ final class SkiPassUIStore {
         referenceDate: Date = .now,
         autoFillEnabled: Bool = true,
         onTurnOnAutoFill: @escaping @MainActor () async -> Bool = { true },
-        onOpenAutoFillSettings: @escaping @MainActor () async -> Void = {}
+        onOpenAutoFillSettings: @escaping @MainActor () async -> Void = {},
+        loadDiagnostics: (@MainActor () -> DiagnosticsInfo)? = nil
     ) {
         self.accounts = accounts
         self.plans = plans
@@ -60,6 +63,7 @@ final class SkiPassUIStore {
         self.autoFillEnabled = autoFillEnabled
         self.turnOnAutoFill = onTurnOnAutoFill
         self.openAutoFillSettingsAction = onOpenAutoFillSettings
+        self.loadDiagnostics = loadDiagnostics
     }
 
     // MARK: Accounts
