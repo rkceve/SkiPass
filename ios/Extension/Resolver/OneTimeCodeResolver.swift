@@ -135,13 +135,19 @@ public struct OneTimeCodeResolver: Sendable {
         self.diagnostics = diagnostics
     }
 
+    /// Where stage lines go (nowhere without diagnostics).
+    private var logLine: @Sendable (String) -> Void {
+        if let diagnostics { return diagnostics.log }
+        return { (_: String) in }
+    }
+
     /// Finds the code for `service` (nil = no service identifier available).
     /// Returns nil on no match, quota exhaustion, or any error. `entryPoint` names the system call
     /// that started the request, for the trace.
     public func resolve(service: String?, entryPoint: String = "unspecified") async -> ResolvedCode? {
         var initial = AutoFillTrace(startedAt: now(), entryPoint: entryPoint, service: service)
         diagnostics?.prepare(&initial)
-        let recorder = AutoFillTraceRecorder(trace: initial, log: diagnostics?.log ?? { _ in })
+        let recorder = AutoFillTraceRecorder(trace: initial, log: logLine)
         recorder.log("request \(entryPoint) service=\(service ?? "none")")
         if let storage = initial.storage {
             let match = initial.groupsMatchApp.map { $0 ? "same as app" : "DIFFERENT from app" } ?? "app record not visible"
@@ -286,7 +292,7 @@ public struct OneTimeCodeResolver: Sendable {
     private func fetchAll(_ boxes: [MailboxConfig], since: Date, budget: Duration, round: Int,
                           recorder: AutoFillTraceRecorder) async -> [FetchedMessage] {
         let fetcher = self.fetcher
-        let log: @Sendable (String) -> Void = diagnostics?.log ?? { _ in }
+        let log = logLine
         let fetchDeadline = ContinuousClock.now + max(budget - Self.fetchMargin, budget / 2)
         let traced = await withTaskGroup(of: (MailboxTrace, [FetchedMessage]).self) { group in
             for box in boxes {
